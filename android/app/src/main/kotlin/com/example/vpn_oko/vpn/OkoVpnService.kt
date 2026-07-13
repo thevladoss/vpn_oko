@@ -79,13 +79,14 @@ class OkoVpnService : VpnService() {
         rx.set(0)
         running.set(true)
         readThread = Thread {
-            val input = FileInputStream(pfd.fileDescriptor)
             val buffer = ByteArray(32767)
             try {
-                while (running.get()) {
-                    val read = input.read(buffer)
-                    if (read <= 0) break
-                    rx.addAndGet(read.toLong())
+                FileInputStream(pfd.fileDescriptor).use { input ->
+                    while (running.get()) {
+                        val read = input.read(buffer)
+                        if (read <= 0) break
+                        rx.addAndGet(read.toLong())
+                    }
                 }
             } catch (_: IOException) {
             }
