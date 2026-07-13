@@ -96,7 +96,9 @@ class OkoVpnService : VpnService() {
     }
 
     private fun startTrafficTicker() {
-        val ticker = Executors.newSingleThreadScheduledExecutor()
+        val ticker = Executors.newSingleThreadScheduledExecutor { runnable ->
+            Thread(runnable, "oko-vpn-traffic-ticker").also { it.isDaemon = true }
+        }
         ticker.scheduleAtFixedRate(
             { VpnEventBus.emit(TrafficChangedMessage(rx.get(), 0L)) },
             1L,
@@ -163,8 +165,7 @@ class OkoVpnService : VpnService() {
     }
 
     override fun onDestroy() {
-        tunnel?.close()
-        tunnel = null
+        teardown("service destroyed")
         super.onDestroy()
     }
 
