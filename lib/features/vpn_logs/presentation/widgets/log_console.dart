@@ -33,8 +33,10 @@ class LogConsole extends StatelessWidget {
               _Header(onCopy: () => _copyAll(context)),
               Expanded(
                 child: NotificationListener<ScrollNotification>(
-                  onNotification: (_) {
-                    _syncAutoScroll(context, scrollController);
+                  onNotification: (notification) {
+                    if (notification is UserScrollNotification) {
+                      _syncAutoScroll(context, scrollController);
+                    }
                     return false;
                   },
                   child: BlocConsumer<LogsCubit, LogsState>(

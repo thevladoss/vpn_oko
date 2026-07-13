@@ -82,6 +82,42 @@ void main() {
       expect(find.byType(LogLine), findsNothing);
     });
 
+    testWidgets(
+        'H-01: bursts of entries keep auto-scroll on (programmatic '
+        'scroll does not pause)', (tester) async {
+      enlarge(tester);
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      for (var i = 0; i < 120; i++) {
+        controller.add(_entry('line $i'));
+      }
+      await tester.pumpAndSettle();
+      expect(cubit.state.autoScroll, isTrue);
+
+      for (var i = 120; i < 240; i++) {
+        controller.add(_entry('line $i'));
+      }
+      await tester.pumpAndSettle();
+      expect(cubit.state.autoScroll, isTrue);
+    });
+
+    testWidgets('H-01: a user drag away from the bottom pauses auto-scroll',
+        (tester) async {
+      enlarge(tester);
+      for (var i = 0; i < 120; i++) {
+        controller.add(_entry('line $i'));
+      }
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+      expect(cubit.state.autoScroll, isTrue);
+
+      await tester.drag(find.byType(ListView), const Offset(0, 400));
+      await tester.pumpAndSettle();
+
+      expect(cubit.state.autoScroll, isFalse);
+    });
+
     testWidgets('copy-all writes plainText to the clipboard', (tester) async {
       enlarge(tester);
       final clipboard = <MethodCall>[];
