@@ -30,7 +30,15 @@
   3. Hot restart не теряет состояние: последний статус реплеится новому подписчику, событие, отправленное до подписки Dart, доходит до слушателя
   4. Domain-слой компилируется без импорта `*.g.dart`; сгенерированный код виден только в core/bridge и features/*/data, DTO носят суффикс Message
   5. Ошибка из native доводится до доменного состояния Error через sealed/immutable-модели VpnConfig, VpnState, VpnEvent
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+- [ ] 01-01-PLAN.md — Контракт pigeon, кодоген трёх языков, зависимости стека (BRG-01, BRG-02)
+- [ ] 01-02-PLAN.md — Доменное ядро: sealed/immutable модели, интерфейсы, usecases (CORE-01)
+- [ ] 01-03-PLAN.md — VpnBridge демультиплексор, мапперы DTO→entity, датасорсы (BRG-02, BRG-03)
+- [ ] 01-04-PLAN.md — Репозитории с replay, composition root, debug-harness (BRG-03, BRG-04)
+- [ ] 01-05-PLAN.md — Android echo-мост: регистрация, main-thread эмиттер, replay (BRG-01, BRG-02, BRG-04)
+- [ ] 01-06-PLAN.md — iOS echo-мост: регистрация Runner, main-queue эмиттер, replay (BRG-01, BRG-02, BRG-04)
+- [ ] 01-07-PLAN.md — Живая end-to-end проверка echo-моста, phase gate (BRG-02, BRG-04)
 
 ### Phase 2: Android VpnService
 **Goal**: Реальный VPN-туннель на Android поднимается через consent-флоу, живёт в foreground-сервисе и шлёт живые события во Flutter
@@ -103,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Фундамент и Pigeon-мост | 0/TBD | Not started | - |
+| 1. Фундамент и Pigeon-мост | 0/7 | Not started | - |
 | 2. Android VpnService | 0/TBD | Not started | - |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
