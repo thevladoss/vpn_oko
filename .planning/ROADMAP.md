@@ -51,7 +51,14 @@ Plans:
   3. Уведомление foreground-сервиса видно с момента Connecting; на Android 13+ запрошен POST_NOTIFICATIONS; на эмуляторе API 34/35 сервис не крашится (foregroundServiceType=systemExempted)
   4. Счётчики trafficChanged растут от реальных байтов из TUN read-loop с периодом раз в секунду
   5. Disconnect и системный отзыв VPN (onRevoke) доводят статус Disconnected до Flutter через единый teardown; каждый переход состояния виден событием logMessage
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 02-01-PLAN.md — Потокобезопасная шина событий + машина состояний + JUnit-автогейт (AND-06)
+- [ ] 02-02-PLAN.md — Манифест, permissions, FGS-уведомление (AND-03)
+- [ ] 02-03-PLAN.md — OkoVpnService: туннель, read-loop, teardown, onRevoke (AND-02, AND-04, AND-05, AND-06)
+- [ ] 02-04-PLAN.md — Consent-флоу FlutterFragmentActivity + делегирование HostApi (AND-01, AND-03, AND-06)
+- [ ] 02-05-PLAN.md — Счётчики трафика в debug-harness (AND-05)
+- [ ] 02-06-PLAN.md — Phase-gate: живой device-чеклист на эмуляторе API 34+ (AND-01..06)
 
 ### Phase 3: Flutter UI
 **Goal**: Пользователь управляет VPN с одного экрана: ирис-индикатор пяти состояний, живые логи, таймер, трафик, восстановление после перезапуска
@@ -112,7 +119,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
-| 2. Android VpnService | 0/TBD | Not started | - |
+| 2. Android VpnService | 0/6 | Not started | - |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
