@@ -11,7 +11,7 @@
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Фундамент и Pigeon-мост** - Типобезопасный контракт моста, доменное ядро, echo-реализации на обеих платформах (completed 2026-07-13)
-- [ ] **Phase 2: Android VpnService** - Реальный туннель, foreground-сервис, живые события статусов/логов/трафика
+- [x] **Phase 2: Android VpnService** - Реальный туннель, foreground-сервис, живые события статусов/логов/трафика (completed 2026-07-13)
 - [ ] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния
 - [ ] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера
 - [ ] **Phase 5: iOS-мост и Network Extension** - Swift-реализация моста, PacketTunnelProvider, entitlements, TestFlight-готовность
@@ -58,7 +58,7 @@ Plans:
 - [x] 02-03-PLAN.md — OkoVpnService: туннель, read-loop, teardown, onRevoke (AND-02, AND-04, AND-05, AND-06)
 - [x] 02-04-PLAN.md — Consent-флоу FlutterFragmentActivity + делегирование HostApi (AND-01, AND-03, AND-06)
 - [x] 02-05-PLAN.md — Счётчики трафика в debug-harness (AND-05)
-- [ ] 02-06-PLAN.md — Phase-gate: живой device-чеклист на эмуляторе API 34+ (AND-01..06)
+- [x] 02-06-PLAN.md — Phase-gate: живой device-чеклист на эмуляторе API 34+ (AND-01..06)
 
 ### Phase 3: Flutter UI
 **Goal**: Пользователь управляет VPN с одного экрана: ирис-индикатор пяти состояний, живые логи, таймер, трафик, восстановление после перезапуска
@@ -119,7 +119,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
-| 2. Android VpnService | 5/6 | In Progress|  |
+| 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
