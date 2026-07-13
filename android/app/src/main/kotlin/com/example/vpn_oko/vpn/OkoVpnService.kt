@@ -32,6 +32,7 @@ class OkoVpnService : VpnService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_DISCONNECT) {
             teardown("stopped by user")
+            stopSelf()
             return START_NOT_STICKY
         }
         if (intent == null) {
