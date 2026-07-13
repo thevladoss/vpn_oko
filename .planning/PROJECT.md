@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Прототип VPN-приложения на Flutter с нативной интеграцией Android/iOS. Выполняется по тестовому заданию «Flutter-разработчик: Native VPN Prototype» (срок 48 часов, сдача: GitHub + README + видео-демо). Приложение поднимает реальный Android VpnService через типобезопасный мост Flutter↔native, показывает живые статусы, логи и трафик из нативного слоя, для iOS даёт skeleton Network Extension с полной документацией.
+Прототип VPN-приложения на Flutter с нативной интеграцией Android/iOS. Выполняется по тестовому заданию «Flutter-разработчик: Native VPN Prototype» (срок 48 часов, сдача: GitHub + README + видео-демо). Приложение поднимает реальный Android VpnService через типобезопасный мост Flutter↔native, показывает живые статусы, логи и трафик из нативного слоя; на iOS мост работает полноценно, Network Extension таргет с PacketTunnelProvider проверяется через TestFlight.
 
 ## Core Value
 
@@ -54,6 +54,8 @@
 - **Timeline**: 48 часов на выполнение — скоуп строго по ТЗ с точечными улучшениями (UI, тесты парсера)
 - **Tech stack**: Flutter (Dart), Kotlin для Android, Swift для iOS — требование ТЗ
 - **Архитектура**: feature-first clean architecture, SOLID, ООП — требование пользователя
+- **State management**: Bloc (flutter_bloc) — прямое указание пользователя
+- **iOS-проверка**: устройство через TestFlight (аккаунт Apple Developer есть); симулятор Network Extension не исполняет
 - **Мост**: Pigeon (типобезопасный кодоген) вместо сырых MethodChannel — современный подход, разрешён ТЗ
 - **Стиль кода**: без комментариев в коде — требование пользователя
 - **Язык документации**: русский (ТЗ и коммуникация на русском); идентификаторы и код — английский

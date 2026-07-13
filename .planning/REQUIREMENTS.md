@@ -93,13 +93,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (заполняется roadmapper) | | |
+| BRG-01 | Phase 1 | Pending |
+| BRG-02 | Phase 1 | Pending |
+| BRG-03 | Phase 1 | Pending |
+| BRG-04 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Pending |
+| AND-01 | Phase 2 | Pending |
+| AND-02 | Phase 2 | Pending |
+| AND-03 | Phase 2 | Pending |
+| AND-04 | Phase 2 | Pending |
+| AND-05 | Phase 2 | Pending |
+| AND-06 | Phase 2 | Pending |
+| UI-01 | Phase 3 | Pending |
+| UI-02 | Phase 3 | Pending |
+| UI-03 | Phase 3 | Pending |
+| UI-04 | Phase 3 | Pending |
+| UI-05 | Phase 3 | Pending |
+| UI-06 | Phase 3 | Pending |
+| UI-07 | Phase 3 | Pending |
+| UI-08 | Phase 3 | Pending |
+| QA-02 | Phase 3 | Pending |
+| VLS-01 | Phase 4 | Pending |
+| VLS-02 | Phase 4 | Pending |
+| VLS-03 | Phase 4 | Pending |
+| QA-01 | Phase 4 | Pending |
+| IOS-01 | Phase 5 | Pending |
+| IOS-02 | Phase 5 | Pending |
+| IOS-03 | Phase 5 | Pending |
+| IOS-04 | Phase 5 | Pending |
+| DOC-01 | Phase 6 | Pending |
+| DOC-02 | Phase 6 | Pending |
+| DOC-03 | Phase 6 | Pending |
+| DOC-04 | Phase 6 | Pending |
+| DOC-05 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32 ⚠️
+- v1 requirements: 33 total (при первичном подсчёте указано 32; пересчёт по списку даёт 33)
+- Mapped to phases: 33
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-13*
-*Last updated: 2026-07-13 after initial definition*
+*Last updated: 2026-07-13 — traceability заполнена roadmapper (6 фаз)*
