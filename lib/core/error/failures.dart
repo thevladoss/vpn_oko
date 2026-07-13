@@ -7,15 +7,6 @@ sealed class Failure extends Equatable implements Exception {
   List<Object?> get props => const [];
 }
 
-class PlatformFailure extends Failure {
-  const PlatformFailure(this.message);
-
-  final String message;
-
-  @override
-  List<Object?> get props => [message];
-}
-
 class VpnStartFailure extends Failure {
   const VpnStartFailure(this.code, this.message);
 
