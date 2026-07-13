@@ -1,12 +1,15 @@
 package com.example.vpn_oko.bridge
 
 object VpnEventBus {
-    private val listeners = mutableSetOf<(VpnEventMessage) -> Unit>()
+    private val listeners =
+        java.util.concurrent.CopyOnWriteArraySet<(VpnEventMessage) -> Unit>()
 
+    @Volatile
     var lastStatus: StatusChangedMessage =
         StatusChangedMessage(status = VpnStatusMessage.DISCONNECTED)
         private set
 
+    @Volatile
     var snapshot: VpnStatusSnapshotMessage =
         VpnStatusSnapshotMessage(
             status = VpnStatusMessage.DISCONNECTED,
