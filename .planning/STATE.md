@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-07-13T22:05:31.753Z"
+last_updated: "2026-07-13T22:18:06.760Z"
 last_activity: 2026-07-13 -- Phase 03 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 14
+  completed_plans: 15
   percent: 33
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 03 (flutter-ui) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Executing Phase 03
 Last activity: 2026-07-13 -- Phase 03 execution started
 
-Progress: [██████░░░░] 64%
+Progress: [███████░░░] 68%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [██████░░░░] 64%
 | Phase 02 P04 | 2min | 2 tasks | 3 files |
 | Phase 02 P05 | 2min | 1 tasks | 2 files |
 | Phase 03 P01 | 12min | 2 tasks | 13 files |
+| Phase 03 P02 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-05: harness читает трафик через AppDependencies.watchTraffic() (проброс vpnRepository); StreamBuilder<TrafficStats> readout rx/tx под статусом — AND-05 наблюдаем без Phase 3 UI
 - [Phase 03]: 03-01: статичные .ttf инстансированы из variable-шрифтов google/fonts через fonttools varLib.instancer (fonts.google.com/download отдаёт HTML, репозиторий содержит только variable-фонты)
 - [Phase 03]: 03-01: google_fonts матчит офлайн-бандл по имени файла {Family}-{Weight}.ttf; вес задаётся OS/2.usWeightClass, внутренний name-table игнорируется (Pitfall 5)
+- [Phase 03]: 03-02: VpnStatus в core/theme (не feature) — accentFor это метод темы; Bloc и виджеты импортируют enum из core (feature→core законно)
+- [Phase 03]: 03-02: ColorScheme обеих тем выведен из токенов OkoTones (single source, не fromSeed); литералы только void #0B0F14 / светлый фон #F4F6F9 / белый — scaffold вне токенов
+- [Phase 03]: 03-02: типографика google_fonts поверх Typography.material2021() — цвета текста от режима темы; табличные цифры на displayLarge+titleMedium (таймер и числа трафика)
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T22:05:31.748Z
+Last session: 2026-07-13T22:17:24.781Z
 Stopped at: Completed 03-01-PLAN.md
 Resume file: None
