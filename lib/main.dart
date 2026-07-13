@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:vpn_oko/app/app.dart';
 import 'package:vpn_oko/app/di.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
 import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
@@ -33,12 +34,14 @@ class DebugHarness extends StatefulWidget {
 class _DebugHarnessState extends State<DebugHarness> {
   final List<LogEntry> _logs = <LogEntry>[];
   late final Stream<VpnState> _stateStream;
+  late final Stream<TrafficStats> _trafficStream;
   StreamSubscription<LogEntry>? _logSubscription;
 
   @override
   void initState() {
     super.initState();
     _stateStream = widget.dependencies.watchVpnState();
+    _trafficStream = widget.dependencies.watchTraffic();
     _logSubscription = widget.dependencies.watchLogs().listen(_onLog);
   }
 
@@ -68,6 +71,12 @@ class _DebugHarnessState extends State<DebugHarness> {
               stream: _stateStream,
               builder: (context, snapshot) =>
                   Text('Status: ${_describeState(snapshot.data)}'),
+            ),
+            const SizedBox(height: 8),
+            StreamBuilder<TrafficStats>(
+              stream: _trafficStream,
+              builder: (context, snapshot) =>
+                  Text(_describeTraffic(snapshot.data)),
             ),
             const SizedBox(height: 12),
             Row(
@@ -110,6 +119,9 @@ class _DebugHarnessState extends State<DebugHarness> {
     );
   }
 }
+
+String _describeTraffic(TrafficStats? stats) =>
+    'rx: ${stats?.rxBytes ?? 0} B  tx: ${stats?.txBytes ?? 0} B';
 
 String _describeState(VpnState? state) => switch (state) {
       null => '—',

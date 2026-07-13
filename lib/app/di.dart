@@ -2,6 +2,7 @@ import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
 import 'package:vpn_oko/core/bridge/vpn_bridge.dart';
 import 'package:vpn_oko/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
 import 'package:vpn_oko/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/repositories/vpn_repository.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/connect_vpn.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
@@ -35,6 +36,8 @@ class AppDependencies {
   late final DisconnectVpn disconnectVpn;
   late final SyncStatus syncStatus;
   late final WatchLogs watchLogs;
+
+  Stream<TrafficStats> watchTraffic() => vpnRepository.watchTraffic();
 
   Future<void> dispose() async {
     await vpnRepository.dispose();
