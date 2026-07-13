@@ -12,7 +12,7 @@
 
 - [x] **Phase 1: Фундамент и Pigeon-мост** - Типобезопасный контракт моста, доменное ядро, echo-реализации на обеих платформах (completed 2026-07-13)
 - [x] **Phase 2: Android VpnService** - Реальный туннель, foreground-сервис, живые события статусов/логов/трафика (completed 2026-07-13)
-- [ ] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния
+- [x] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния (completed 2026-07-13)
 - [ ] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера
 - [ ] **Phase 5: iOS-мост и Network Extension** - Swift-реализация моста, PacketTunnelProvider, entitlements, TestFlight-готовность
 - [ ] **Phase 6: Подача** - README с диаграммой и планом интеграции core, CI, видео-демо
@@ -81,7 +81,7 @@ Plans:
 - [x] 03-06-PLAN.md — Хром и управление: wordmark, бейдж, карточка, трафик, кнопка (UI-01, UI-02, UI-04, UI-05, UI-06)
 - [x] 03-07-PLAN.md — Панель логов: LogConsole + LogLine, автоскролл, copy-all (UI-03, UI-08)
 - [x] 03-08-PLAN.md — Экран VpnHomeScreen + OkoApp + DI + точка входа (UI-06, UI-07)
-- [ ] 03-09-PLAN.md — Device-визуал phase-gate: пять статусов, обе темы, восстановление (UI-01..08)
+- [x] 03-09-PLAN.md — Device-визуал phase-gate: пять статусов, обе темы, восстановление (UI-01..08)
 
 ### Phase 4: VLESS-конфиг сервера
 **Goal**: Пользователь вставляет vless://-ссылку и видит распарсенный конфиг сервера с измеренной задержкой
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
-| 3. Flutter UI | 8/9 | In Progress|  |
+| 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
