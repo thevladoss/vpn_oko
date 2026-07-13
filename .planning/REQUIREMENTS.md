@@ -14,7 +14,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UI-03**: Блок логов показывает события из native в реальном времени (буфер ограничен, автоскролл с отключением при ручной прокрутке)
 - [ ] **UI-04**: Экран показывает выбранный сервер и таймер времени подключения (тикает от connectedAt, переживает пересоздание виджета)
 - [ ] **UI-05**: Экран показывает статистику трафика rx/tx из событий trafficChanged
-- [ ] **UI-06**: UI реализует дизайн-концепцию DESIGN.md: ирис-индикатор состояния, тёмная и светлая темы, staggered-вход, haptics
+- [x] **UI-06**: UI реализует дизайн-концепцию DESIGN.md: ирис-индикатор состояния, тёмная и светлая темы, staggered-вход, haptics
 - [ ] **UI-07**: UI восстанавливает актуальное состояние через getStatus() при старте приложения (VPN живёт в сервисе)
 - [ ] **UI-08**: Логи имеют уровни (info/warning/error) с цветовой маркировкой и кнопку копирования в буфер
 
@@ -54,7 +54,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Тесты
 
 - [ ] **QA-01**: Unit-тесты VLESS-парсера: валидные ссылки, кривые ссылки, edge cases
-- [ ] **QA-02**: Unit-тесты Bloc-машины состояний: переходы, реакция на error и onRevoke-сценарий
+- [x] **QA-02**: Unit-тесты Bloc-машины состояний: переходы, реакция на error и onRevoke-сценарий
 
 ### Подача
 
@@ -109,10 +109,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-03 | Phase 3 | Pending |
 | UI-04 | Phase 3 | Pending |
 | UI-05 | Phase 3 | Pending |
-| UI-06 | Phase 3 | Pending |
+| UI-06 | Phase 3 | Complete |
 | UI-07 | Phase 3 | Pending |
 | UI-08 | Phase 3 | Pending |
-| QA-02 | Phase 3 | Pending |
+| QA-02 | Phase 3 | Complete |
 | VLS-01 | Phase 4 | Pending |
 | VLS-02 | Phase 4 | Pending |
 | VLS-03 | Phase 4 | Pending |

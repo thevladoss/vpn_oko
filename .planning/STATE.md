@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-07-13T20:31:46.079Z"
-last_activity: 2026-07-13 -- Phase 02 execution started
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-07-13T22:05:31.753Z"
+last_activity: 2026-07-13 -- Phase 03 execution started
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 13
-  completed_plans: 12
-  percent: 17
+  completed_phases: 2
+  total_plans: 22
+  completed_plans: 14
+  percent: 33
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Реально работающий Android VpnService с живым потоком статусов и логов из native во Flutter через чистый типобезопасный мост.
-**Current focus:** Phase 02 — android-vpnservice
+**Current focus:** Phase 03 — flutter-ui
 
 ## Current Position
 
-Phase: 02 (android-vpnservice) — EXECUTING
-Plan: 6 of 6
-Status: Executing Phase 02
-Last activity: 2026-07-13 -- Phase 02 execution started
+Phase: 03 (flutter-ui) — EXECUTING
+Plan: 2 of 9
+Status: Executing Phase 03
+Last activity: 2026-07-13 -- Phase 03 execution started
 
-Progress: [█████████░] 92%
+Progress: [██████░░░░] 64%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [█████████░] 92%
 | Phase Phase 02 PP03 | 6min | 2 tasks | 1 files |
 | Phase 02 P04 | 2min | 2 tasks | 3 files |
 | Phase 02 P05 | 2min | 1 tasks | 2 files |
+| Phase 03 P01 | 12min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 02-03: establish()==null и невалидный host/port → терминальный Error (не Disconnected) с ErrorMessage + stopForeground + stopSelf (T-2-04); userId не читается и не логируется (T-2-05)
 - [Phase ?]: 02-03: единый @Synchronized teardown из ACTION_DISCONNECT/onRevoke/onDestroy — close(fd) ДО join потока (разблокирует блокирующий read, Pitfall 7), идемпотентен по Disconnected
 - [Phase 02]: 02-05: harness читает трафик через AppDependencies.watchTraffic() (проброс vpnRepository); StreamBuilder<TrafficStats> readout rx/tx под статусом — AND-05 наблюдаем без Phase 3 UI
+- [Phase 03]: 03-01: статичные .ttf инстансированы из variable-шрифтов google/fonts через fonttools varLib.instancer (fonts.google.com/download отдаёт HTML, репозиторий содержит только variable-фонты)
+- [Phase 03]: 03-01: google_fonts матчит офлайн-бандл по имени файла {Family}-{Weight}.ttf; вес задаётся OS/2.usWeightClass, внутренний name-table игнорируется (Pitfall 5)
 
 ### Pending Todos
 
@@ -122,6 +125,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T20:29:37.809Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-07-13T22:05:31.748Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
