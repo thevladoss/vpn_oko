@@ -66,6 +66,21 @@ void main() {
       );
     });
 
+    test('does not drop an event emitted right after listen (race window)',
+        () async {
+      final received = <VpnState>[];
+      final subscription = repository.watchState().listen(received.add);
+
+      fake.emitState(const VpnConnecting());
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      expect(received, <VpnState>[
+        const VpnDisconnected(),
+        const VpnConnecting(),
+      ]);
+    });
+
     test('subscriber before emits receives events in order', () async {
       final received = <VpnState>[];
       final subscription = repository.watchState().listen(received.add);

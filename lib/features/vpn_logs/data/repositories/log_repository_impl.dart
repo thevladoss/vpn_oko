@@ -26,11 +26,21 @@ class LogRepositoryImpl implements LogRepository {
   }
 
   @override
-  Stream<LogEntry> watchLogs() async* {
-    for (final entry in List<LogEntry>.of(_buffer)) {
-      yield entry;
-    }
-    yield* _controller.stream;
+  Stream<LogEntry> watchLogs() {
+    late final StreamController<LogEntry> output;
+    StreamSubscription<LogEntry>? forwarding;
+    output = StreamController<LogEntry>(
+      onListen: () {
+        forwarding = _controller.stream.listen(
+          output.add,
+          onError: output.addError,
+          onDone: output.close,
+        );
+        List<LogEntry>.of(_buffer).forEach(output.add);
+      },
+      onCancel: () => forwarding?.cancel(),
+    );
+    return output.stream;
   }
 
   Future<void> dispose() async {

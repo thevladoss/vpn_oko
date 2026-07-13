@@ -27,9 +27,21 @@ class VpnRepositoryImpl implements VpnRepository {
   }
 
   @override
-  Stream<VpnState> watchState() async* {
-    yield _last;
-    yield* _controller.stream;
+  Stream<VpnState> watchState() {
+    late final StreamController<VpnState> output;
+    StreamSubscription<VpnState>? forwarding;
+    output = StreamController<VpnState>(
+      onListen: () {
+        forwarding = _controller.stream.listen(
+          output.add,
+          onError: output.addError,
+          onDone: output.close,
+        );
+        output.add(_last);
+      },
+      onCancel: () => forwarding?.cancel(),
+    );
+    return output.stream;
   }
 
   @override
