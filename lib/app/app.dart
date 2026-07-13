@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vpn_oko/app/di.dart';
+import 'package:vpn_oko/core/theme/oko_theme.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
+import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 
 class OkoApp extends StatelessWidget {
-  const OkoApp({required this.home, super.key});
+  const OkoApp({
+    required this.dependencies,
+    this.themeMode = ThemeMode.system,
+    super.key,
+  });
 
-  final Widget home;
+  final AppDependencies dependencies;
+  final ThemeMode themeMode;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Oko VPN',
-      home: home,
+      theme: OkoTheme.light,
+      darkTheme: OkoTheme.dark,
+      themeMode: themeMode,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => VpnConnectionBloc(
+              watchVpnState: dependencies.watchVpnState,
+              watchTraffic: dependencies.watchTraffic,
+              connectVpn: dependencies.connectVpn,
+              disconnectVpn: dependencies.disconnectVpn,
+              syncStatus: dependencies.syncStatus,
+              config: dependencies.demoConfig,
+            )..add(const VpnStarted()),
+          ),
+          BlocProvider(
+            create: (_) => LogsCubit(watchLogs: dependencies.watchLogs),
+          ),
+        ],
+        child: const VpnHomeScreen(),
+      ),
     );
   }
 }
