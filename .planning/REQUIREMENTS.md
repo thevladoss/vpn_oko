@@ -32,7 +32,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AND-03**: Foreground Service запускается с уведомлением, foregroundServiceType=systemExempted, POST_NOTIFICATIONS запрашивается на Android 13+
 - [ ] **AND-04**: VPN корректно останавливается (закрытие TUN fd, остановка foreground); onRevoke обрабатывается и доводит статус Disconnected до Flutter
 - [ ] **AND-05**: Read-loop TUN-дескриптора считает реальные байты и шлёт trafficChanged раз в секунду
-- [ ] **AND-06**: Все переходы состояний и ключевые действия сервиса логируются событиями logMessage во Flutter
+- [x] **AND-06**: Все переходы состояний и ключевые действия сервиса логируются событиями logMessage во Flutter
 
 ### iOS
 
@@ -103,7 +103,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AND-03 | Phase 2 | Pending |
 | AND-04 | Phase 2 | Pending |
 | AND-05 | Phase 2 | Pending |
-| AND-06 | Phase 2 | Pending |
+| AND-06 | Phase 2 | Complete |
 | UI-01 | Phase 3 | Pending |
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Pending |

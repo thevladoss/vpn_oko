@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
+status: executing
 stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-07-13T17:54:08.529Z"
-last_activity: 2026-07-13 -- Phase 01 marked complete
+last_updated: "2026-07-13T20:01:33.268Z"
+last_activity: 2026-07-13 -- Phase 02 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 13
+  completed_plans: 8
   percent: 17
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Реально работающий Android VpnService с живым потоком статусов и логов из native во Flutter через чистый типобезопасный мост.
-**Current focus:** Phase 01 — pigeon
+**Current focus:** Phase 02 — android-vpnservice
 
 ## Current Position
 
-Phase: 01 — COMPLETE
-Plan: 7 of 7
-Status: Phase 01 complete
-Last activity: 2026-07-13 -- Phase 01 marked complete
+Phase: 02 (android-vpnservice) — EXECUTING
+Plan: 2 of 6
+Status: Executing Phase 02
+Last activity: 2026-07-13 -- Phase 02 execution started
 
-Progress: [█████████░] 86%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [█████████░] 86%
 | Phase 01 P06 | 2min | 2 tasks | 4 files |
 | Phase 01 P03 | 5min | 2 tasks | 9 files |
 | Phase 01 P04 | 12min | 2 tasks | 10 files |
+| Phase 02 P01 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 01-04: repository двойной replay — native onListen + Dart-кэш _last; watchState() отдаёт _last первым (BRG-04)
 - [Phase ?]: 01-04: Failure implements Exception — connect() бросает типизированный VpnStartFailure без inline-ignore only_throw_errors
 - [Phase ?]: 01-04: composition root AppDependencies — единственный вызов vpnEvents(); harness ходит через usecase, g.dart изолирован в di.dart (Pitfall 5)
+- [Phase ?]: 02-01: canTransition — public top-level рантайм-гейт переходов (не private/тестовый), OkoVpnService.transition() из плана 03 обязан звать её
+- [Phase ?]: 02-01: VpnEventBus укреплён потокобезопасностью — CopyOnWriteArraySet + @Volatile lastStatus/snapshot (emit из read-loop/ticker/onRevoke без ConcurrentModificationException, Pitfall 5)
+- [Phase ?]: 02-01: minSdk 24→26 (build.gradle.kts) — безветочные NotificationChannel/startForegroundService для FGS; junit:junit:4.13.2 в testImplementation, автогейт :app:testDebugUnitTest
 
 ### Pending Todos
 
@@ -108,6 +112,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T17:00:26.287Z
+Last session: 2026-07-13T20:00:20.976Z
 Stopped at: Completed 01-04-PLAN.md
 Resume file: None
