@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
-last_updated: "2026-07-13T16:26:24.691Z"
+last_updated: "2026-07-13T16:34:30.591Z"
 last_activity: 2026-07-13 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 01 (pigeon) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Executing Phase 01
 Last activity: 2026-07-13 -- Phase 01 execution started
 
-Progress: [████░░░░░░] 43%
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [████░░░░░░] 43%
 | Phase 01 P01 | 5min | 2 tasks | 7 files |
 | Phase 01 P02 | 5min | 2 tasks | 14 files |
 | Phase 01 P05 | 43min | 2 tasks | 4 files |
+| Phase 01 P06 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 01-02: one_member_abstracts отключён в analysis_options под single-method repository-абстракции Clean Architecture (LogRepository)
 - [Phase ?]: 01-05: echo LogMessage.level="info" (нижний регистр) — контракт с LogLevel.values.byName маппера 01-03
 - [Phase ?]: 01-05: Android echo — доставка sink с main thread через Handler(Looper.getMainLooper()); VpnEventBus (object) кэширует last-status и реплеит новому подписчику
+- [Phase 01]: 01-06: iOS echo-мост зарегистрирован в didInitializeImplicitFlutterEngine через applicationRegistrar.messenger() (шаблон Flutter 3.44, не rootViewController); события с DispatchQueue.main, replay lastStatus в onListen, снапшот в getStatus
+- [Phase 01]: 01-06: три Bridge/*.swift добавлены в Sources таргета Runner правкой project.pbxproj вручную (objectVersion 54, без синхронизированных групп); flutter build ios --no-codesign собирается
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T16:25:05.630Z
+Last session: 2026-07-13T16:33:22.819Z
 Stopped at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
 Resume file: None
