@@ -100,11 +100,15 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     return switch (domain) {
       VpnDisconnected() => state.copyWith(
           status: VpnStatus.disconnected,
+          rxBytes: 0,
+          txBytes: 0,
           clearConnectedSince: true,
           clearError: true,
         ),
       VpnConnecting() => state.copyWith(
           status: VpnStatus.connecting,
+          rxBytes: 0,
+          txBytes: 0,
           clearConnectedSince: true,
           clearError: true,
         ),

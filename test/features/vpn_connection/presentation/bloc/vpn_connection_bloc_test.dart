@@ -197,6 +197,34 @@ void main() {
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'M-01: переход в connecting и disconnected обнуляет rx/tx прошлой сессии',
+    setUp: () => stubStarted(
+      states: Stream<VpnState>.fromIterable([
+        const VpnConnecting(),
+        const VpnDisconnected(),
+      ]),
+    ),
+    seed: () => VpnConnectionState(
+      status: VpnStatus.connected,
+      connectedSince: connectedSince,
+      rxBytes: 999,
+      txBytes: 888,
+    ),
+    build: buildBloc,
+    act: (bloc) => bloc.add(const VpnStarted()),
+    expect: () => [
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.connecting)
+          .having((s) => s.rxBytes, 'rxBytes', 0)
+          .having((s) => s.txBytes, 'txBytes', 0),
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.rxBytes, 'rxBytes', 0)
+          .having((s) => s.txBytes, 'txBytes', 0),
+    ],
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
     'ConnectRequested вне переходного статуса зовёт connectVpn с config',
     setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
     build: buildBloc,
