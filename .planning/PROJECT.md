@@ -27,7 +27,7 @@
 - [ ] Android Foreground Service с уведомлением и корректным lifecycle
 - [ ] Корректная остановка VPN и обработка onRevoke
 - [ ] iOS: Swift-реализация Pigeon-моста в основном приложении — startVpn/stopVpn/getStatus и поток событий (statusChanged, logMessage, trafficChanged, error) реально работают, приложение запускается на iOS и показывает статусы/логи из Swift-слоя
-- [ ] iOS: skeleton PacketTunnelProvider (Network Extension) со start/stop туннеля через NETunnelProviderManager
+- [ ] iOS: реальный Network Extension таргет с PacketTunnelProvider — start/stop туннеля через NETunnelProviderManager, статусы из extension в приложение; проверка на устройстве через TestFlight (аккаунт Apple Developer есть)
 - [ ] iOS: README-раздел про capabilities, entitlements, App Groups, взаимодействие app ↔ extension
 - [ ] Парсинг VLESS-ссылки (vless://) в модель VlessConfig с тестами
 - [ ] Модели VpnConfig и VpnState, обработка ошибок на всех слоях
@@ -37,7 +37,7 @@
 ### Out of Scope
 
 - Полная интеграция VLESS/Xray/sing-box core — ТЗ явно говорит «не обязательно»; вместо этого README описывает точки подключения core (Android .aar, iOS framework, FFI/JNI/gomobile)
-- Реальный iOS-туннель в продакшн-режиме — entitlement Network Extension выдаётся self-serve, но требует платного аккаунта Apple Developer и физического устройства (симулятор Network Extension не исполняет); делаем компилируемый skeleton + документацию, при этом Pigeon-мост на iOS работает полноценно
+- Проксирование реального трафика через iOS-туннель — туннель поднимается и останавливается (NEPacketTunnelProvider через TestFlight), но без VPN-core пакеты не обрабатываются; симулятор Network Extension не исполняет — разработка через устройство/TestFlight
 - Продуктовые функции (аккаунты, подписки, список стран, kill switch, split tunneling) — это прототип для демонстрации архитектуры и native bridge
 - Реальное шифрование/проксирование трафика — туннель поднимается и маршрутизирует, но без VPN-core трафик не проксируется
 
@@ -64,8 +64,9 @@
 |----------|-----------|---------|
 | Pigeon вместо сырых MethodChannel/EventChannel | Типобезопасность, кодоген для трёх платформ, современный стандарт; ТЗ допускает «MethodChannel + EventChannel или Pigeon» | — Pending |
 | События native→Flutter через Pigeon @EventChannelApi (либо FlutterApi callback) | Единый контракт моста в одном .dart-файле, без ручной сериализации | — Pending |
-| iOS: компилируемый skeleton PacketTunnelProvider + доки вместо рабочего туннеля | Нужны платный аккаунт Apple Developer и физическое устройство (симулятор NE не исполняет); ТЗ явно допускает такой вариант | — Pending |
-| iOS-мост Pigeon реализуется полноценно (Swift HostApi + события), skeleton касается только туннеля | Требование пользователя: корректный мост на обеих платформах; демо на iOS показывает статусы/логи из Swift | — Pending |
+| iOS: реальный NE-таргет с PacketTunnelProvider, проверка через TestFlight | Аккаунт Apple Developer есть (подтверждено пользователем); entitlement self-serve; симулятор NE не исполняет — тестируем на устройстве | — Pending |
+| iOS-мост Pigeon реализуется полноценно (Swift HostApi + события) | Требование пользователя: корректный мост на обеих платформах; демо на iOS показывает статусы/логи из Swift | — Pending |
+| State management: Bloc (flutter_bloc) | Прямое указание пользователя; research предлагал Riverpod, Bloc — заявленная альтернатива, ложится на ту же архитектуру | — Pending |
 | VLESS: парсер ссылки + модель конфига без реального core | ТЗ: «плюсом будет парсинг VLESS-ссылки»; полная интеграция вне скоупа | — Pending |
 | UI делаем современным и красивым, хотя ТЗ говорит «дизайн не важен» | Дифференциатор кандидата; mobile-design скилл, тёмная тема, аккуратные статусные состояния | — Pending |
 

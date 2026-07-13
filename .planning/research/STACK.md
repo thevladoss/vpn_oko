@@ -12,7 +12,7 @@
 |------------|---------|---------|-----------------|
 | Flutter | 3.44 (stable) | UI + host-приложение | Текущий stable (docs.flutter.dev, май 2026). Dart 3: sealed classes и pattern matching закрывают модель VpnState без кодогена. Confidence: HIGH |
 | pigeon | ^27.1.1 | Типобезопасный мост Flutter↔native | Официальный кодоген от команды Flutter, версия 27.1.1 опубликована в июле 2026. `@HostApi` для startVpn/stopVpn/getStatus, `@EventChannelApi` для потоков событий. Единый контракт в одном .dart-файле, генерирует Kotlin + Swift + Dart. Confidence: HIGH |
-| flutter_riverpod | ^3.3.2 | State management | Riverpod 3.x — дефолт 2026 для новых Flutter-приложений. `Notifier` + `StreamProvider` естественно оборачивают Pigeon-стримы в состояние UI. Тестируется через `ProviderContainer` без mock-фреймворка. Confidence: HIGH |
+| flutter_bloc | ^9.1.1 | State management | **Решение пользователя (override research):** бизнес-логика на Bloc. `Bloc<VpnEvent, VpnUiState>` подписывается на Pigeon-стрим репозитория, UI через `BlocBuilder`/`BlocListener`. Riverpod (исходная рекомендация research) перенесён в Alternatives. Confidence: HIGH |
 | Kotlin | 2.x (из шаблона Flutter 3.44) | Android: VpnService, Foreground Service | Требование ТЗ. Шаблон Flutter 3.44 генерирует Kotlin DSL + AGP 8.x, ничего менять не нужно. Confidence: MEDIUM (точную версию шаблона не проверял, для прототипа некритично) |
 | Swift | 5.x / Xcode 16+ | iOS: PacketTunnelProvider skeleton | Требование ТЗ. `NEPacketTunnelProvider` + `NETunnelProviderManager` — единственный API для VPN-туннелей на iOS, стабилен годами. Confidence: HIGH |
 
@@ -64,7 +64,7 @@
 
 ```bash
 # Runtime
-flutter pub add flutter_riverpod equatable
+flutter pub add flutter_bloc equatable
 
 # Dev
 flutter pub add --dev pigeon mocktail very_good_analysis
@@ -86,7 +86,7 @@ linter:
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| flutter_riverpod 3.3.2 (ручные Notifier/StreamProvider) | flutter_bloc 9.1.1 | Bloc уместен, если команда живёт в Bloc или ревьюер ожидает явную event-driven машину состояний. VPN-статусы ложатся и на `Cubit<VpnState>`. Riverpod выигрывает меньшим бойлерплейтом на 48 часов и нативной работой со Stream |
+| flutter_bloc 9.1.1 (выбран пользователем) | flutter_riverpod 3.3.2 | Research изначально рекомендовал Riverpod за меньший бойлерплейт, но пользователь явно выбрал Bloc: явная event-driven машина состояний хорошо читается ревьюером тестового задания. VPN-статусы ложатся на `Bloc`/`Cubit` без потерь |
 | Ручные провайдеры | riverpod_generator 4.0.4 + riverpod_annotation 4.0.3 | Кодоген оправдан на проектах с десятками провайдеров. Здесь провайдеров 3-5; build_runner watch ради них — лишний процесс в 48-часовом окне |
 | Dart 3 sealed classes + equatable | freezed 3.2.5 + freezed_annotation 3.1.0 | freezed стоит брать, если нужен `copyWith` на многих моделях и есть привычка к его workflow. Для двух-трёх моделей sealed class + equatable закрывают равенство и pattern matching без build_runner. Итог: единственный кодоген в проекте — pigeon, это чистая история для README |
 | `@EventChannelApi` | Сырые EventChannel + StreamHandler вручную | Только если pigeon упрётся в баг генерации. Ручной канал теряет типобезопасность — главный аргумент выбора pigeon в ТЗ |
