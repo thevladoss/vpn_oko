@@ -49,7 +49,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Доменное ядро
 
-- [ ] **CORE-01**: Доменные модели VpnConfig, VpnState, VpnEvent — sealed/immutable, ошибки обрабатываются на всех слоях и доводятся до UI-состояния Error
+- [x] **CORE-01**: Доменные модели VpnConfig, VpnState, VpnEvent — sealed/immutable, ошибки обрабатываются на всех слоях и доводятся до UI-состояния Error
 
 ### Тесты
 
@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BRG-02 | Phase 1 | Complete |
 | BRG-03 | Phase 1 | Pending |
 | BRG-04 | Phase 1 | Pending |
-| CORE-01 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Complete |
 | AND-01 | Phase 2 | Pending |
 | AND-02 | Phase 2 | Pending |
 | AND-03 | Phase 2 | Pending |

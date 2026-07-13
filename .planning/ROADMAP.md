@@ -33,7 +33,7 @@
 **Plans**: 7 plans
 Plans:
 - [x] 01-01-PLAN.md — Контракт pigeon, кодоген трёх языков, зависимости стека (BRG-01, BRG-02)
-- [ ] 01-02-PLAN.md — Доменное ядро: sealed/immutable модели, интерфейсы, usecases (CORE-01)
+- [x] 01-02-PLAN.md — Доменное ядро: sealed/immutable модели, интерфейсы, usecases (CORE-01)
 - [ ] 01-03-PLAN.md — VpnBridge демультиплексор, мапперы DTO→entity, датасорсы (BRG-02, BRG-03)
 - [ ] 01-04-PLAN.md — Репозитории с replay, composition root, debug-harness (BRG-03, BRG-04)
 - [ ] 01-05-PLAN.md — Android echo-мост: регистрация, main-thread эмиттер, replay (BRG-01, BRG-02, BRG-04)
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Фундамент и Pigeon-мост | 1/7 | In Progress|  |
+| 1. Фундамент и Pigeon-мост | 2/7 | In Progress|  |
 | 2. Android VpnService | 0/TBD | Not started | - |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
