@@ -123,6 +123,7 @@ class OkoVpnService : VpnService() {
         stopSelf()
     }
 
+    @Synchronized
     private fun transition(next: VpnConnectionState): Boolean {
         if (!canTransition(state, next)) {
             VpnEventBus.emit(
