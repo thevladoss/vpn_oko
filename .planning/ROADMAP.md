@@ -10,7 +10,7 @@
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Фундамент и Pigeon-мост** - Типобезопасный контракт моста, доменное ядро, echo-реализации на обеих платформах
+- [x] **Phase 1: Фундамент и Pigeon-мост** - Типобезопасный контракт моста, доменное ядро, echo-реализации на обеих платформах (completed 2026-07-13)
 - [ ] **Phase 2: Android VpnService** - Реальный туннель, foreground-сервис, живые события статусов/логов/трафика
 - [ ] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния
 - [ ] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера
@@ -38,7 +38,7 @@ Plans:
 - [x] 01-04-PLAN.md — Репозитории с replay, composition root, debug-harness (BRG-03, BRG-04)
 - [x] 01-05-PLAN.md — Android echo-мост: регистрация, main-thread эмиттер, replay (BRG-01, BRG-02, BRG-04)
 - [x] 01-06-PLAN.md — iOS echo-мост: регистрация Runner, main-queue эмиттер, replay (BRG-01, BRG-02, BRG-04)
-- [ ] 01-07-PLAN.md — Живая end-to-end проверка echo-моста, phase gate (BRG-02, BRG-04)
+- [x] 01-07-PLAN.md — Живая end-to-end проверка echo-моста, phase gate (BRG-02, BRG-04)
 
 ### Phase 2: Android VpnService
 **Goal**: Реальный VPN-туннель на Android поднимается через consent-флоу, живёт в foreground-сервисе и шлёт живые события во Flutter
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Фундамент и Pigeon-мост | 6/7 | In Progress|  |
+| 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 0/TBD | Not started | - |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
