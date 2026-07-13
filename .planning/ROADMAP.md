@@ -54,7 +54,7 @@ Plans:
 **Plans**: 6 plans
 Plans:
 - [x] 02-01-PLAN.md — Потокобезопасная шина событий + машина состояний + JUnit-автогейт (AND-06)
-- [ ] 02-02-PLAN.md — Манифест, permissions, FGS-уведомление (AND-03)
+- [x] 02-02-PLAN.md — Манифест, permissions, FGS-уведомление (AND-03)
 - [ ] 02-03-PLAN.md — OkoVpnService: туннель, read-loop, teardown, onRevoke (AND-02, AND-04, AND-05, AND-06)
 - [ ] 02-04-PLAN.md — Consent-флоу FlutterFragmentActivity + делегирование HostApi (AND-01, AND-03, AND-06)
 - [ ] 02-05-PLAN.md — Счётчики трафика в debug-harness (AND-05)
@@ -119,7 +119,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
-| 2. Android VpnService | 1/6 | In Progress|  |
+| 2. Android VpnService | 2/6 | In Progress|  |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
