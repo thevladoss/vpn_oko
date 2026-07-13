@@ -42,6 +42,9 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Init: Маршрут TUN — узкая тестовая подсеть (интернет живёт в Connected; счётчики демонстрируются пингом в подсеть туннеля) — выбор пользователя
+- Init: Демо-конфиг VLESS — зашитый пример в коде (реальную ссылку пользователь может дать ближе к демо; в репо она не попадает)
+- Init: README на русском; ТЗ-docx в .gitignore, в публичный репозиторий не попадает
 - Init: State management через Bloc (flutter_bloc), не Riverpod (прямое указание пользователя; research предлагал Riverpod)
 - Init: iOS делается полноценно: Swift Pigeon-мост + реальный NE-таргет, проверка через TestFlight (Apple Developer аккаунт есть)
 - Init: Pigeon (@HostApi + @EventChannelApi, sealed-события) вместо сырых MethodChannel/EventChannel
@@ -53,7 +56,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 2: решение по маршруту (узкая подсеть vs 0.0.0.0/0 + read-and-drop) зафиксировать до кода сервиса; влияет на источник trafficChanged и текст README
+- ~~Phase 2: решение по маршруту~~ — снято: пользователь выбрал узкую подсеть (2026-07-13)
 - Phase 5: источник живых статусов в Swift-слое при туннеле без core решить при планировании фазы (см. research Gaps); фаза помечена research-флагом
 - Phase 1: генерация Kotlin StreamHandler в pigeon 27.x проверяется на echo-мосте; запасной вариант @FlutterApi-коллбеки
 - Дедлайн 48 часов: дифференциаторы Phase 6 добавляются по остатку времени, каждый независим и отбрасываем
