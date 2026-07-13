@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **BRG-01**: Pigeon-контракт объявляет методы startVpn(config), stopVpn(), getStatus() (@HostApi)
 - [x] **BRG-02**: События native→Flutter идут одним стримом через @EventChannelApi с sealed-иерархией: StatusChanged, LogMessage, TrafficChanged, VpnError
 - [ ] **BRG-03**: Domain-слой изолирован от кодогена: типы Pigeon получают суффикс Message, импорт *.g.dart разрешён только в core/bridge и features/*/data, мапперы переводят DTO в доменные entity
-- [ ] **BRG-04**: События отправляются только с main thread платформы; последний статус реплеится новому подписчику, getStatus() отдаёт снапшот (status, connectedSince, счётчики) — гонка «событие раньше подписки» исключена
+- [x] **BRG-04**: События отправляются только с main thread платформы; последний статус реплеится новому подписчику, getStatus() отдаёт снапшот (status, connectedSince, счётчики) — гонка «событие раньше подписки» исключена
 
 ### Android
 
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BRG-01 | Phase 1 | Complete |
 | BRG-02 | Phase 1 | Complete |
 | BRG-03 | Phase 1 | Pending |
-| BRG-04 | Phase 1 | Pending |
+| BRG-04 | Phase 1 | Complete |
 | CORE-01 | Phase 1 | Complete |
 | AND-01 | Phase 2 | Pending |
 | AND-02 | Phase 2 | Pending |

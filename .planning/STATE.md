@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
-last_updated: "2026-07-13T15:37:50.187Z"
+last_updated: "2026-07-13T16:26:24.691Z"
 last_activity: 2026-07-13 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 01 (pigeon) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Executing Phase 01
 Last activity: 2026-07-13 -- Phase 01 execution started
 
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [███░░░░░░░] 29%
 *Updated after each plan completion*
 | Phase 01 P01 | 5min | 2 tasks | 7 files |
 | Phase 01 P02 | 5min | 2 tasks | 14 files |
+| Phase 01 P05 | 43min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 01-01: pigeon 27.x генерирует VpnEventsStreamHandler на Kotlin и Swift — @FlutterApi-fallback снят; точные символы моста в 01-01-SUMMARY
 - [Phase ?]: 01-02: доменные модели sealed/immutable через equatable (VpnState + value objects); репозитории — abstract interface class, реализация в data-слое
 - [Phase ?]: 01-02: one_member_abstracts отключён в analysis_options под single-method repository-абстракции Clean Architecture (LogRepository)
+- [Phase ?]: 01-05: echo LogMessage.level="info" (нижний регистр) — контракт с LogLevel.values.byName маппера 01-03
+- [Phase ?]: 01-05: Android echo — доставка sink с main thread через Handler(Looper.getMainLooper()); VpnEventBus (object) кэширует last-status и реплеит новому подписчику
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T15:37:24.829Z
+Last session: 2026-07-13T16:25:05.630Z
 Stopped at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
 Resume file: None
