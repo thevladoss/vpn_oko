@@ -83,7 +83,9 @@ void main() {
     'сценарий 2: DisconnectRequested в connected зовёт disconnectVpn раз, '
     'VpnDisconnected обнуляет connectedSince',
     setUp: () {
-      stubStarted(states: Stream<VpnState>.fromIterable([const VpnDisconnected()]));
+      stubStarted(
+        states: Stream<VpnState>.fromIterable([const VpnDisconnected()]),
+      );
       when(() => disconnectVpn()).thenAnswer((_) async {});
     },
     seed: () => VpnConnectionState(
