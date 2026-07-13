@@ -60,6 +60,16 @@ void main() {
     });
   });
 
+  group('errorToEntity', () {
+    test('carries the real message from ErrorMessage', () {
+      final result = errorToEntity(
+        ErrorMessage(code: 'consent_denied', message: 'User denied consent'),
+      );
+
+      expect(result, const VpnError('User denied consent'));
+    });
+  });
+
   group('trafficToEntity', () {
     test('maps rx and tx bytes', () {
       final result =

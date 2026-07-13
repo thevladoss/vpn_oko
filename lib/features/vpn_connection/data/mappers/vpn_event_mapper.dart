@@ -21,5 +21,7 @@ VpnState statusToEntity(StatusChangedMessage m) =>
 VpnState snapshotToEntity(VpnStatusSnapshotMessage m) =>
     _statusToState(m.status, m.connectedSinceEpochMs);
 
+VpnState errorToEntity(ErrorMessage m) => VpnError(m.message);
+
 TrafficStats trafficToEntity(TrafficChangedMessage m) =>
     TrafficStats(rxBytes: m.rxBytes, txBytes: m.txBytes);
