@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-07-13T20:25:12.935Z"
+last_updated: "2026-07-13T20:31:46.079Z"
 last_activity: 2026-07-13 -- Phase 02 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 17
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 02 (android-vpnservice) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Executing Phase 02
 Last activity: 2026-07-13 -- Phase 02 execution started
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 85%
 | Phase 02 P02 | 2min | 2 tasks | 2 files |
 | Phase Phase 02 PP03 | 6min | 2 tasks | 1 files |
 | Phase 02 P04 | 2min | 2 tasks | 3 files |
+| Phase 02 P05 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 02-03: OkoVpnService маршрутит только узкую подсеть 10.111.222.0/24 (addRoute), не 0.0.0.0/0 — интернет жив в Connected, счётчики через ping в подсеть (locked decision)
 - [Phase ?]: 02-03: establish()==null и невалидный host/port → терминальный Error (не Disconnected) с ErrorMessage + stopForeground + stopSelf (T-2-04); userId не читается и не логируется (T-2-05)
 - [Phase ?]: 02-03: единый @Synchronized teardown из ACTION_DISCONNECT/onRevoke/onDestroy — close(fd) ДО join потока (разблокирует блокирующий read, Pitfall 7), идемпотентен по Disconnected
+- [Phase 02]: 02-05: harness читает трафик через AppDependencies.watchTraffic() (проброс vpnRepository); StreamBuilder<TrafficStats> readout rx/tx под статусом — AND-05 наблюдаем без Phase 3 UI
 
 ### Pending Todos
 
@@ -120,6 +122,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T20:25:12.930Z
+Last session: 2026-07-13T20:29:37.809Z
 Stopped at: Completed 02-03-PLAN.md
 Resume file: None
