@@ -82,6 +82,7 @@ class VpnRepositoryImpl implements VpnRepository {
     }
   }
 
+  @override
   Future<void> dispose() async {
     await _subscription.cancel();
     await _controller.close();

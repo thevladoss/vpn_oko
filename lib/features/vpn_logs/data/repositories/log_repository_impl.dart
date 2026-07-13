@@ -43,6 +43,7 @@ class LogRepositoryImpl implements LogRepository {
     return output.stream;
   }
 
+  @override
   Future<void> dispose() async {
     await _subscription.cancel();
     await _controller.close();

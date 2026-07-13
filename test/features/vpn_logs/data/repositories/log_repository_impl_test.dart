@@ -67,4 +67,18 @@ void main() {
       expect(received, [_entry('buffered'), _entry('after')]);
     });
   });
+
+  group('dispose', () {
+    test('closes the log stream and is safe to call repeatedly', () async {
+      var done = false;
+      repository.watchLogs().listen((_) {}, onDone: () => done = true);
+      await pumpEventQueue();
+
+      await repository.dispose();
+      await repository.dispose();
+      await pumpEventQueue();
+
+      expect(done, isTrue);
+    });
+  });
 }

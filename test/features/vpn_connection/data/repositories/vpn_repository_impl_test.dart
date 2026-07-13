@@ -178,6 +178,20 @@ void main() {
     });
   });
 
+  group('dispose', () {
+    test('closes the state stream and is safe to call repeatedly', () async {
+      var done = false;
+      repository.watchState().listen((_) {}, onDone: () => done = true);
+      await pumpEventQueue();
+
+      await repository.dispose();
+      await repository.dispose();
+      await pumpEventQueue();
+
+      expect(done, isTrue);
+    });
+  });
+
   group('mapPlatformException', () {
     test('preserves the platform code in VpnStartFailure', () {
       final failure = mapPlatformException(

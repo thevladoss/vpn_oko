@@ -8,4 +8,5 @@ abstract interface class VpnRepository {
   Future<void> connect(VpnConfig config);
   Future<void> disconnect();
   Future<void> syncStatus();
+  Future<void> dispose();
 }

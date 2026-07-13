@@ -36,5 +36,9 @@ class AppDependencies {
   late final SyncStatus syncStatus;
   late final WatchLogs watchLogs;
 
-  Future<void> dispose() => _bridge.dispose();
+  Future<void> dispose() async {
+    await vpnRepository.dispose();
+    await logRepository.dispose();
+    await _bridge.dispose();
+  }
 }
