@@ -16,9 +16,9 @@ class VpnConnecting extends VpnState {
 }
 
 class VpnConnected extends VpnState {
-  const VpnConnected({required this.connectedSince});
+  const VpnConnected({this.connectedSince});
 
-  final DateTime connectedSince;
+  final DateTime? connectedSince;
 
   @override
   List<Object?> get props => [connectedSince];

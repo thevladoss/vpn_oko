@@ -35,14 +35,11 @@ void main() {
       );
     });
 
-    test('connected with null epoch yields epoch 0 without throwing', () {
+    test('connected with null epoch yields null connectedSince', () {
       final result = statusToEntity(
         StatusChangedMessage(status: VpnStatusMessage.connected),
       );
-      expect(
-        result,
-        VpnConnected(connectedSince: DateTime.fromMillisecondsSinceEpoch(0)),
-      );
+      expect(result, const VpnConnected());
     });
 
     test('disconnecting maps to VpnDisconnecting', () {

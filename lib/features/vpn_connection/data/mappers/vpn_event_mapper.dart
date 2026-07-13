@@ -7,9 +7,9 @@ VpnState _statusToState(VpnStatusMessage status, int? connectedSinceEpochMs) =>
       VpnStatusMessage.disconnected => const VpnDisconnected(),
       VpnStatusMessage.connecting => const VpnConnecting(),
       VpnStatusMessage.connected => VpnConnected(
-          connectedSince: DateTime.fromMillisecondsSinceEpoch(
-            connectedSinceEpochMs ?? 0,
-          ),
+          connectedSince: connectedSinceEpochMs == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(connectedSinceEpochMs),
         ),
       VpnStatusMessage.disconnecting => const VpnDisconnecting(),
       VpnStatusMessage.error => const VpnError('unknown'),
