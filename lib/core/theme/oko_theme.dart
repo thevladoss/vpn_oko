@@ -28,7 +28,7 @@ class OkoTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
       textTheme: OkoTypography.textTheme(brightness),
-      extensions: [tones],
+      extensions: <OkoTones>[tones],
     );
   }
 
