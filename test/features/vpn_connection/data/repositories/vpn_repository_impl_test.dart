@@ -135,6 +135,32 @@ void main() {
 
       expect(fake.stopCount, 1);
     });
+
+    test('translates PlatformException into a typed Failure', () async {
+      fake.stopError = PlatformException(
+        code: 'stop_failed',
+        message: 'Tunnel refused to stop',
+      );
+
+      await expectLater(
+        repository.disconnect(),
+        throwsA(isA<Failure>()),
+      );
+    });
+  });
+
+  group('syncStatus', () {
+    test('translates PlatformException into a typed Failure', () async {
+      fake.statusError = PlatformException(
+        code: 'status_unavailable',
+        message: 'getStatus threw',
+      );
+
+      await expectLater(
+        repository.syncStatus(),
+        throwsA(isA<Failure>()),
+      );
+    });
   });
 
   group('mapPlatformException', () {

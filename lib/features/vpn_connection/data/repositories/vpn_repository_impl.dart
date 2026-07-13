@@ -52,12 +52,22 @@ class VpnRepositoryImpl implements VpnRepository {
   }
 
   @override
-  Future<void> disconnect() => _ds.stop();
+  Future<void> disconnect() async {
+    try {
+      await _ds.stop();
+    } on PlatformException catch (exception) {
+      throw mapPlatformException(exception);
+    }
+  }
 
   @override
   Future<void> syncStatus() async {
-    _last = snapshotToEntity(await _ds.currentStatus());
-    _controller.add(_last);
+    try {
+      _last = snapshotToEntity(await _ds.currentStatus());
+      _controller.add(_last);
+    } on PlatformException catch (exception) {
+      throw mapPlatformException(exception);
+    }
   }
 
   Future<void> dispose() async {

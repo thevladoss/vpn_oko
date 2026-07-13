@@ -16,6 +16,8 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
   int stopCount = 0;
 
   PlatformException? startError;
+  PlatformException? stopError;
+  PlatformException? statusError;
 
   VpnStatusSnapshotMessage snapshot = VpnStatusSnapshotMessage(
     status: VpnStatusMessage.disconnected,
@@ -34,7 +36,13 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
   Stream<TrafficStats> get traffic => _traffic.stream;
 
   @override
-  Future<VpnStatusSnapshotMessage> currentStatus() async => snapshot;
+  Future<VpnStatusSnapshotMessage> currentStatus() async {
+    final error = statusError;
+    if (error != null) {
+      throw error;
+    }
+    return snapshot;
+  }
 
   @override
   Future<void> start(VpnConfigMessage config) async {
@@ -47,6 +55,10 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
 
   @override
   Future<void> stop() async {
+    final error = stopError;
+    if (error != null) {
+      throw error;
+    }
     stopCount++;
   }
 
