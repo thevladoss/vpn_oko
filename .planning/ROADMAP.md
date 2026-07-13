@@ -32,7 +32,7 @@
   5. Ошибка из native доводится до доменного состояния Error через sealed/immutable-модели VpnConfig, VpnState, VpnEvent
 **Plans**: 7 plans
 Plans:
-- [ ] 01-01-PLAN.md — Контракт pigeon, кодоген трёх языков, зависимости стека (BRG-01, BRG-02)
+- [x] 01-01-PLAN.md — Контракт pigeon, кодоген трёх языков, зависимости стека (BRG-01, BRG-02)
 - [ ] 01-02-PLAN.md — Доменное ядро: sealed/immutable модели, интерфейсы, usecases (CORE-01)
 - [ ] 01-03-PLAN.md — VpnBridge демультиплексор, мапперы DTO→entity, датасорсы (BRG-02, BRG-03)
 - [ ] 01-04-PLAN.md — Репозитории с replay, composition root, debug-harness (BRG-03, BRG-04)
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Фундамент и Pigeon-мост | 0/7 | Not started | - |
+| 1. Фундамент и Pigeon-мост | 1/7 | In Progress|  |
 | 2. Android VpnService | 0/TBD | Not started | - |
 | 3. Flutter UI | 0/TBD | Not started | - |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
