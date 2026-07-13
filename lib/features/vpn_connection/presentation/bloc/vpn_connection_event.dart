@@ -1,0 +1,40 @@
+import 'package:equatable/equatable.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
+
+sealed class VpnConnectionEvent extends Equatable {
+  const VpnConnectionEvent();
+
+  @override
+  List<Object?> get props => const [];
+}
+
+class VpnStarted extends VpnConnectionEvent {
+  const VpnStarted();
+}
+
+class VpnStateReceived extends VpnConnectionEvent {
+  const VpnStateReceived(this.state);
+
+  final VpnState state;
+
+  @override
+  List<Object?> get props => [state];
+}
+
+class VpnTrafficReceived extends VpnConnectionEvent {
+  const VpnTrafficReceived(this.stats);
+
+  final TrafficStats stats;
+
+  @override
+  List<Object?> get props => [stats];
+}
+
+class ConnectRequested extends VpnConnectionEvent {
+  const ConnectRequested();
+}
+
+class DisconnectRequested extends VpnConnectionEvent {
+  const DisconnectRequested();
+}
