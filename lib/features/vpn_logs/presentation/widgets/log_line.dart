@@ -10,7 +10,7 @@ class LogLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final mono = OkoTypography.mono(Theme.of(context).brightness);
     final levelColor = switch (entry.level) {
       LogLevel.info => tones.textSecondary,

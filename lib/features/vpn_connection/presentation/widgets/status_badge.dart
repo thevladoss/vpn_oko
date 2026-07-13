@@ -18,7 +18,7 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final accent = tones.accentFor(status);
     final style = Theme.of(context).textTheme.labelSmall ?? const TextStyle();
     return ExcludeSemantics(

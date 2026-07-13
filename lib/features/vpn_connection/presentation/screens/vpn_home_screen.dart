@@ -65,7 +65,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     final config = context.read<VpnConnectionBloc>().config;
     final sheetPeek = MediaQuery.sizeOf(context).height * 0.12;

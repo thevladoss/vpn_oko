@@ -130,7 +130,7 @@ class _IrisIndicatorState extends State<IrisIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final since =
         widget.status == VpnStatus.connected ? widget.connectedSince : null;
     return Semantics(

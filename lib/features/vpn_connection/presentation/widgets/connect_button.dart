@@ -60,7 +60,7 @@ class ConnectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final foreground = _foreground(tones, scheme);

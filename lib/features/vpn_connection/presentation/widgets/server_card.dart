@@ -15,7 +15,7 @@ class ServerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(24),

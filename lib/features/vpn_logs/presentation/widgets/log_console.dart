@@ -16,7 +16,7 @@ class LogConsole extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     return DraggableScrollableSheet(
       initialChildSize: 0.12,
       minChildSize: 0.12,
@@ -110,7 +110,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
@@ -166,7 +166,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     return ListView(
       controller: controller,

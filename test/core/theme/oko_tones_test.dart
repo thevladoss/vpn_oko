@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vpn_oko/core/theme/oko_theme.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/theme/vpn_status.dart';
 
@@ -56,6 +58,26 @@ void main() {
 
     test('returns this when other is not OkoTones', () {
       expect(dark.lerp(null, 0.5), same(dark));
+    });
+  });
+
+  group('BuildContext.okoTones', () {
+    testWidgets('returns the OkoTones extension from the active theme',
+        (tester) async {
+      OkoTones? captured;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: OkoTheme.dark,
+          home: Builder(
+            builder: (context) {
+              captured = context.okoTones;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      expect(captured, same(OkoTones.dark));
     });
   });
 }

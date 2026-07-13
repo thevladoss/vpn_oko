@@ -10,7 +10,7 @@ class OkoWordmark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final style = Theme.of(context).textTheme.titleMedium?.copyWith(
           color: tones.textPrimary,
         );

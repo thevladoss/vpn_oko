@@ -18,7 +18,7 @@ class TrafficTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = Theme.of(context).extension<OkoTones>()!;
+    final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     final accent = active ? tones.accentConnected : tones.textSecondary;
     final isDown = direction == TrafficDirection.down;

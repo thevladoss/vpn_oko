@@ -100,3 +100,11 @@ class OkoTones extends ThemeExtension<OkoTones> {
     textSecondary: Color(0xFF5A6472),
   );
 }
+
+extension OkoTonesContext on BuildContext {
+  OkoTones get okoTones {
+    final tones = Theme.of(this).extension<OkoTones>();
+    assert(tones != null, 'OkoTones is missing; wrap the tree in OkoTheme.');
+    return tones!;
+  }
+}
