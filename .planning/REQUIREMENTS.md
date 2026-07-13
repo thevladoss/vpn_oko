@@ -29,7 +29,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **AND-01**: VpnService.prepare() вызывается перед каждым стартом; отказ пользователя переводит в статус Error с внятным логом
 - [ ] **AND-02**: VpnService.Builder конфигурирует туннель: addAddress, addRoute, addDnsServer, establish; маршрут выбран так, чтобы Connected не убивал интернет устройства без VPN-core
-- [ ] **AND-03**: Foreground Service запускается с уведомлением, foregroundServiceType=systemExempted, POST_NOTIFICATIONS запрашивается на Android 13+
+- [x] **AND-03**: Foreground Service запускается с уведомлением, foregroundServiceType=systemExempted, POST_NOTIFICATIONS запрашивается на Android 13+
 - [ ] **AND-04**: VPN корректно останавливается (закрытие TUN fd, остановка foreground); onRevoke обрабатывается и доводит статус Disconnected до Flutter
 - [ ] **AND-05**: Read-loop TUN-дескриптора считает реальные байты и шлёт trafficChanged раз в секунду
 - [x] **AND-06**: Все переходы состояний и ключевые действия сервиса логируются событиями logMessage во Flutter
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CORE-01 | Phase 1 | Complete |
 | AND-01 | Phase 2 | Pending |
 | AND-02 | Phase 2 | Pending |
-| AND-03 | Phase 2 | Pending |
+| AND-03 | Phase 2 | Complete |
 | AND-04 | Phase 2 | Pending |
 | AND-05 | Phase 2 | Pending |
 | AND-06 | Phase 2 | Complete |

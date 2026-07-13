@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-07-13T20:01:33.268Z"
+last_updated: "2026-07-13T20:07:03.734Z"
 last_activity: 2026-07-13 -- Phase 02 execution started
 progress:
   total_phases: 6
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 02 (android-vpnservice) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Executing Phase 02
 Last activity: 2026-07-13 -- Phase 02 execution started
 
@@ -59,6 +59,7 @@ Progress: [██████░░░░] 62%
 | Phase 01 P03 | 5min | 2 tasks | 9 files |
 | Phase 01 P04 | 12min | 2 tasks | 10 files |
 | Phase 02 P01 | 3min | 2 tasks | 4 files |
+| Phase 02 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 02-01: canTransition — public top-level рантайм-гейт переходов (не private/тестовый), OkoVpnService.transition() из плана 03 обязан звать её
 - [Phase ?]: 02-01: VpnEventBus укреплён потокобезопасностью — CopyOnWriteArraySet + @Volatile lastStatus/snapshot (emit из read-loop/ticker/onRevoke без ConcurrentModificationException, Pitfall 5)
 - [Phase ?]: 02-01: minSdk 24→26 (build.gradle.kts) — безветочные NotificationChannel/startForegroundService для FGS; junit:junit:4.13.2 в testImplementation, автогейт :app:testDebugUnitTest
+- [Phase 02]: 02-02: манифест декларирует OkoVpnService с BIND_VPN_SERVICE + exported=false + intent-filter android.net.VpnService (T-2-02); foregroundServiceType=systemExempted (T-2-03) — startForeground не роняет приложение на Android 14+
+- [Phase 02]: 02-02: android.R.drawable.stat_sys_vpn_ic (RESEARCH-пример) не публичный ресурс → заменён на android.R.drawable.ic_lock_lock (проверен по android.jar); VpnNotificationFactory.NOTIFICATION_ID=1001 для startForeground сервиса плана 03
 
 ### Pending Todos
 
@@ -112,6 +115,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T20:00:20.976Z
+Last session: 2026-07-13T20:06:14.640Z
 Stopped at: Completed 01-04-PLAN.md
 Resume file: None
