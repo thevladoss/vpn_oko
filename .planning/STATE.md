@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
-last_updated: "2026-07-13T16:46:34.212Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-07-13T17:00:26.293Z"
 last_activity: 2026-07-13 -- Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 01 (pigeon) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Executing Phase 01
 Last activity: 2026-07-13 -- Phase 01 execution started
 
-Progress: [███████░░░] 71%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [███████░░░] 71%
 | Phase 01 P05 | 43min | 2 tasks | 4 files |
 | Phase 01 P06 | 2min | 2 tasks | 4 files |
 | Phase 01 P03 | 5min | 2 tasks | 9 files |
+| Phase 01 P04 | 12min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 01]: 01-06: три Bridge/*.swift добавлены в Sources таргета Runner правкой project.pbxproj вручную (objectVersion 54, без синхронизированных групп); flutter build ios --no-codesign собирается
 - [Phase 01]: VpnBridge — единственный владелец подписки на vpnEvents(); фичи читают broadcast-стримы (T-1-04) — Одна подписка + exhaustive switch по sealed демультиплексирует один event channel; тест на throwsStateError подтверждает единственного consumer
 - [Phase 01]: logToEntity резолвит LogLevel через firstWhere+orElse:info вместо byName (T-1-09) — Уровень с native — свободная строка; case-insensitive match с fallback исключает ArgumentError на неизвестном значении
+- [Phase ?]: 01-04: repository двойной replay — native onListen + Dart-кэш _last; watchState() отдаёт _last первым (BRG-04)
+- [Phase ?]: 01-04: Failure implements Exception — connect() бросает типизированный VpnStartFailure без inline-ignore only_throw_errors
+- [Phase ?]: 01-04: composition root AppDependencies — единственный вызов vpnEvents(); harness ходит через usecase, g.dart изолирован в di.dart (Pitfall 5)
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T16:45:21.683Z
-Stopped at: Roadmap и STATE созданы, traceability в REQUIREMENTS.md заполнена
+Last session: 2026-07-13T17:00:26.287Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
