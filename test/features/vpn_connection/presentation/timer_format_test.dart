@@ -22,5 +22,11 @@ void main() {
     test('does not truncate hours above two digits', () {
       expect(hhmmss(const Duration(hours: 100)), '100:00:00');
     });
+
+    test('clamps negative durations to zero', () {
+      expect(hhmmss(const Duration(seconds: -1)), '00:00:00');
+      expect(hhmmss(const Duration(hours: -2, minutes: -3, seconds: -4)),
+          '00:00:00');
+    });
   });
 }
