@@ -25,14 +25,21 @@ object VpnEventBus {
     }
 
     fun emit(event: VpnEventMessage) {
-        if (event is StatusChangedMessage) {
-            lastStatus = event
-            snapshot = VpnStatusSnapshotMessage(
-                status = event.status,
-                connectedSinceEpochMs = event.connectedSinceEpochMs,
-                rxBytes = snapshot.rxBytes,
-                txBytes = snapshot.txBytes,
-            )
+        when (event) {
+            is StatusChangedMessage -> {
+                lastStatus = event
+                snapshot = snapshot.copy(
+                    status = event.status,
+                    connectedSinceEpochMs = event.connectedSinceEpochMs,
+                )
+            }
+            is TrafficChangedMessage -> {
+                snapshot = snapshot.copy(
+                    rxBytes = event.rxBytes,
+                    txBytes = event.txBytes,
+                )
+            }
+            else -> {}
         }
         listeners.toList().forEach { it(event) }
     }
