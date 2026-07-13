@@ -1,0 +1,70 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
+import 'package:vpn_oko/features/vpn_connection/data/mappers/vpn_event_mapper.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
+
+void main() {
+  group('statusToEntity', () {
+    test('disconnected maps to VpnDisconnected', () {
+      final result = statusToEntity(
+        StatusChangedMessage(status: VpnStatusMessage.disconnected),
+      );
+      expect(result, const VpnDisconnected());
+    });
+
+    test('connecting maps to VpnConnecting', () {
+      final result = statusToEntity(
+        StatusChangedMessage(status: VpnStatusMessage.connecting),
+      );
+      expect(result, const VpnConnecting());
+    });
+
+    test('connected maps to VpnConnected with epoch timestamp', () {
+      final result = statusToEntity(
+        StatusChangedMessage(
+          status: VpnStatusMessage.connected,
+          connectedSinceEpochMs: 1000,
+        ),
+      );
+      expect(
+        result,
+        VpnConnected(
+          connectedSince: DateTime.fromMillisecondsSinceEpoch(1000),
+        ),
+      );
+    });
+
+    test('connected with null epoch yields epoch 0 without throwing', () {
+      final result = statusToEntity(
+        StatusChangedMessage(status: VpnStatusMessage.connected),
+      );
+      expect(
+        result,
+        VpnConnected(connectedSince: DateTime.fromMillisecondsSinceEpoch(0)),
+      );
+    });
+
+    test('disconnecting maps to VpnDisconnecting', () {
+      final result = statusToEntity(
+        StatusChangedMessage(status: VpnStatusMessage.disconnecting),
+      );
+      expect(result, const VpnDisconnecting());
+    });
+
+    test('error maps to VpnError', () {
+      final result = statusToEntity(
+        StatusChangedMessage(status: VpnStatusMessage.error),
+      );
+      expect(result, isA<VpnError>());
+    });
+  });
+
+  group('trafficToEntity', () {
+    test('maps rx and tx bytes', () {
+      final result =
+          trafficToEntity(TrafficChangedMessage(rxBytes: 5, txBytes: 7));
+      expect(result, const TrafficStats(rxBytes: 5, txBytes: 7));
+    });
+  });
+}
