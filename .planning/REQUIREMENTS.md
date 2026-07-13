@@ -9,13 +9,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Flutter UI
 
-- [ ] **UI-01**: Экран показывает пять статусов VPN: Disconnected, Connecting, Connected, Disconnecting, Error
-- [ ] **UI-02**: Кнопки Connect/Disconnect работают и блокируются в переходных состояниях (двойной тап невозможен)
+- [x] **UI-01**: Экран показывает пять статусов VPN: Disconnected, Connecting, Connected, Disconnecting, Error
+- [x] **UI-02**: Кнопки Connect/Disconnect работают и блокируются в переходных состояниях (двойной тап невозможен)
 - [x] **UI-03**: Блок логов показывает события из native в реальном времени (буфер ограничен, автоскролл с отключением при ручной прокрутке)
 - [x] **UI-04**: Экран показывает выбранный сервер и таймер времени подключения (тикает от connectedAt, переживает пересоздание виджета)
 - [x] **UI-05**: Экран показывает статистику трафика rx/tx из событий trafficChanged
 - [x] **UI-06**: UI реализует дизайн-концепцию DESIGN.md: ирис-индикатор состояния, тёмная и светлая темы, staggered-вход, haptics
-- [ ] **UI-07**: UI восстанавливает актуальное состояние через getStatus() при старте приложения (VPN живёт в сервисе)
+- [x] **UI-07**: UI восстанавливает актуальное состояние через getStatus() при старте приложения (VPN живёт в сервисе)
 - [x] **UI-08**: Логи имеют уровни (info/warning/error) с цветовой маркировкой и кнопку копирования в буфер
 
 ### Мост Flutter ↔ Native
@@ -104,13 +104,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AND-04 | Phase 2 | Complete |
 | AND-05 | Phase 2 | Complete |
 | AND-06 | Phase 2 | Complete |
-| UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 3 | Pending |
+| UI-01 | Phase 3 | Complete |
+| UI-02 | Phase 3 | Complete |
 | UI-03 | Phase 3 | Complete |
 | UI-04 | Phase 3 | Complete |
 | UI-05 | Phase 3 | Complete |
 | UI-06 | Phase 3 | Complete |
-| UI-07 | Phase 3 | Pending |
+| UI-07 | Phase 3 | Complete |
 | UI-08 | Phase 3 | Complete |
 | QA-02 | Phase 3 | Complete |
 | VLS-01 | Phase 4 | Pending |

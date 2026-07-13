@@ -75,7 +75,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Package legitimacy gate + установка google_fonts/bloc_test, бандл шрифтов (UI-06, QA-02)
 - [x] 03-02-PLAN.md — Дизайн-система: VpnStatus, OkoTones, типографика, обе темы, motion (UI-06)
-- [ ] 03-03-PLAN.md — VpnConnectionBloc + WatchTraffic usecase + 6 сценариев QA-02 (UI-01, UI-02, UI-05, UI-07, QA-02)
+- [x] 03-03-PLAN.md — VpnConnectionBloc + WatchTraffic usecase + 6 сценариев QA-02 (UI-01, UI-02, UI-05, UI-07, QA-02)
 - [x] 03-04-PLAN.md — LogsCubit + форматтеры байт/длительности + unit-тесты (UI-03, UI-04, UI-05, UI-08)
 - [ ] 03-05-PLAN.md — Ирис: CustomPainter + AnimationController + ConnectionTimer (UI-01, UI-04, UI-06)
 - [ ] 03-06-PLAN.md — Хром и управление: wordmark, бейдж, карточка, трафик, кнопка (UI-01, UI-02, UI-04, UI-05, UI-06)
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
-| 3. Flutter UI | 3/9 | In Progress|  |
+| 3. Flutter UI | 4/9 | In Progress|  |
 | 4. VLESS-конфиг сервера | 0/TBD | Not started | - |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
