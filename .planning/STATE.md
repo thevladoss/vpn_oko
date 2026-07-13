@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-07-13T20:07:03.734Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-07-13T20:16:09.199Z"
 last_activity: 2026-07-13 -- Phase 02 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 13
-  completed_plans: 8
+  completed_plans: 10
   percent: 17
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 02 (android-vpnservice) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Executing Phase 02
 Last activity: 2026-07-13 -- Phase 02 execution started
 
-Progress: [██████░░░░] 62%
+Progress: [████████░░] 77%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [██████░░░░] 62%
 | Phase 01 P04 | 12min | 2 tasks | 10 files |
 | Phase 02 P01 | 3min | 2 tasks | 4 files |
 | Phase 02 P02 | 2min | 2 tasks | 2 files |
+| Phase Phase 02 PP03 | 6min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 02-01: minSdk 24→26 (build.gradle.kts) — безветочные NotificationChannel/startForegroundService для FGS; junit:junit:4.13.2 в testImplementation, автогейт :app:testDebugUnitTest
 - [Phase 02]: 02-02: манифест декларирует OkoVpnService с BIND_VPN_SERVICE + exported=false + intent-filter android.net.VpnService (T-2-02); foregroundServiceType=systemExempted (T-2-03) — startForeground не роняет приложение на Android 14+
 - [Phase 02]: 02-02: android.R.drawable.stat_sys_vpn_ic (RESEARCH-пример) не публичный ресурс → заменён на android.R.drawable.ic_lock_lock (проверен по android.jar); VpnNotificationFactory.NOTIFICATION_ID=1001 для startForeground сервиса плана 03
+- [Phase ?]: 02-03: OkoVpnService маршрутит только узкую подсеть 10.111.222.0/24 (addRoute), не 0.0.0.0/0 — интернет жив в Connected, счётчики через ping в подсеть (locked decision)
+- [Phase ?]: 02-03: establish()==null и невалидный host/port → терминальный Error (не Disconnected) с ErrorMessage + stopForeground + stopSelf (T-2-04); userId не читается и не логируется (T-2-05)
+- [Phase ?]: 02-03: единый @Synchronized teardown из ACTION_DISCONNECT/onRevoke/onDestroy — close(fd) ДО join потока (разблокирует блокирующий read, Pitfall 7), идемпотентен по Disconnected
 
 ### Pending Todos
 
@@ -115,6 +119,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T20:06:14.640Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-07-13T20:15:58.112Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
