@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: None
-last_updated: "2026-07-13T22:38:27.312Z"
+last_updated: "2026-07-13T22:51:57.243Z"
 last_activity: 2026-07-13 -- Phase 03 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 17
+  completed_plans: 18
   percent: 33
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 03 (flutter-ui) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Status: Executing Phase 03
 Last activity: 2026-07-13 -- Phase 03 execution started
 
-Progress: [████████░░] 77%
+Progress: [████████░░] 82%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 77%
 | Phase 03 P01 | 12min | 2 tasks | 13 files |
 | Phase 03 P02 | 6min | 2 tasks | 6 files |
 | Phase 03 P04 | 3min | 2 tasks | 7 files |
+| Phase 03 P05 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,8 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-02: типографика google_fonts поверх Typography.material2021() — цвета текста от режима темы; табличные цифры на displayLarge+titleMedium (таймер и числа трафика)
 - [Phase 03]: 03-04: plainText форматирует время через приватный _hms (DateTime→HH:mm:ss), отдельно от hhmmss(Duration)
 - [Phase 03]: 03-04: форматтеры байт/длительности — чистые top-level функции в presentation/formatters под unit-тест
+- [Phase 03]: IrisIndicator принимает VpnStatus + connectedSince (презентационный, Bloc не читает); центр отдаёт в ConnectionTimer только в connected — Экран 03-08 обернёт в BlocBuilder; виджеты остаются переиспользуемыми и тестируемыми без Bloc
+- [Phase 03]: reduce-motion читается в didChangeDependencies; oneShot-флаг отделяет смену статуса от смены зависимостей (тема/reduce не перезапускают раскрыв/shake/haptics) — Pitfall 3: MediaQuery недоступна в initState; повторный запуск одноразовых эффектов на rebuild — визуальный дефект
 
 ### Pending Todos
 
@@ -132,6 +135,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T22:38:27.307Z
+Last session: 2026-07-13T22:51:09.360Z
 Stopped at: None
 Resume file: None
