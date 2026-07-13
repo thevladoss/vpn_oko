@@ -232,6 +232,46 @@ void main() {
     verify: (_) => verify(() => connectVpn(config)).called(1),
   );
 
+  test(
+      'M-02: повторный VpnStarted не течёт подписками — старые отменяются '
+      'перед пересозданием', () async {
+    final firstState = StreamController<VpnState>();
+    final secondState = StreamController<VpnState>();
+    final firstTraffic = StreamController<TrafficStats>();
+    final secondTraffic = StreamController<TrafficStats>();
+    final stateQueue = [firstState, secondState];
+    final trafficQueue = [firstTraffic, secondTraffic];
+    when(() => syncStatus()).thenAnswer((_) async {});
+    when(() => watchVpnState())
+        .thenAnswer((_) => stateQueue.removeAt(0).stream);
+    when(() => watchTraffic())
+        .thenAnswer((_) => trafficQueue.removeAt(0).stream);
+
+    final bloc = buildBloc()..add(const VpnStarted());
+    await pumpEventQueue();
+
+    expect(firstState.hasListener, isTrue);
+    expect(firstTraffic.hasListener, isTrue);
+
+    bloc.add(const VpnStarted());
+    await pumpEventQueue();
+
+    expect(firstState.hasListener, isFalse);
+    expect(firstTraffic.hasListener, isFalse);
+    expect(secondState.hasListener, isTrue);
+    expect(secondTraffic.hasListener, isTrue);
+
+    await bloc.close();
+
+    expect(secondState.hasListener, isFalse);
+    expect(secondTraffic.hasListener, isFalse);
+
+    await firstState.close();
+    await secondState.close();
+    await firstTraffic.close();
+    await secondTraffic.close();
+  });
+
   test('close отменяет подписки на оба стрима', () async {
     final stateController = StreamController<VpnState>();
     final trafficController = StreamController<TrafficStats>();

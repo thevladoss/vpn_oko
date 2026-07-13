@@ -57,6 +57,8 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
         ),
       );
     }
+    await _stateSub?.cancel();
+    await _trafficSub?.cancel();
     _stateSub = watchVpnState().listen((s) => add(VpnStateReceived(s)));
     _trafficSub = watchTraffic().listen((t) => add(VpnTrafficReceived(t)));
   }
