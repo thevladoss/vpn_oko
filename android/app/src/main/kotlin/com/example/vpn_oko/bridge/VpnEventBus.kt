@@ -18,6 +18,7 @@ object VpnEventBus {
         )
         private set
 
+    @Synchronized
     fun addListener(listener: (VpnEventMessage) -> Unit) {
         listeners += listener
         listener(lastStatus)
