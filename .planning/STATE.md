@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: None
-last_updated: "2026-07-13T22:51:57.243Z"
+last_updated: "2026-07-13T23:05:09.094Z"
 last_activity: 2026-07-13 -- Phase 03 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 22
-  completed_plans: 18
+  completed_plans: 19
   percent: 33
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 03 (flutter-ui) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Executing Phase 03
 Last activity: 2026-07-13 -- Phase 03 execution started
 
-Progress: [████████░░] 82%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [████████░░] 82%
 | Phase 03 P02 | 6min | 2 tasks | 6 files |
 | Phase 03 P04 | 3min | 2 tasks | 7 files |
 | Phase 03 P05 | 6min | 2 tasks | 4 files |
+| Phase 03 P06 | 4min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-04: форматтеры байт/длительности — чистые top-level функции в presentation/formatters под unit-тест
 - [Phase 03]: IrisIndicator принимает VpnStatus + connectedSince (презентационный, Bloc не читает); центр отдаёт в ConnectionTimer только в connected — Экран 03-08 обернёт в BlocBuilder; виджеты остаются переиспользуемыми и тестируемыми без Bloc
 - [Phase 03]: reduce-motion читается в didChangeDependencies; oneShot-флаг отделяет смену статуса от смены зависимостей (тема/reduce не перезапускают раскрыв/shake/haptics) — Pitfall 3: MediaQuery недоступна в initState; повторный запуск одноразовых эффектов на rebuild — визуальный дефект
+- [Phase 03]: 03-06: StatusBadge рендерит слово статуса title-case ('Disconnected') — behavior-контракт find.text приоритетнее косметического uppercase UI-SPEC; вид даёт стиль labelSmall
+- [Phase 03]: 03-06: ConnectButton — StatelessWidget, бегущий сегмент в приватном _RunningSegment (уважает disableAnimations); спиннеры запрещены, прогресс через CustomPainter
+- [Phase 03]: 03-06: foreground filled-кнопки = colorScheme.onPrimary (инверсия по яркости темы), не литерал void-цвета — контраст в обеих темах и проходит grep-гейт Color(0xFF
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T22:51:09.360Z
+Last session: 2026-07-13T23:04:18.287Z
 Stopped at: None
 Resume file: None
