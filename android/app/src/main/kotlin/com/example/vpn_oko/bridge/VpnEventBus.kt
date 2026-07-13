@@ -27,6 +27,7 @@ object VpnEventBus {
         listeners -= listener
     }
 
+    @Synchronized
     fun emit(event: VpnEventMessage) {
         when (event) {
             is StatusChangedMessage -> {
