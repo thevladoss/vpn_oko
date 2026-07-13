@@ -47,7 +47,12 @@ class OkoVpnService : VpnService() {
             ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
         )
 
-        transition(VpnConnectionState.Connecting)
+        if (!transition(VpnConnectionState.Connecting)) {
+            VpnEventBus.emit(
+                LogMessage("connect ignored: already active", System.currentTimeMillis(), "warning"),
+            )
+            return START_NOT_STICKY
+        }
 
         val host = intent.getStringExtra(EXTRA_HOST).orEmpty()
         val port = intent.getLongExtra(EXTRA_PORT, 0L)
@@ -118,12 +123,12 @@ class OkoVpnService : VpnService() {
         stopSelf()
     }
 
-    private fun transition(next: VpnConnectionState) {
+    private fun transition(next: VpnConnectionState): Boolean {
         if (!canTransition(state, next)) {
             VpnEventBus.emit(
                 LogMessage("illegal transition $state -> $next", System.currentTimeMillis(), "error"),
             )
-            return
+            return false
         }
         state = next
         val status = next.toStatusMessage()
@@ -131,6 +136,7 @@ class OkoVpnService : VpnService() {
         VpnEventBus.emit(
             StatusChangedMessage(status, (next as? VpnConnectionState.Connected)?.sinceEpochMs),
         )
+        return true
     }
 
     @Synchronized
