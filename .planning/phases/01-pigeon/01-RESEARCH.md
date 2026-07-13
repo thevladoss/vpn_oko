@@ -710,22 +710,22 @@ class AppDependencies {
 | A4 | Kotlin enum-константы генерируются UPPER_CASE (`VpnStatusMessage.DISCONNECTED`) | Code Example 3 | LOW — видно в Messages.g.kt; при lowerCamel поправить обращения |
 | A5 | Верификация echo-фазы на уровне codegen+analyze+test+компиляция достаточна без обязательного live-прогона на устройстве | Environment Availability, Validation | MEDIUM — live-прогон доказывает мост end-to-end; если планировщик хочет гарантию BRG-02/04 «руками», добавить checkpoint с эмулятором |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Точные имена сгенерированных Swift/Kotlin символов (setUp, enum-константы).**
    - What we know: паттерн из официального примера — Kotlin `VpnHostApi.setUp`, Swift `VpnHostApiSetup.setUp`, StreamHandler `VpnEventsStreamHandler`, sink `PigeonEventSink<T>`.
    - What's unclear: точный кейс enum-констант и возможные суффиксы — видно только после первого `dart run pigeon`.
-   - Recommendation: первая задача плана — контракт + генерация; сверить имена в `Messages.g.kt`/`Messages.g.swift`, потом писать impl. Дёшево, снимает A2/A4.
+   - RESOLVED: план 01-01 (задача T2) генерирует контракт первой задачей и передаёт точные имена символов в SUMMARY вниз по волнам (планы 03/05/06). Снимает A2/A4.
 
 2. **Live end-to-end echo (BRG-02/BRG-04 «руками»).**
    - What we know: unit-тесты покрывают демультиплекс, replay, мапперы; компиляция обеих платформ проверяется в phase gate.
    - What's unclear: доступность эмулятора/симулятора для прогона реального стрима из Kotlin/Swift в Dart.
-   - Recommendation: добавить опциональный `checkpoint:human-verify` — запустить на эмуляторе Android, нажать echo-Connect, увидеть StatusChanged/LogMessage в debug-harness; при недоступности эмулятора зафиксировать в README как ограничение.
+   - RESOLVED: план 01-07 (задача T2) — `checkpoint:human-verify`: запуск на эмуляторе Android, echo-Connect, StatusChanged/LogMessage в debug-harness; при недоступности эмулятора фиксируется в README как ограничение.
 
 3. **Формат VpnConfigMessage под будущий VLESS.**
    - What we know: echo-конфиг зашит; поля host/port/userId/serverName достаточны для echo.
    - What's unclear: полный набор VLESS-полей (sni, type, security, pbk) появится в Phase 4.
-   - Recommendation: не расширять контракт под VLESS сейчас; Phase 4 добавит поля — pigeon-контракт версионируется, мапперы поглотят изменение.
+   - RESOLVED: контракт под VLESS сейчас не расширяется (решение зафиксировано в 01-01); Phase 4 добавит поля, мапперы поглотят изменение.
 
 ## Sources
 
