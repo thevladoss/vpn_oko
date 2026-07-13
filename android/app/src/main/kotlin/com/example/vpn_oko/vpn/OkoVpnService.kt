@@ -8,13 +8,26 @@ import androidx.core.app.ServiceCompat
 import com.example.vpn_oko.bridge.ErrorMessage
 import com.example.vpn_oko.bridge.LogMessage
 import com.example.vpn_oko.bridge.StatusChangedMessage
+import com.example.vpn_oko.bridge.TrafficChangedMessage
 import com.example.vpn_oko.bridge.VpnEventBus
+import java.io.FileInputStream
+import java.io.IOException
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 class OkoVpnService : VpnService() {
 
     private var state: VpnConnectionState = VpnConnectionState.Disconnected
     private var tunnel: ParcelFileDescriptor? = null
     private val notificationFactory by lazy { VpnNotificationFactory(this) }
+
+    private val rx = AtomicLong(0)
+    private val running = AtomicBoolean(false)
+    private var readThread: Thread? = null
+    private var trafficTicker: ScheduledExecutorService? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_DISCONNECT) {
@@ -51,8 +64,41 @@ class OkoVpnService : VpnService() {
         }
 
         tunnel = descriptor
+        startReadLoop(descriptor)
+        startTrafficTicker()
         transition(VpnConnectionState.Connected(System.currentTimeMillis()))
         return START_NOT_STICKY
+    }
+
+    private fun startReadLoop(pfd: ParcelFileDescriptor) {
+        rx.set(0)
+        running.set(true)
+        readThread = Thread {
+            val input = FileInputStream(pfd.fileDescriptor)
+            val buffer = ByteArray(32767)
+            try {
+                while (running.get()) {
+                    val read = input.read(buffer)
+                    if (read <= 0) break
+                    rx.addAndGet(read.toLong())
+                }
+            } catch (_: IOException) {
+            }
+        }.also {
+            it.isDaemon = true
+            it.start()
+        }
+    }
+
+    private fun startTrafficTicker() {
+        val ticker = Executors.newSingleThreadScheduledExecutor()
+        ticker.scheduleAtFixedRate(
+            { VpnEventBus.emit(TrafficChangedMessage(rx.get(), 0L)) },
+            1L,
+            1L,
+            TimeUnit.SECONDS,
+        )
+        trafficTicker = ticker
     }
 
     private fun buildTunnel(serverName: String): ParcelFileDescriptor? =
@@ -91,12 +137,22 @@ class OkoVpnService : VpnService() {
     private fun teardown(reason: String) {
         if (state is VpnConnectionState.Disconnected) return
         transition(VpnConnectionState.Disconnecting)
+        running.set(false)
         tunnel?.close()
         tunnel = null
+        readThread?.join(500)
+        readThread = null
+        trafficTicker?.shutdownNow()
+        trafficTicker = null
+        rx.set(0)
         VpnEventBus.emit(LogMessage(reason, System.currentTimeMillis(), "info"))
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         transition(VpnConnectionState.Disconnected)
         stopSelf()
+    }
+
+    override fun onRevoke() {
+        teardown("revoked by system")
     }
 
     override fun onDestroy() {
