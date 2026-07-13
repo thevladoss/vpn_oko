@@ -23,4 +23,20 @@ void main() {
       expect(formatBytes(1073741824), '1.0 GB');
     });
   });
+
+  group('formatBytesParts', () {
+    test('splits value and unit without brittle string parsing', () {
+      expect(formatBytesParts(0), ('0', 'B'));
+      expect(formatBytesParts(1023), ('1023', 'B'));
+      expect(formatBytesParts(1024), ('1.0', 'KB'));
+      expect(formatBytesParts(1536), ('1.5', 'KB'));
+      expect(formatBytesParts(1048576), ('1.0', 'MB'));
+      expect(formatBytesParts(1073741824), ('1.0', 'GB'));
+    });
+
+    test('formatBytes composes the same parts', () {
+      final (value, unit) = formatBytesParts(1536);
+      expect(formatBytes(1536), '$value $unit');
+    });
+  });
 }

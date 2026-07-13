@@ -25,10 +25,8 @@ class TrafficTile extends StatelessWidget {
     final icon =
         isDown ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
     final label = isDown ? 'DOWN' : 'UP';
-    final formatted = formatBytes(bytes);
-    final split = formatted.lastIndexOf(' ');
-    final value = formatted.substring(0, split);
-    final unit = formatted.substring(split + 1);
+    final (value, unit) = formatBytesParts(bytes);
+    final formatted = '$value $unit';
     final semantics = isDown ? 'Downloaded $formatted' : 'Uploaded $formatted';
 
     return Semantics(
