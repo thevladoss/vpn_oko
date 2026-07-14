@@ -8,6 +8,17 @@ final class VpnHostApiImpl: VpnHostApi {
 
   init(listener: VpnEventListener = .shared) {
     self.listener = listener
+    restoreExistingTunnel()
+  }
+
+  private func restoreExistingTunnel() {
+    #if !targetEnvironment(simulator)
+    NETunnelProviderManager.loadAllFromPreferences { [weak self] managers, _ in
+      guard let self = self, let manager = managers?.first else { return }
+      self.manager = manager
+      self.observer.attach(manager.connection, emitInitial: true)
+    }
+    #endif
   }
 
   func startVpn(config: VpnConfigMessage, completion: @escaping (Result<Void, Error>) -> Void) {
