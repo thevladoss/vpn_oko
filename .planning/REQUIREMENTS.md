@@ -58,10 +58,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Подача
 
-- [ ] **DOC-01**: README: инструкция запуска, mermaid-диаграмма архитектуры Flutter → Pigeon → VpnService / Network Extension, что взято open-source и что написано самостоятельно
-- [ ] **DOC-02**: README-раздел iOS: capabilities, entitlements, App Groups, взаимодействие app ↔ extension, ограничения симулятора
-- [ ] **DOC-03**: README-раздел «План интеграции VPN-core»: sing-box / xray / libv2ray, Android .aar, iOS .xcframework, FFI/JNI/gomobile, точки подключения в коде (интерфейс VpnCore)
-- [ ] **DOC-04**: CI GitHub Actions: flutter analyze + flutter test, бейдж в README
+- [x] **DOC-01**: README: инструкция запуска, mermaid-диаграмма архитектуры Flutter → Pigeon → VpnService / Network Extension, что взято open-source и что написано самостоятельно
+- [x] **DOC-02**: README-раздел iOS: capabilities, entitlements, App Groups, взаимодействие app ↔ extension, ограничения симулятора
+- [x] **DOC-03**: README-раздел «План интеграции VPN-core»: sing-box / xray / libv2ray, Android .aar, iOS .xcframework, FFI/JNI/gomobile, точки подключения в коде (интерфейс VpnCore)
+- [x] **DOC-04**: CI GitHub Actions: flutter analyze + flutter test, бейдж в README
 - [ ] **DOC-05**: Видео-демо 1–3 минуты: запуск, Connect, статусы/логи/трафик, Disconnect
 
 ## v2 Requirements
@@ -121,10 +121,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IOS-02 | Phase 5 | Complete |
 | IOS-03 | Phase 5 | Complete |
 | IOS-04 | Phase 5 | Complete |
-| DOC-01 | Phase 6 | Pending |
-| DOC-02 | Phase 6 | Pending |
-| DOC-03 | Phase 6 | Pending |
-| DOC-04 | Phase 6 | Pending |
+| DOC-01 | Phase 6 | Complete |
+| DOC-02 | Phase 6 | Complete |
+| DOC-03 | Phase 6 | Complete |
+| DOC-04 | Phase 6 | Complete |
 | DOC-05 | Phase 6 | Pending |
 
 **Coverage:**

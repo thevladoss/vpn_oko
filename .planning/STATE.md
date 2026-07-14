@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-14T02:50:26.701Z"
-last_activity: 2026-07-14 -- Phase 05 execution started
+last_updated: "2026-07-14T03:47:37.978Z"
+last_activity: 2026-07-14 -- Phase 06 execution started
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 31
-  completed_plans: 30
-  percent: 67
+  completed_phases: 5
+  total_plans: 35
+  completed_plans: 32
+  percent: 83
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Реально работающий Android VpnService с живым потоком статусов и логов из native во Flutter через чистый типобезопасный мост.
-**Current focus:** Phase 05 — ios-network-extension
+**Current focus:** Phase 06 — podacha
 
 ## Current Position
 
-Phase: 05 (ios-network-extension) — EXECUTING
-Plan: 3 of 3
-Status: Executing Phase 05
-Last activity: 2026-07-14 -- Phase 05 execution started
+Phase: 06 (podacha) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 06
+Last activity: 2026-07-14 -- Phase 06 execution started
 
-Progress: [██████████] 97%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Progress: [██████████] 97%
 | Phase 04 P05 | 6min | 2 tasks | 4 files |
 | Phase 05 P01 | 16min | 2 tasks | 6 files |
 | Phase 05 P02 | 14min | 2 tasks | 4 files |
+| Phase 06 P01 | 4min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -136,6 +137,8 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-01: entitlement packet-tunnel-provider + App Group group.com.example.vpnOko у обоих таргетов (Runner+PacketTunnel); Info.plist NSExtensionPointIdentifier com.apple.networkextension.packet-tunnel (без -provider); bundle id com.example.vpnOko.PacketTunnel
 - [Phase ?]: 05-02: echo VpnHostApiImpl заменён реальным NETunnelProviderManager (load→save→loadFromPreferences reload→startVPNTunnel); честный симулятор-путь connecting→error+лог доказывает живой менеджер
 - [Phase ?]: 05-02: VpnStatusObserver (NEVPNStatusDidChange) доводит NEVPNStatus до Flutter только через VpnEventListener.emit (main queue); runtime-демо/реальные переходы — device-checkpoint 05-03 (packet-tunnel NE appex не ставится на симулятор)
+- [Phase ?]: 06-01: интерфейс VpnCore описан только в README (эскиз Kotlin/Swift), в код не введён — very_good_analysis ловит мёртвый код
+- [Phase ?]: 06-01: CI-бейдж README с плейсхолдером <owner>/<repo> — git remote не настроен, реальные owner/repo подставит пользователь на сдаче (план 06-04)
 
 ### Pending Todos
 
@@ -158,6 +161,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T02:49:40.974Z
+Last session: 2026-07-14T03:46:18.072Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None
