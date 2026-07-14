@@ -55,12 +55,16 @@ final class VpnHostApiImpl: VpnHostApi {
       manager.localizedDescription = "Oko VPN"
       manager.isEnabled = true
 
+      self.log("preferences loaded, saving config")
+
       manager.saveToPreferences { error in
         if let error = error {
           self.fail(code: "ne_error", message: error.localizedDescription)
           completion(.success(()))
           return
         }
+
+        self.log("config saved, reloading")
 
         manager.loadFromPreferences { error in
           if let error = error {
@@ -72,6 +76,7 @@ final class VpnHostApiImpl: VpnHostApi {
           do {
             self.observer.attach(manager.connection)
             try manager.connection.startVPNTunnel()
+            self.log("startVPNTunnel invoked")
             completion(.success(()))
           } catch {
             self.fail(code: "ne_error", message: error.localizedDescription)
@@ -110,8 +115,13 @@ final class VpnHostApiImpl: VpnHostApi {
   }
 
   private func fail(code: String, message: String) {
+    listener.emit(LogMessage(text: "error [\(code)]: \(message)", timestampMillis: nowMillis(), level: "error"))
     listener.emit(ErrorMessage(code: code, message: message))
     listener.emit(StatusChangedMessage(status: .error))
+  }
+
+  private func log(_ text: String) {
+    listener.emit(LogMessage(text: text, timestampMillis: nowMillis(), level: "debug"))
   }
 
   private func nowMillis() -> Int64 {
