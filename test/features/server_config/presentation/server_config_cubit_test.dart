@@ -1,13 +1,28 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_state.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
 import '../../../helpers/fake_latency_probe.dart';
+
+class _GatedProbe implements LatencyProbe {
+  _GatedProbe(this._gate);
+
+  final Completer<void> _gate;
+
+  @override
+  Future<LatencyResult> measure(String host, int port) async {
+    await _gate.future;
+    return const LatencyMeasured(Duration(milliseconds: 10));
+  }
+}
 
 const _validLink =
     'vless://b831381d-6324-4d53-ad4f-8cda48b30811@example.com:443'
@@ -89,4 +104,29 @@ void main() {
     expect: () => const [ServerConfigError(VlessError.scheme)],
     verify: (_) => expect(probe.measureCallCount, 0),
   );
+
+  test('close во время measure не бросает StateError и не эмитит после close',
+      () async {
+    final gate = Completer<void>();
+    final gatedProbe = _GatedProbe(gate);
+    final gatedClipboard = FakeClipboardSource(textToReturn: _validLink);
+    final cubit = ServerConfigCubit(
+      clipboard: gatedClipboard,
+      probe: gatedProbe,
+    );
+    final states = <ServerConfigState>[];
+    final sub = cubit.stream.listen(states.add);
+
+    final future = cubit.pasteFromClipboard();
+    await Future<void>.delayed(Duration.zero);
+    await cubit.close();
+    gate.complete();
+    await future;
+    await sub.cancel();
+
+    final withLatency = states.whereType<ServerConfigLoaded>().where(
+          (s) => s.latency != null,
+        );
+    expect(withLatency, isEmpty);
+  });
 }

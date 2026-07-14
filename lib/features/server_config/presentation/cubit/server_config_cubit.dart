@@ -14,6 +14,9 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
 
   Future<void> pasteFromClipboard() async {
     final raw = await clipboard.readText();
+    if (isClosed) {
+      return;
+    }
     if (raw == null || raw.trim().isEmpty) {
       emit(const ServerConfigError(VlessError.empty));
       return;
@@ -24,6 +27,9 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
       case VlessParsed(:final config):
         emit(ServerConfigLoaded(config));
         final latency = await probe.measure(config.host, config.port);
+        if (isClosed) {
+          return;
+        }
         emit(ServerConfigLoaded(config, latency: latency));
     }
   }
