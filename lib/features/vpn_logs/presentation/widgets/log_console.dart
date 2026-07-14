@@ -9,18 +9,51 @@ import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_state.dart';
 import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_line.dart';
 
-class LogConsole extends StatelessWidget {
+class LogConsole extends StatefulWidget {
   const LogConsole({super.key});
 
+  @override
+  State<LogConsole> createState() => _LogConsoleState();
+}
+
+class _LogConsoleState extends State<LogConsole> {
   static const double _bottomThreshold = 24;
+  static const double _collapsed = 0.12;
+  static const double _expanded = 0.70;
+
+  final DraggableScrollableController _sheet =
+      DraggableScrollableController();
+
+  @override
+  void dispose() {
+    _sheet.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    if (!_sheet.isAttached) return;
+    final target = _sheet.size > (_collapsed + _expanded) / 2
+        ? _collapsed
+        : _expanded;
+    unawaited(
+      _sheet.animateTo(
+        target,
+        duration: OkoMotion.autoscroll,
+        curve: OkoMotion.autoscrollCurve,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     return DraggableScrollableSheet(
-      initialChildSize: 0.12,
-      minChildSize: 0.12,
-      maxChildSize: 0.70,
+      controller: _sheet,
+      initialChildSize: _collapsed,
+      minChildSize: _collapsed,
+      maxChildSize: _expanded,
+      snap: true,
+      snapSizes: const [_collapsed, _expanded],
       builder: (context, scrollController) {
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -30,7 +63,7 @@ class LogConsole extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _Header(onCopy: () => _copyAll(context)),
+              _Header(onCopy: () => _copyAll(context), onToggle: _toggle),
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (notification) {
@@ -104,56 +137,69 @@ class LogConsole extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.onCopy});
+  const _Header({required this.onCopy, required this.onToggle});
 
   final Future<void> Function() onCopy;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: tones.textSecondary,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
+    return Semantics(
+      button: true,
+      label: 'Toggle logs panel',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onToggle,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Semantics(
-                header: true,
-                child: Text(
-                  'Logs',
-                  style: textTheme.titleMedium
-                      ?.copyWith(color: tones.textPrimary),
-                ),
-              ),
-              const Spacer(),
-              Semantics(
-                button: true,
-                label: 'Copy all logs',
-                child: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: IconButton(
-                    onPressed: onCopy,
-                    icon: Icon(Icons.copy_rounded, color: tones.textSecondary),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: tones.textSecondary,
+                    borderRadius: BorderRadius.circular(999),
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      'Logs',
+                      style: textTheme.titleMedium
+                          ?.copyWith(color: tones.textPrimary),
+                    ),
+                  ),
+                  Icon(Icons.expand_less_rounded, color: tones.textSecondary),
+                  const Spacer(),
+                  Semantics(
+                    button: true,
+                    label: 'Copy all logs',
+                    child: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: IconButton(
+                        onPressed: onCopy,
+                        icon: Icon(
+                          Icons.copy_rounded,
+                          color: tones.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

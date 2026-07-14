@@ -48,7 +48,6 @@ class ServerCard extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right_rounded, color: tones.textSecondary),
         ],
       ),
     );
