@@ -198,6 +198,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               .add(const DisconnectRequested()),
                         ),
                       ),
+                      const SizedBox(height: 16),
                       const SizedBox(height: LogConsole.collapsedHeight),
                     ],
                   ),
