@@ -112,7 +112,11 @@ Plans:
   2. Extension-таргет с PacketTunnelProvider стартует и останавливает туннель через NETunnelProviderManager, NEPacketTunnelNetworkSettings применяются
   3. Смена статуса туннеля из extension доходит до Flutter-экрана через NEVPNStatus observer
   4. Packet Tunnel entitlements и App Group настроены у обоих таргетов; архив собирается и готов к прогону через TestFlight на устройстве
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 05-01-PLAN.md — NE-таргет PacketTunnel через xcodeproj, provider с узким маршрутом, entitlements + App Group обоих таргетов (IOS-02, IOS-04)
+- [ ] 05-02-PLAN.md — Реальный VpnHostApiImpl (NETunnelProviderManager) + VpnStatusObserver, честный путь ошибки в симуляторе (IOS-01, IOS-02, IOS-03)
+- [ ] 05-03-PLAN.md — Device/TestFlight checkpoint реального туннеля + handoff-заметка DOC-02 (IOS-01, IOS-02, IOS-03, IOS-04)
 
 ### Phase 6: Подача
 **Goal**: Ревьюер запускает проект по README за минуты и получает полную картину архитектуры, ограничений и плана интеграции core
@@ -138,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
 | 4. VLESS-конфиг сервера | 6/6 | Complete   | 2026-07-14 |
-| 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
+| 5. iOS-мост и Network Extension | 0/3 | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
 
 ---
