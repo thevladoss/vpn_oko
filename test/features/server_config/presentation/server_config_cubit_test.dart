@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_state.dart';
@@ -22,6 +23,25 @@ class _GatedProbe implements LatencyProbe {
     await _gate.future;
     return const LatencyMeasured(Duration(milliseconds: 10));
   }
+}
+
+class _SequenceClipboard implements ClipboardSource {
+  _SequenceClipboard(this._items);
+
+  final List<String> _items;
+  int _index = 0;
+
+  @override
+  Future<String?> readText() async => _items[_index++];
+}
+
+class _HostGateProbe implements LatencyProbe {
+  _HostGateProbe(this.gates);
+
+  final Map<String, Future<LatencyResult>> gates;
+
+  @override
+  Future<LatencyResult> measure(String host, int port) => gates[host]!;
 }
 
 const _validLink =
@@ -153,5 +173,42 @@ void main() {
           (s) => s.latency != null,
         );
     expect(withLatency, isEmpty);
+  });
+
+  test('гонка: поздний measure первого конфига не перетирает второй',
+      () async {
+    const uuid = 'b831381d-6324-4d53-ad4f-8cda48b30811';
+    final gateA = Completer<LatencyResult>();
+    final gateB = Completer<LatencyResult>();
+    final raceProbe = _HostGateProbe({
+      'a.example': gateA.future,
+      'b.example': gateB.future,
+    });
+    final raceClipboard = _SequenceClipboard([
+      'vless://$uuid@a.example:443#A',
+      'vless://$uuid@b.example:443#B',
+    ]);
+    final cubit = ServerConfigCubit(
+      clipboard: raceClipboard,
+      probe: raceProbe,
+    );
+
+    final f1 = cubit.pasteFromClipboard();
+    await Future<void>.delayed(Duration.zero);
+    final f2 = cubit.pasteFromClipboard();
+    await Future<void>.delayed(Duration.zero);
+
+    gateB.complete(const LatencyMeasured(Duration(milliseconds: 20)));
+    await Future<void>.delayed(Duration.zero);
+    gateA.complete(const LatencyMeasured(Duration(milliseconds: 99)));
+    await Future.wait([f1, f2]);
+
+    final state = cubit.state;
+    expect(state, isA<ServerConfigLoaded>());
+    final loaded = state as ServerConfigLoaded;
+    expect(loaded.config.host, 'b.example');
+    expect(loaded.latency, const LatencyMeasured(Duration(milliseconds: 20)));
+
+    await cubit.close();
   });
 }

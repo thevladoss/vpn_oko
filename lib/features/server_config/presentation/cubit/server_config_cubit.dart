@@ -13,17 +13,20 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
   final ClipboardSource clipboard;
   final LatencyProbe probe;
 
+  int _generation = 0;
+
   Future<void> pasteFromClipboard() async {
+    final generation = ++_generation;
     final String? raw;
     try {
       raw = await clipboard.readText();
     } on Object {
-      if (!isClosed) {
+      if (!isClosed && generation == _generation) {
         emit(const ServerConfigError(VlessError.malformed));
       }
       return;
     }
-    if (isClosed) {
+    if (isClosed || generation != _generation) {
       return;
     }
     if (raw == null || raw.trim().isEmpty) {
@@ -39,14 +42,14 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
         try {
           latency = await probe.measure(config.host, config.port);
         } on Object {
-          if (!isClosed) {
+          if (!isClosed && generation == _generation) {
             emit(
               ServerConfigLoaded(config, latency: const LatencyUnreachable()),
             );
           }
           return;
         }
-        if (isClosed) {
+        if (isClosed || generation != _generation) {
           return;
         }
         emit(ServerConfigLoaded(config, latency: latency));
