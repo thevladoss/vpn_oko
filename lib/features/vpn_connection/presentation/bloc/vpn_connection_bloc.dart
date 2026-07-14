@@ -21,11 +21,13 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     required this.connectVpn,
     required this.disconnectVpn,
     required this.syncStatus,
-    required this.config,
-  }) : super(const VpnConnectionState(status: VpnStatus.disconnected)) {
+    required VpnConfig config,
+  }) : _activeConfig = config,
+       super(const VpnConnectionState(status: VpnStatus.disconnected)) {
     on<VpnStarted>(_onStarted);
     on<VpnStateReceived>(_onStateReceived);
     on<VpnTrafficReceived>(_onTrafficReceived);
+    on<ConfigSelected>(_onConfigSelected);
     on<ConnectRequested>(_onConnectRequested);
     on<DisconnectRequested>(_onDisconnectRequested);
   }
@@ -35,7 +37,10 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
   final ConnectVpn connectVpn;
   final DisconnectVpn disconnectVpn;
   final SyncStatus syncStatus;
-  final VpnConfig config;
+
+  VpnConfig _activeConfig;
+
+  VpnConfig get config => _activeConfig;
 
   StreamSubscription<VpnState>? _stateSub;
   StreamSubscription<TrafficStats>? _trafficSub;
@@ -82,12 +87,19 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     );
   }
 
+  void _onConfigSelected(
+    ConfigSelected event,
+    Emitter<VpnConnectionState> emit,
+  ) {
+    _activeConfig = event.config;
+  }
+
   void _onConnectRequested(
     ConnectRequested event,
     Emitter<VpnConnectionState> emit,
   ) {
     if (state.isBusy) return;
-    unawaited(connectVpn(config));
+    unawaited(connectVpn(_activeConfig));
   }
 
   void _onDisconnectRequested(
@@ -101,35 +113,35 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
   VpnConnectionState _map(VpnState domain) {
     return switch (domain) {
       VpnDisconnected() => state.copyWith(
-          status: VpnStatus.disconnected,
-          rxBytes: 0,
-          txBytes: 0,
-          clearConnectedSince: true,
-          clearError: true,
-        ),
+        status: VpnStatus.disconnected,
+        rxBytes: 0,
+        txBytes: 0,
+        clearConnectedSince: true,
+        clearError: true,
+      ),
       VpnConnecting() => state.copyWith(
-          status: VpnStatus.connecting,
-          rxBytes: 0,
-          txBytes: 0,
-          clearConnectedSince: true,
-          clearError: true,
-        ),
+        status: VpnStatus.connecting,
+        rxBytes: 0,
+        txBytes: 0,
+        clearConnectedSince: true,
+        clearError: true,
+      ),
       VpnConnected(:final connectedSince) => state.copyWith(
-          status: VpnStatus.connected,
-          connectedSince: connectedSince,
-          clearConnectedSince: connectedSince == null,
-          clearError: true,
-        ),
+        status: VpnStatus.connected,
+        connectedSince: connectedSince,
+        clearConnectedSince: connectedSince == null,
+        clearError: true,
+      ),
       VpnDisconnecting() => state.copyWith(
-          status: VpnStatus.disconnecting,
-          clearConnectedSince: true,
-          clearError: true,
-        ),
+        status: VpnStatus.disconnecting,
+        clearConnectedSince: true,
+        clearError: true,
+      ),
       VpnError(:final message) => state.copyWith(
-          status: VpnStatus.error,
-          errorMessage: message,
-          clearConnectedSince: true,
-        ),
+        status: VpnStatus.error,
+        errorMessage: message,
+        clearConnectedSince: true,
+      ),
     };
   }
 

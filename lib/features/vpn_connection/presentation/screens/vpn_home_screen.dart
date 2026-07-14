@@ -11,6 +11,7 @@ import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_
 import 'package:vpn_oko/features/server_config/presentation/widgets/paste_config_button.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/vless_error_text.dart';
+import 'package:vpn_oko/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
@@ -80,138 +81,148 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     final config = context.read<VpnConnectionBloc>().config;
-    return Scaffold(
-      body: BlocBuilder<VpnConnectionBloc, VpnConnectionState>(
-        builder: (context, state) {
-          final accent = tones.accentFor(state.status);
-          return Stack(
-            children: [
-              _GlowLayer(accent: accent, status: state.status),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 56,
-                        child: Row(
-                          children: [
-                            OkoWordmark(status: state.status),
-                            const Spacer(),
-                            StatusBadge(status: state.status),
-                          ],
+    return BlocListener<ServerConfigCubit, ServerConfigState>(
+      listener: (context, cfgState) {
+        if (cfgState is ServerConfigLoaded) {
+          context.read<VpnConnectionBloc>().add(
+            ConfigSelected(proxyConfigToVpnConfig(cfgState.config)),
+          );
+        }
+      },
+      child: Scaffold(
+        body: BlocBuilder<VpnConnectionBloc, VpnConnectionState>(
+          builder: (context, state) {
+            final accent = tones.accentFor(state.status);
+            return Stack(
+              children: [
+                _GlowLayer(accent: accent, status: state.status),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 56,
+                          child: Row(
+                            children: [
+                              OkoWordmark(status: state.status),
+                              const Spacer(),
+                              StatusBadge(status: state.status),
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: _Staggered(
+                        Expanded(
+                          child: _Staggered(
+                            animation: _entrance,
+                            interval: _interval(OkoMotion.staggerIris),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 32),
+                              child: IrisIndicator(
+                                status: state.status,
+                                connectedSince: state.connectedSince,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (state.status == VpnStatus.error &&
+                            state.errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(
+                              state.errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: tones.accentError,
+                              ),
+                            ),
+                          ),
+                        _Staggered(
                           animation: _entrance,
-                          interval: _interval(OkoMotion.staggerIris),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 32),
-                            child: IrisIndicator(
-                              status: state.status,
-                              connectedSince: state.connectedSince,
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (state.status == VpnStatus.error &&
-                          state.errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(
-                            state.errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: tones.accentError,
-                            ),
-                          ),
-                        ),
-                      _Staggered(
-                        animation: _entrance,
-                        interval: _interval(OkoMotion.staggerServerCard),
-                        child: Column(
-                          children: [
-                            BlocBuilder<ServerConfigCubit, ServerConfigState>(
-                              builder: (context, cfgState) =>
-                                  switch (cfgState) {
-                                    ServerConfigLoaded(
-                                      :final config,
-                                      :final latency,
-                                    ) =>
-                                      VlessConfigCard(
-                                        config: config,
-                                        latency: latency,
-                                      ),
-                                    ServerConfigError(:final error) => Column(
-                                      children: [
-                                        ServerCard(
-                                          serverName: config.serverName,
-                                          host: config.host,
-                                          port: config.port,
+                          interval: _interval(OkoMotion.staggerServerCard),
+                          child: Column(
+                            children: [
+                              BlocBuilder<ServerConfigCubit, ServerConfigState>(
+                                builder: (context, cfgState) =>
+                                    switch (cfgState) {
+                                      ServerConfigLoaded(
+                                        :final config,
+                                        :final latency,
+                                      ) =>
+                                        VlessConfigCard(
+                                          config: config,
+                                          latency: latency,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          describeVlessError(error),
-                                          textAlign: TextAlign.center,
-                                          style: textTheme.bodySmall?.copyWith(
-                                            color: tones.accentError,
+                                      ServerConfigError(:final error) => Column(
+                                        children: [
+                                          ServerCard(
+                                            serverName: config.serverName,
+                                            host: config.host,
+                                            port: config.port,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    ServerConfigInitial() => ServerCard(
-                                      serverName: config.serverName,
-                                      host: config.host,
-                                      port: config.port,
-                                    ),
-                                  },
-                            ),
-                            const SizedBox(height: 12),
-                            PasteConfigButton(
-                              onPressed: () => _pasteConfig(context),
-                            ),
-                          ],
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            describeVlessError(error),
+                                            textAlign: TextAlign.center,
+                                            style: textTheme.bodySmall
+                                                ?.copyWith(
+                                                  color: tones.accentError,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      ServerConfigInitial() => ServerCard(
+                                        serverName: config.serverName,
+                                        host: config.host,
+                                        port: config.port,
+                                      ),
+                                    },
+                              ),
+                              const SizedBox(height: 12),
+                              PasteConfigButton(
+                                onPressed: () => _pasteConfig(context),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      _Staggered(
-                        animation: _entrance,
-                        interval: _interval(OkoMotion.staggerTrafficPanel),
-                        child: TrafficPanel(
-                          rxBytes: state.rxBytes,
-                          txBytes: state.txBytes,
-                          status: state.status,
+                        const SizedBox(height: 24),
+                        _Staggered(
+                          animation: _entrance,
+                          interval: _interval(OkoMotion.staggerTrafficPanel),
+                          child: TrafficPanel(
+                            rxBytes: state.rxBytes,
+                            txBytes: state.txBytes,
+                            status: state.status,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      _Staggered(
-                        animation: _entrance,
-                        interval: _interval(OkoMotion.staggerConnectButton),
-                        child: ConnectButton(
-                          status: state.status,
-                          onConnect: () => context
-                              .read<VpnConnectionBloc>()
-                              .add(const ConnectRequested()),
-                          onDisconnect: () => context
-                              .read<VpnConnectionBloc>()
-                              .add(const DisconnectRequested()),
+                        const SizedBox(height: 24),
+                        _Staggered(
+                          animation: _entrance,
+                          interval: _interval(OkoMotion.staggerConnectButton),
+                          child: ConnectButton(
+                            status: state.status,
+                            onConnect: () => context
+                                .read<VpnConnectionBloc>()
+                                .add(const ConnectRequested()),
+                            onDisconnect: () => context
+                                .read<VpnConnectionBloc>()
+                                .add(const DisconnectRequested()),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      const SizedBox(height: LogConsole.collapsedHeight),
-                    ],
+                        const SizedBox(height: 16),
+                        const SizedBox(height: LogConsole.collapsedHeight),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              _Staggered(
-                animation: _entrance,
-                interval: _interval(OkoMotion.staggerLogConsole),
-                child: const LogConsole(),
-              ),
-            ],
-          );
-        },
+                _Staggered(
+                  animation: _entrance,
+                  interval: _interval(OkoMotion.staggerLogConsole),
+                  child: const LogConsole(),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
