@@ -12,7 +12,7 @@ import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_line.dart';
 class LogConsole extends StatefulWidget {
   const LogConsole({super.key});
 
-  static const double collapsedHeight = 84;
+  static const double collapsedHeight = 64;
 
   @override
   State<LogConsole> createState() => _LogConsoleState();
@@ -102,7 +102,6 @@ class _LogConsoleState extends State<LogConsole>
                 child: Column(
                   children: [
                     _Header(
-                      expanded: _controller.value > 0.5,
                       onTap: _toggle,
                       onDragUpdate: _onDragUpdate,
                       onDragEnd: _onDragEnd,
@@ -188,14 +187,12 @@ class _LogConsoleState extends State<LogConsole>
 
 class _Header extends StatelessWidget {
   const _Header({
-    required this.expanded,
     required this.onTap,
     required this.onDragUpdate,
     required this.onDragEnd,
     required this.onCopy,
   });
 
-  final bool expanded;
   final VoidCallback onTap;
   final GestureDragUpdateCallback onDragUpdate;
   final GestureDragEndCallback onDragEnd;
@@ -216,7 +213,7 @@ class _Header extends StatelessWidget {
         child: SizedBox(
           height: LogConsole.collapsedHeight,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 8, 6),
+            padding: const EdgeInsets.fromLTRB(16, 6, 8, 4),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -230,7 +227,7 @@ class _Header extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Semantics(
@@ -240,12 +237,6 @@ class _Header extends StatelessWidget {
                         style: textTheme.titleMedium
                             ?.copyWith(color: tones.textPrimary),
                       ),
-                    ),
-                    Icon(
-                      expanded
-                          ? Icons.expand_more_rounded
-                          : Icons.expand_less_rounded,
-                      color: tones.textSecondary,
                     ),
                     const Spacer(),
                     Semantics(

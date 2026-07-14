@@ -65,6 +65,25 @@ void main() {
       tester.getSize(find.byType(ListView)).height;
 
   group('LogConsole', () {
+    test('collapsed height is 64', () {
+      expect(LogConsole.collapsedHeight, 64);
+    });
+
+    testWidgets('shows no expand chevron in the header', (tester) async {
+      enlarge(tester);
+      controller.add(_entry('alpha'));
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.expand_less_rounded), findsNothing);
+      expect(find.byIcon(Icons.expand_more_rounded), findsNothing);
+
+      await tapHeader(tester);
+
+      expect(find.byIcon(Icons.expand_less_rounded), findsNothing);
+      expect(find.byIcon(Icons.expand_more_rounded), findsNothing);
+    });
+
     testWidgets('renders one LogLine per buffered entry once expanded',
         (tester) async {
       enlarge(tester);
