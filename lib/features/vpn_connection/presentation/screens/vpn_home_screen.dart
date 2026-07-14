@@ -80,7 +80,6 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     final config = context.read<VpnConnectionBloc>().config;
-    final sheetPeek = MediaQuery.sizeOf(context).height * 0.12;
     return Scaffold(
       body: BlocBuilder<VpnConnectionBloc, VpnConnectionState>(
         builder: (context, state) {
@@ -199,7 +198,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               .add(const DisconnectRequested()),
                         ),
                       ),
-                      SizedBox(height: sheetPeek),
+                      const SizedBox(height: LogConsole.collapsedHeight),
                     ],
                   ),
                 ),

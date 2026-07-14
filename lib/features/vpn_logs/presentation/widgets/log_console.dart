@@ -12,103 +12,142 @@ import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_line.dart';
 class LogConsole extends StatefulWidget {
   const LogConsole({super.key});
 
+  static const double collapsedHeight = 84;
+
   @override
   State<LogConsole> createState() => _LogConsoleState();
 }
 
-class _LogConsoleState extends State<LogConsole> {
+class _LogConsoleState extends State<LogConsole>
+    with SingleTickerProviderStateMixin {
   static const double _bottomThreshold = 24;
-  static const double _collapsed = 0.12;
-  static const double _expanded = 0.70;
-  static const double _headerExtent = 60;
+  static const double _expandedFraction = 0.70;
+  static const double _flingVelocity = 320;
 
-  final DraggableScrollableController _sheet =
-      DraggableScrollableController();
+  late final AnimationController _controller;
+  final ScrollController _scroll = ScrollController();
+  bool _open = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: OkoMotion.autoscroll,
+    );
+  }
 
   @override
   void dispose() {
-    _sheet.dispose();
+    _controller.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
-  void _toggle() {
-    if (!_sheet.isAttached) return;
-    final target = _sheet.size > (_collapsed + _expanded) / 2
-        ? _collapsed
-        : _expanded;
+  double get _expandedHeight =>
+      MediaQuery.sizeOf(context).height * _expandedFraction;
+
+  double get _dragRange => _expandedHeight - LogConsole.collapsedHeight;
+
+  void _animateTo({required bool open, required bool haptic}) {
+    if (haptic) unawaited(HapticFeedback.selectionClick());
+    _open = open;
     unawaited(
-      _sheet.animateTo(
-        target,
+      _controller.animateTo(
+        open ? 1 : 0,
         duration: OkoMotion.autoscroll,
         curve: OkoMotion.autoscrollCurve,
       ),
     );
   }
 
+  void _toggle() => _animateTo(open: !_open, haptic: true);
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    if (_dragRange <= 0) return;
+    final delta = details.primaryDelta ?? 0;
+    _controller.value =
+        (_controller.value - delta / _dragRange).clamp(0.0, 1.0);
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    final velocity = details.velocity.pixelsPerSecond.dy;
+    final open = velocity.abs() > _flingVelocity
+        ? velocity < 0
+        : _controller.value >= 0.5;
+    _animateTo(open: open, haptic: _open != open);
+  }
+
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
-    return DraggableScrollableSheet(
-      controller: _sheet,
-      initialChildSize: _collapsed,
-      minChildSize: _collapsed,
-      maxChildSize: _expanded,
-      snap: true,
-      snapSizes: const [_collapsed, _expanded],
-      builder: (context, scrollController) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            color: tones.surfaceElevated,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification is UserScrollNotification) {
-                _syncAutoScroll(context, scrollController);
-              }
-              return false;
-            },
-            child: BlocConsumer<LogsCubit, LogsState>(
-              listener: (context, state) =>
-                  _followTail(state, scrollController),
-              builder: (context, state) {
-                return CustomScrollView(
-                  controller: scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  slivers: [
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _HeaderDelegate(
-                        extent: _headerExtent,
-                        onCopy: () => _copyAll(context),
-                        onToggle: _toggle,
-                      ),
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final height =
+              LogConsole.collapsedHeight + _dragRange * _controller.value;
+          return SizedBox(
+            height: height + bottomInset,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: tones.surfaceElevated,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(bottom: bottomInset),
+                child: Column(
+                  children: [
+                    _Header(
+                      expanded: _controller.value > 0.5,
+                      onTap: _toggle,
+                      onDragUpdate: _onDragUpdate,
+                      onDragEnd: _onDragEnd,
+                      onCopy: () => _copyAll(context),
                     ),
-                    if (state.entries.isEmpty)
-                      const SliverToBoxAdapter(child: _EmptyState())
-                    else
-                      SliverPadding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        sliver: SliverList.builder(
-                          itemCount: state.entries.length,
-                          itemBuilder: (_, index) =>
-                              LogLine(entry: state.entries[index]),
-                        ),
-                      ),
+                    Expanded(child: ClipRect(child: child)),
                   ],
-                );
-              },
+                ),
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+        child: BlocConsumer<LogsCubit, LogsState>(
+          listener: (context, state) => _followTail(state),
+          builder: (context, state) {
+            if (state.entries.isEmpty) {
+              return const SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: _EmptyState(),
+              );
+            }
+            return NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is UserScrollNotification) {
+                  _syncAutoScroll(context);
+                }
+                return false;
+              },
+              child: ListView.builder(
+                controller: _scroll,
+                physics: const ClampingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 16),
+                itemCount: state.entries.length,
+                itemBuilder: (_, index) => LogLine(entry: state.entries[index]),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
-  void _syncAutoScroll(BuildContext context, ScrollController controller) {
-    if (!controller.hasClients) return;
-    final position = controller.position;
+  void _syncAutoScroll(BuildContext context) {
+    if (!_scroll.hasClients) return;
+    final position = _scroll.position;
     if (!position.hasContentDimensions) return;
     final atBottom =
         position.pixels >= position.maxScrollExtent - _bottomThreshold;
@@ -119,14 +158,14 @@ class _LogConsoleState extends State<LogConsole> {
     }
   }
 
-  void _followTail(LogsState state, ScrollController controller) {
-    if (!state.autoScroll || !controller.hasClients) return;
+  void _followTail(LogsState state) {
+    if (!state.autoScroll || !_scroll.hasClients) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!controller.hasClients) return;
-      final position = controller.position;
+      if (!_scroll.hasClients) return;
+      final position = _scroll.position;
       if (!position.hasContentDimensions) return;
       unawaited(
-        controller.animateTo(
+        _scroll.animateTo(
           position.maxScrollExtent,
           duration: OkoMotion.autoscroll,
           curve: OkoMotion.autoscrollCurve,
@@ -147,29 +186,23 @@ class _LogConsoleState extends State<LogConsole> {
   }
 }
 
-class _HeaderDelegate extends SliverPersistentHeaderDelegate {
-  const _HeaderDelegate({
-    required this.extent,
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.expanded,
+    required this.onTap,
+    required this.onDragUpdate,
+    required this.onDragEnd,
     required this.onCopy,
-    required this.onToggle,
   });
 
-  final double extent;
+  final bool expanded;
+  final VoidCallback onTap;
+  final GestureDragUpdateCallback onDragUpdate;
+  final GestureDragEndCallback onDragEnd;
   final Future<void> Function() onCopy;
-  final VoidCallback onToggle;
 
   @override
-  double get minExtent => extent;
-
-  @override
-  double get maxExtent => extent;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     return Semantics(
@@ -177,11 +210,13 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
       label: 'Toggle logs panel',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: onToggle,
-        child: ColoredBox(
-          color: tones.surfaceElevated,
+        onTap: onTap,
+        onVerticalDragUpdate: onDragUpdate,
+        onVerticalDragEnd: onDragEnd,
+        child: SizedBox(
+          height: LogConsole.collapsedHeight,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 6),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -195,7 +230,7 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Semantics(
@@ -206,7 +241,12 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
                             ?.copyWith(color: tones.textPrimary),
                       ),
                     ),
-                    Icon(Icons.expand_less_rounded, color: tones.textSecondary),
+                    Icon(
+                      expanded
+                          ? Icons.expand_more_rounded
+                          : Icons.expand_less_rounded,
+                      color: tones.textSecondary,
+                    ),
                     const Spacer(),
                     Semantics(
                       button: true,
@@ -232,11 +272,6 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
         ),
       ),
     );
-  }
-
-  @override
-  bool shouldRebuild(_HeaderDelegate oldDelegate) {
-    return extent != oldDelegate.extent;
   }
 }
 

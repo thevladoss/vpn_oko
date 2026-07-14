@@ -56,8 +56,17 @@ void main() {
         ),
       );
 
+  Future<void> tapHeader(WidgetTester tester) async {
+    await tester.tap(find.text('Logs'));
+    await tester.pumpAndSettle();
+  }
+
+  double listHeight(WidgetTester tester) =>
+      tester.getSize(find.byType(ListView)).height;
+
   group('LogConsole', () {
-    testWidgets('renders one LogLine per buffered entry', (tester) async {
+    testWidgets('renders one LogLine per buffered entry once expanded',
+        (tester) async {
       enlarge(tester);
       controller
         ..add(_entry('alpha'))
@@ -65,14 +74,17 @@ void main() {
         ..add(_entry('gamma', level: LogLevel.error));
       await tester.pumpWidget(consoleHost());
       await tester.pumpAndSettle();
+      await tapHeader(tester);
 
       expect(find.byType(LogLine), findsNWidgets(3));
     });
 
-    testWidgets('shows Waiting for events for an empty buffer', (tester) async {
+    testWidgets('shows Waiting for events for an empty expanded panel',
+        (tester) async {
       enlarge(tester);
       await tester.pumpWidget(consoleHost());
       await tester.pumpAndSettle();
+      await tapHeader(tester);
 
       expect(find.text('Waiting for events'), findsOneWidget);
       expect(
@@ -82,12 +94,75 @@ void main() {
       expect(find.byType(LogLine), findsNothing);
     });
 
+    testWidgets('a tap on the header expands the panel', (tester) async {
+      enlarge(tester);
+      controller.add(_entry('alpha'));
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      expect(listHeight(tester), 0);
+
+      await tapHeader(tester);
+
+      expect(listHeight(tester), greaterThan(0));
+      expect(find.byType(LogLine), findsOneWidget);
+    });
+
+    testWidgets('a swipe up on the header expands the panel', (tester) async {
+      enlarge(tester);
+      controller.add(_entry('alpha'));
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      expect(listHeight(tester), 0);
+
+      await tester.drag(find.text('Logs'), const Offset(0, -900));
+      await tester.pumpAndSettle();
+
+      expect(listHeight(tester), greaterThan(0));
+    });
+
+    testWidgets(
+        'a drag on the header expands the panel without scrolling the list',
+        (tester) async {
+      enlarge(tester);
+      for (var i = 0; i < 20; i++) {
+        controller.add(_entry('line $i'));
+      }
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      expect(listHeight(tester), 0);
+
+      await tester.drag(find.text('Logs'), const Offset(0, -900));
+      await tester.pumpAndSettle();
+
+      expect(listHeight(tester), greaterThan(0));
+      expect(find.byType(LogLine), findsWidgets);
+      expect(cubit.state.autoScroll, isTrue);
+    });
+
+    testWidgets('a tap on the header again collapses the panel',
+        (tester) async {
+      enlarge(tester);
+      controller.add(_entry('alpha'));
+      await tester.pumpWidget(consoleHost());
+      await tester.pumpAndSettle();
+
+      await tapHeader(tester);
+      expect(listHeight(tester), greaterThan(0));
+
+      await tapHeader(tester);
+      expect(listHeight(tester), 0);
+    });
+
     testWidgets(
         'H-01: bursts of entries keep auto-scroll on (programmatic '
         'scroll does not pause)', (tester) async {
       enlarge(tester);
       await tester.pumpWidget(consoleHost());
       await tester.pumpAndSettle();
+      await tapHeader(tester);
 
       for (var i = 0; i < 120; i++) {
         controller.add(_entry('line $i'));
@@ -110,6 +185,7 @@ void main() {
       }
       await tester.pumpWidget(consoleHost());
       await tester.pumpAndSettle();
+      await tapHeader(tester);
       expect(cubit.state.autoScroll, isTrue);
 
       await tester.drag(find.byType(ListView), const Offset(0, 400));
@@ -118,7 +194,8 @@ void main() {
       expect(cubit.state.autoScroll, isFalse);
     });
 
-    testWidgets('copy-all writes plainText to the clipboard', (tester) async {
+    testWidgets('copy-all writes plainText to the clipboard while collapsed',
+        (tester) async {
       enlarge(tester);
       final clipboard = <MethodCall>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
