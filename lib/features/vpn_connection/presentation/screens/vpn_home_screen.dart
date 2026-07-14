@@ -1,10 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/core/theme/oko_motion.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_state.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/paste_config_button.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/vless_error_text.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
@@ -58,9 +64,15 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 
   Interval _interval(Duration start) {
     final begin = start.inMilliseconds / _total.inMilliseconds;
-    final end = (start.inMilliseconds + OkoMotion.enterScreen.inMilliseconds) /
+    final end =
+        (start.inMilliseconds + OkoMotion.enterScreen.inMilliseconds) /
         _total.inMilliseconds;
     return Interval(begin, end, curve: OkoMotion.enterScreenCurve);
+  }
+
+  void _pasteConfig(BuildContext context) {
+    unawaited(HapticFeedback.mediumImpact());
+    unawaited(context.read<ServerConfigCubit>().pasteFromClipboard());
   }
 
   @override
@@ -119,10 +131,48 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                       _Staggered(
                         animation: _entrance,
                         interval: _interval(OkoMotion.staggerServerCard),
-                        child: ServerCard(
-                          serverName: config.serverName,
-                          host: config.host,
-                          port: config.port,
+                        child: Column(
+                          children: [
+                            BlocBuilder<ServerConfigCubit, ServerConfigState>(
+                              builder: (context, cfgState) =>
+                                  switch (cfgState) {
+                                    ServerConfigLoaded(
+                                      :final config,
+                                      :final latency,
+                                    ) =>
+                                      VlessConfigCard(
+                                        config: config,
+                                        latency: latency,
+                                      ),
+                                    ServerConfigError(:final error) => Column(
+                                      children: [
+                                        ServerCard(
+                                          serverName: config.serverName,
+                                          host: config.host,
+                                          port: config.port,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          describeVlessError(error),
+                                          textAlign: TextAlign.center,
+                                          style: textTheme.bodySmall?.copyWith(
+                                            color: tones.accentError,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    ServerConfigInitial() => ServerCard(
+                                      serverName: config.serverName,
+                                      host: config.host,
+                                      port: config.port,
+                                    ),
+                                  },
+                            ),
+                            const SizedBox(height: 12),
+                            PasteConfigButton(
+                              onPressed: () => _pasteConfig(context),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 24),
