@@ -139,4 +139,66 @@ void main() {
       expect(config.name, 'h');
     });
   });
+
+  group('parseVless — Reality/XTLS/ws/grpc/ALPN (07-02)', () {
+    test('Reality-полный набор: pbk/sid/fp/flow', () {
+      final result = parseVless(
+        'vless://$_uuid@example.com:443'
+        '?type=tcp&security=reality&sni=www.microsoft.com'
+        '&pbk=aabb&sid=01ab&fp=chrome&flow=xtls-rprx-vision#R',
+      );
+
+      expect(result, isA<VlessParsed>());
+      final config = (result as VlessParsed).config;
+      expect(config.security, 'reality');
+      expect(config.sni, 'www.microsoft.com');
+      expect(config.publicKey, 'aabb');
+      expect(config.shortId, '01ab');
+      expect(config.fingerprint, 'chrome');
+      expect(config.flow, 'xtls-rprx-vision');
+    });
+
+    test('ws-транспорт: path декодируется, host-заголовок', () {
+      final result = parseVless(
+        'vless://$_uuid@h:443'
+        '?type=ws&security=tls&path=%2Fws&host=cdn.example.com',
+      );
+
+      final config = (result as VlessParsed).config;
+      expect(config.transport, 'ws');
+      expect(config.wsPath, '/ws');
+      expect(config.wsHostHeader, 'cdn.example.com');
+    });
+
+    test('grpc-транспорт: serviceName', () {
+      final result = parseVless(
+        'vless://$_uuid@h:443?type=grpc&serviceName=grpcSvc&security=tls',
+      );
+
+      final config = (result as VlessParsed).config;
+      expect(config.transport, 'grpc');
+      expect(config.grpcServiceName, 'grpcSvc');
+    });
+
+    test('ALPN: split по запятой после decode', () {
+      final result = parseVless('vless://$_uuid@h:443?alpn=h2%2Chttp%2F1.1');
+
+      final config = (result as VlessParsed).config;
+      expect(config.alpn, ['h2', 'http/1.1']);
+    });
+
+    test('без параметров: новые поля null, alpn пустой', () {
+      final result = parseVless('vless://$_uuid@h:443');
+
+      final config = (result as VlessParsed).config;
+      expect(config.flow, isNull);
+      expect(config.publicKey, isNull);
+      expect(config.shortId, isNull);
+      expect(config.fingerprint, isNull);
+      expect(config.alpn, isEmpty);
+      expect(config.wsPath, isNull);
+      expect(config.wsHostHeader, isNull);
+      expect(config.grpcServiceName, isNull);
+    });
+  });
 }
