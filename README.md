@@ -126,8 +126,8 @@ flowchart TD
   UC -->|domain interfaces| REPO["Repositories: VpnRepository, LogRepository"]
   REPO -->|impl| DS["Datasources: VpnNativeDatasource,<br/>LogNativeDatasource"]
   DS --> BR["VpnBridge<br/>(single owner of Pigeon stream)"]
-  BR -->|VpnHostApi: startVpn / stopVpn / getStatus| PG["Pigeon generated<br/>(Dart / Kotlin / Swift)"]
-  PG -.->|@EventChannelApi vpnEvents| BR
+  BR -->|VpnHostApi startVpn stopVpn getStatus| PG["Pigeon generated<br/>Dart Kotlin Swift"]
+  PG -.->|EventChannelApi vpnEvents| BR
   PG --> ANDROID["Android: VpnHostApiImpl<br/>-> OkoVpnService"]
   PG --> IOS["iOS: VpnHostApiImpl<br/>-> NETunnelProviderManager"]
   ANDROID --> TUN["VpnService.Builder.establish()<br/>-> TUN fd -> read-loop (counts rx, drops packets)"]
