@@ -45,6 +45,24 @@ void main() {
       expect(emoji.config.name, 'Tokyo 🇯🇵');
     });
 
+    test('битый percent-encoded фрагмент — failure(malformed), не бросает', () {
+      expect(
+        parseVless('vless://$_uuid@h:443#%D0'),
+        const VlessParseFailure(VlessError.malformed),
+      );
+      expect(
+        parseVless('vless://$_uuid@h:443#%FF'),
+        const VlessParseFailure(VlessError.malformed),
+      );
+    });
+
+    test('битый percent-encoded query — failure(malformed), не бросает', () {
+      expect(
+        parseVless('vless://$_uuid@h:443?sni=%D0#N'),
+        const VlessParseFailure(VlessError.malformed),
+      );
+    });
+
     test('IPv6-хост без скобок', () {
       final result = parseVless(
         'vless://$_uuid@[2606:4700:4700::1111]:8443?type=tcp',

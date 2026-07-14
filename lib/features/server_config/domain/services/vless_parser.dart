@@ -27,19 +27,23 @@ VlessParseResult parseVless(String input) {
   if (!uri.hasPort || uri.port < 1 || uri.port > 65535) {
     return const VlessParseFailure(VlessError.port);
   }
-  final q = uri.queryParameters;
-  final name = uri.fragment.isEmpty
-      ? uri.host
-      : Uri.decodeComponent(uri.fragment);
-  return VlessParsed(
-    VlessConfig(
-      uuid: uuid,
-      host: uri.host,
-      port: uri.port,
-      transport: q['type'] ?? 'tcp',
-      security: q['security'] ?? 'none',
-      sni: q['sni'],
-      name: name,
-    ),
-  );
+  try {
+    final q = uri.queryParameters;
+    final name = uri.fragment.isEmpty
+        ? uri.host
+        : Uri.decodeComponent(uri.fragment);
+    return VlessParsed(
+      VlessConfig(
+        uuid: uuid,
+        host: uri.host,
+        port: uri.port,
+        transport: q['type'] ?? 'tcp',
+        security: q['security'] ?? 'none',
+        sni: q['sni'],
+        name: name,
+      ),
+    );
+  } on FormatException {
+    return const VlessParseFailure(VlessError.malformed);
+  }
 }
