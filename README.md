@@ -65,7 +65,7 @@ lib/
 pigeons/vpn_api.dart          # контракт моста (источник кодогена)
 android/app/src/main/kotlin/  # VpnService, foreground-сервис, event bus, host api
 ios/Runner/ + ios/PacketTunnel/  # Swift-мост + NE-таргет
-test/                         # 122 теста: парсер, мапперы, Bloc, виджеты
+test/                         # 147 автотестов: парсер, мапперы, Bloc, виджеты
 .github/workflows/ci.yml      # CI: flutter analyze + flutter test
 ```
 
@@ -108,7 +108,7 @@ test/                         # 122 теста: парсер, мапперы, Bl
 | iOS | `VpnHostApiImpl` (реальный `NETunnelProviderManager`), `VpnStatusObserver` (`NEVPNStatus` → Flutter), `PacketTunnelProvider` (skeleton туннеля с узким маршрутом), entitlements, `scripts/add_packet_tunnel_target.rb` (добавление NE-таргета через гем xcodeproj) |
 | VLESS | Парсер `vless://` (чистая функция поверх `Uri.parse` с валидацией порта и UUID), `SocketLatencyProbe` (tcping), маскировка UUID |
 | UI | `iris_painter.dart` (CustomPainter ирис-индикатора), `VpnConnectionBloc`, `LogsCubit`, `ServerConfigCubit`, виджеты (кнопка с прогрессом, таймер, панели трафика и логов, карточка сервера), дизайн-система `core/theme/` (токены, обе темы, типографика, motion) |
-| Тесты | 122 объявления в `test/`: парсер, мапперы, переходы Bloc/Cubit (включая error и `onRevoke`), виджеты |
+| Тесты | 147 автотестов в `test/`: парсер (11+ edge-кейсов), мапперы, переходы Bloc/Cubit (включая error и `onRevoke`), виджеты |
 
 ## Архитектура
 
