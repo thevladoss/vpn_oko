@@ -21,7 +21,7 @@ ext.build_configurations.each do |config|
   settings['CODE_SIGN_ENTITLEMENTS'] = 'PacketTunnel/PacketTunnel.entitlements'
   settings['SWIFT_VERSION'] = '5.0'
   settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-  settings['DEVELOPMENT_TEAM'] = 'Z2GDTXHVZZ'
+  settings['DEVELOPMENT_TEAM'] = ENV.fetch('DEVELOPMENT_TEAM', 'Z2GDTXHVZZ')
   settings['CODE_SIGN_STYLE'] = 'Automatic'
   settings['GENERATE_INFOPLIST_FILE'] = 'NO'
   settings['ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES'] = 'NO'
