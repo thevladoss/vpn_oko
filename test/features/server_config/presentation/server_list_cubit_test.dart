@@ -126,8 +126,9 @@ void main() {
       return build();
     },
     act: (cubit) => cubit.addFromClipboard(),
-    expect: () =>
-        const [ServerListState(notice: NoticeInvalid(ProxyParseError.unsupported))],
+    expect: () => const [
+      ServerListState(notice: NoticeInvalid(ProxyParseError.unsupported)),
+    ],
     verify: (_) => verifyNever(() => repository.add(any(), any())),
   );
 
