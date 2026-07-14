@@ -36,9 +36,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### iOS
 
-- [ ] **IOS-01**: Swift-реализация Pigeon-моста в основном приложении: startVpn/stopVpn/getStatus и поток событий работают, демо на iOS показывает статусы/логи из Swift-слоя
+- [x] **IOS-01**: Swift-реализация Pigeon-моста в основном приложении: startVpn/stopVpn/getStatus и поток событий работают, демо на iOS показывает статусы/логи из Swift-слоя
 - [x] **IOS-02**: Network Extension таргет с PacketTunnelProvider: start/stop туннеля через NETunnelProviderManager, NEPacketTunnelNetworkSettings применяются
-- [ ] **IOS-03**: Статусы туннеля из extension доводятся до приложения (NEVPNStatus observer) и дальше во Flutter
+- [x] **IOS-03**: Статусы туннеля из extension доводятся до приложения (NEVPNStatus observer) и дальше во Flutter
 - [x] **IOS-04**: Capabilities, entitlements (Packet Tunnel), App Groups настроены; сборка готова к прогону через TestFlight на устройстве
 
 ### VLESS
@@ -117,9 +117,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VLS-02 | Phase 4 | Complete |
 | VLS-03 | Phase 4 | Complete |
 | QA-01 | Phase 4 | Complete |
-| IOS-01 | Phase 5 | Pending |
+| IOS-01 | Phase 5 | Complete |
 | IOS-02 | Phase 5 | Complete |
-| IOS-03 | Phase 5 | Pending |
+| IOS-03 | Phase 5 | Complete |
 | IOS-04 | Phase 5 | Complete |
 | DOC-01 | Phase 6 | Pending |
 | DOC-02 | Phase 6 | Pending |

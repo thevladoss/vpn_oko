@@ -115,7 +115,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 05-01-PLAN.md — NE-таргет PacketTunnel через xcodeproj, provider с узким маршрутом, entitlements + App Group обоих таргетов (IOS-02, IOS-04)
-- [ ] 05-02-PLAN.md — Реальный VpnHostApiImpl (NETunnelProviderManager) + VpnStatusObserver, честный путь ошибки в симуляторе (IOS-01, IOS-02, IOS-03)
+- [x] 05-02-PLAN.md — Реальный VpnHostApiImpl (NETunnelProviderManager) + VpnStatusObserver, честный путь ошибки в симуляторе (IOS-01, IOS-02, IOS-03)
 - [ ] 05-03-PLAN.md — Device/TestFlight checkpoint реального туннеля + handoff-заметка DOC-02 (IOS-01, IOS-02, IOS-03, IOS-04)
 
 ### Phase 6: Подача
@@ -142,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
 | 4. VLESS-конфиг сервера | 6/6 | Complete   | 2026-07-14 |
-| 5. iOS-мост и Network Extension | 1/3 | In Progress|  |
+| 5. iOS-мост и Network Extension | 2/3 | In Progress|  |
 | 6. Подача | 0/TBD | Not started | - |
 
 ---
