@@ -46,3 +46,12 @@ app.*.map.json
 
 # Тестовое задание (не для публичного репо)
 ТЗ_*.docx
+
+# Planning artifacts (GSD)
+.planning/
+
+# AI tooling config
+CLAUDE.md
+
+# Editor
+.vscode/
