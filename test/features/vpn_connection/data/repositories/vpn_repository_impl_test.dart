@@ -19,6 +19,7 @@ void main() {
     port: 443,
     userId: 'user-1',
     serverName: 'Echo',
+    singboxConfigJson: '{"outbounds":[]}',
   );
 
   setUp(() {
@@ -129,6 +130,7 @@ void main() {
       expect(sent.port, demoConfig.port);
       expect(sent.userId, demoConfig.userId);
       expect(sent.serverName, demoConfig.serverName);
+      expect(sent.singboxConfigJson, demoConfig.singboxConfigJson);
     });
 
     test('translates PlatformException into a typed VpnStartFailure', () async {

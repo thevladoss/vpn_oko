@@ -198,6 +198,7 @@ struct VpnConfigMessage: Hashable, CustomStringConvertible {
   var port: Int64
   var userId: String
   var serverName: String
+  var singboxConfigJson: String
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -206,12 +207,14 @@ struct VpnConfigMessage: Hashable, CustomStringConvertible {
     let port = pigeonVar_list[1] as! Int64
     let userId = pigeonVar_list[2] as! String
     let serverName = pigeonVar_list[3] as! String
+    let singboxConfigJson = pigeonVar_list[4] as! String
 
     return VpnConfigMessage(
       host: host,
       port: port,
       userId: userId,
-      serverName: serverName
+      serverName: serverName,
+      singboxConfigJson: singboxConfigJson
     )
   }
   func toList() -> [Any?] {
@@ -220,13 +223,14 @@ struct VpnConfigMessage: Hashable, CustomStringConvertible {
       port,
       userId,
       serverName,
+      singboxConfigJson,
     ]
   }
   static func == (lhs: VpnConfigMessage, rhs: VpnConfigMessage) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.host, rhs.host) && MessagesPigeonInternal.deepEquals(lhs.port, rhs.port) && MessagesPigeonInternal.deepEquals(lhs.userId, rhs.userId) && MessagesPigeonInternal.deepEquals(lhs.serverName, rhs.serverName)
+    return MessagesPigeonInternal.deepEquals(lhs.host, rhs.host) && MessagesPigeonInternal.deepEquals(lhs.port, rhs.port) && MessagesPigeonInternal.deepEquals(lhs.userId, rhs.userId) && MessagesPigeonInternal.deepEquals(lhs.serverName, rhs.serverName) && MessagesPigeonInternal.deepEquals(lhs.singboxConfigJson, rhs.singboxConfigJson)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -235,10 +239,11 @@ struct VpnConfigMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: port, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: userId, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: serverName, hasher: &hasher)
+    MessagesPigeonInternal.deepHash(value: singboxConfigJson, hasher: &hasher)
   }
 
   public var description: String {
-    return "VpnConfigMessage(host: \(String(describing: host)), port: \(String(describing: port)), userId: \(String(describing: userId)), serverName: \(String(describing: serverName)))"
+    return "VpnConfigMessage(host: \(String(describing: host)), port: \(String(describing: port)), userId: \(String(describing: userId)), serverName: \(String(describing: serverName)), singboxConfigJson: \(String(describing: singboxConfigJson)))"
   }
 }
 

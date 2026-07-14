@@ -87,6 +87,7 @@ void main() {
         port: 443,
         userId: 'u',
         serverName: 's',
+        singboxConfigJson: '',
       );
       when(() => hostApi.startVpn(config)).thenAnswer((_) async {});
 

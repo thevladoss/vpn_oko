@@ -211,7 +211,8 @@ data class VpnConfigMessage (
   val host: String,
   val port: Long,
   val userId: String,
-  val serverName: String
+  val serverName: String,
+  val singboxConfigJson: String
 )
  {
   companion object {
@@ -220,7 +221,8 @@ data class VpnConfigMessage (
       val port = pigeonVar_list[1] as Long
       val userId = pigeonVar_list[2] as String
       val serverName = pigeonVar_list[3] as String
-      return VpnConfigMessage(host, port, userId, serverName)
+      val singboxConfigJson = pigeonVar_list[4] as String
+      return VpnConfigMessage(host, port, userId, serverName, singboxConfigJson)
     }
   }
   fun toList(): List<Any?> {
@@ -229,6 +231,7 @@ data class VpnConfigMessage (
       port,
       userId,
       serverName,
+      singboxConfigJson,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -239,7 +242,7 @@ data class VpnConfigMessage (
       return true
     }
     val other = other as VpnConfigMessage
-    return MessagesPigeonUtils.deepEquals(this.host, other.host) && MessagesPigeonUtils.deepEquals(this.port, other.port) && MessagesPigeonUtils.deepEquals(this.userId, other.userId) && MessagesPigeonUtils.deepEquals(this.serverName, other.serverName)
+    return MessagesPigeonUtils.deepEquals(this.host, other.host) && MessagesPigeonUtils.deepEquals(this.port, other.port) && MessagesPigeonUtils.deepEquals(this.userId, other.userId) && MessagesPigeonUtils.deepEquals(this.serverName, other.serverName) && MessagesPigeonUtils.deepEquals(this.singboxConfigJson, other.singboxConfigJson)
   }
 
   override fun hashCode(): Int {
@@ -248,10 +251,11 @@ data class VpnConfigMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.port)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.userId)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.serverName)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.singboxConfigJson)
     return result
   }
   override fun toString(): String {
-    return "VpnConfigMessage(host=$host, port=$port, userId=$userId, serverName=$serverName)"
+    return "VpnConfigMessage(host=$host, port=$port, userId=$userId, serverName=$serverName, singboxConfigJson=$singboxConfigJson)"
   }
 }
 

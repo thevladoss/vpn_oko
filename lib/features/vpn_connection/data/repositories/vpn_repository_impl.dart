@@ -56,6 +56,7 @@ class VpnRepositoryImpl implements VpnRepository {
           port: config.port,
           userId: config.userId,
           serverName: config.serverName,
+          singboxConfigJson: config.singboxConfigJson,
         ),
       );
     } on PlatformException catch (exception) {

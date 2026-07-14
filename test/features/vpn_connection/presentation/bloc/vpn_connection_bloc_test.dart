@@ -25,6 +25,7 @@ void main() {
     port: 443,
     userId: 'user-1',
     serverName: 'Echo',
+    singboxConfigJson: '',
   );
 
   final connectedSince = DateTime(2026, 7, 14, 9);

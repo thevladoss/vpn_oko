@@ -111,6 +111,7 @@ class VpnConfigMessage {
     required this.port,
     required this.userId,
     required this.serverName,
+    required this.singboxConfigJson,
   });
 
   String host;
@@ -121,12 +122,15 @@ class VpnConfigMessage {
 
   String serverName;
 
+  String singboxConfigJson;
+
   List<Object?> _toList() {
     return <Object?>[
       host,
       port,
       userId,
       serverName,
+      singboxConfigJson,
     ];
   }
 
@@ -140,6 +144,7 @@ class VpnConfigMessage {
       port: result[1]! as int,
       userId: result[2]! as String,
       serverName: result[3]! as String,
+      singboxConfigJson: result[4]! as String,
     );
   }
 
@@ -152,7 +157,7 @@ class VpnConfigMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(host, other.host) && _deepEquals(port, other.port) && _deepEquals(userId, other.userId) && _deepEquals(serverName, other.serverName);
+    return _deepEquals(host, other.host) && _deepEquals(port, other.port) && _deepEquals(userId, other.userId) && _deepEquals(serverName, other.serverName) && _deepEquals(singboxConfigJson, other.singboxConfigJson);
   }
 
   @override
@@ -161,7 +166,7 @@ class VpnConfigMessage {
 
   @override
   String toString() {
-    return 'VpnConfigMessage(host: $host, port: $port, userId: $userId, serverName: $serverName)';
+    return 'VpnConfigMessage(host: $host, port: $port, userId: $userId, serverName: $serverName, singboxConfigJson: $singboxConfigJson)';
   }
 }
 

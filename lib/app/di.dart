@@ -49,6 +49,7 @@ class AppDependencies {
     port: 443,
     userId: '00000000-0000-0000-0000-000000000000',
     serverName: 'Echo Server',
+    singboxConfigJson: '',
   );
 
   final ClipboardSource clipboardSource = const SystemClipboardSource();

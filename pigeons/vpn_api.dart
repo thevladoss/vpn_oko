@@ -18,12 +18,14 @@ class VpnConfigMessage {
     required this.port,
     required this.userId,
     required this.serverName,
+    required this.singboxConfigJson,
   });
 
   String host;
   int port;
   String userId;
   String serverName;
+  String singboxConfigJson;
 }
 
 class VpnStatusSnapshotMessage {

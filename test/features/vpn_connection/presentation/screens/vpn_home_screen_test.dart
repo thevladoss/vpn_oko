@@ -51,6 +51,7 @@ void main() {
     port: 443,
     userId: 'user-1',
     serverName: 'Echo Server',
+    singboxConfigJson: '',
   );
 
   setUpAll(() {
