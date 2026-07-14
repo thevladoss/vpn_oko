@@ -106,12 +106,16 @@ void main() {
       );
     });
 
-    test('чужая схема и пустая строка — failure(scheme)', () {
+    test('чужая схема — failure(scheme)', () {
       expect(
         parseVless('https://x'),
         const VlessParseFailure(VlessError.scheme),
       );
-      expect(parseVless(''), const VlessParseFailure(VlessError.scheme));
+    });
+
+    test('пустая и whitespace-строка — failure(empty)', () {
+      expect(parseVless(''), const VlessParseFailure(VlessError.empty));
+      expect(parseVless('   '), const VlessParseFailure(VlessError.empty));
     });
 
     test('ведущие/хвостовые пробелы из буфера — trim + parse', () {

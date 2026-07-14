@@ -8,6 +8,9 @@ final _uuidRe = RegExp(
 
 VlessParseResult parseVless(String input) {
   final raw = input.trim();
+  if (raw.isEmpty) {
+    return const VlessParseFailure(VlessError.empty);
+  }
   final Uri uri;
   try {
     uri = Uri.parse(raw);
