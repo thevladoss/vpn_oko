@@ -1,5 +1,9 @@
 import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
 import 'package:vpn_oko/core/bridge/vpn_bridge.dart';
+import 'package:vpn_oko/features/server_config/data/datasources/clipboard_source_impl.dart';
+import 'package:vpn_oko/features/server_config/data/probes/socket_latency_probe.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
 import 'package:vpn_oko/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
 import 'package:vpn_oko/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
@@ -46,6 +50,9 @@ class AppDependencies {
     userId: '00000000-0000-0000-0000-000000000000',
     serverName: 'Echo Server',
   );
+
+  final ClipboardSource clipboardSource = const SystemClipboardSource();
+  final LatencyProbe latencyProbe = const SocketLatencyProbe();
 
   Future<void> dispose() async {
     await vpnRepository.dispose();
