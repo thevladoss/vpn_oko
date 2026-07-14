@@ -9,6 +9,9 @@ final class VpnStatusObserver {
   }
 
   func attach(_ connection: NEVPNConnection) {
+    if let token = token {
+      NotificationCenter.default.removeObserver(token)
+    }
     token = NotificationCenter.default.addObserver(
       forName: .NEVPNStatusDidChange,
       object: connection,
