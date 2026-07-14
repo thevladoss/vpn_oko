@@ -3,9 +3,8 @@ import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
 
-String maskUuid(String uuid) => uuid.length >= 12
-    ? '${uuid.substring(0, 8)}…${uuid.substring(uuid.length - 4)}'
-    : '••••';
+String maskUuid(String uuid) =>
+    uuid.length >= 4 ? '••••${uuid.substring(uuid.length - 4)}' : '••••';
 
 class VlessConfigCard extends StatelessWidget {
   const VlessConfigCard({

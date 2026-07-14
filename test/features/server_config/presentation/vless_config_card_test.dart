@@ -42,9 +42,9 @@ void main() {
       await tester.pumpWidget(host(const VlessConfigCard(config: config)));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('b831381d-6324-4d53'), findsNothing);
+      expect(find.textContaining('b831381d'), findsNothing);
       expect(find.textContaining('ad4f-8cda48b30811'), findsNothing);
-      expect(find.textContaining('b831381d…'), findsOneWidget);
+      expect(find.textContaining('••••0811'), findsOneWidget);
     });
 
     testWidgets('показывает задержку при LatencyMeasured', (tester) async {
