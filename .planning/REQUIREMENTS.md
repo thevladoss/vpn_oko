@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### VLESS
 
-- [ ] **VLS-01**: Парсер vless://-ссылки создаёт модель VlessConfig (uuid, host, port, type, security, sni, name); кривые ссылки дают внятные ошибки
+- [x] **VLS-01**: Парсер vless://-ссылки создаёт модель VlessConfig (uuid, host, port, type, security, sni, name); кривые ссылки дают внятные ошибки
 - [ ] **VLS-02**: Пользователь может вставить vless:// из буфера обмена и увидеть карточку распарсенного конфига
 - [ ] **VLS-03**: Приложение измеряет задержку сервера через TCP connect time (tcping) с таймаутом
 
@@ -53,7 +53,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Тесты
 
-- [ ] **QA-01**: Unit-тесты VLESS-парсера: валидные ссылки, кривые ссылки, edge cases
+- [x] **QA-01**: Unit-тесты VLESS-парсера: валидные ссылки, кривые ссылки, edge cases
 - [x] **QA-02**: Unit-тесты Bloc-машины состояний: переходы, реакция на error и onRevoke-сценарий
 
 ### Подача
@@ -113,10 +113,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-07 | Phase 3 | Complete |
 | UI-08 | Phase 3 | Complete |
 | QA-02 | Phase 3 | Complete |
-| VLS-01 | Phase 4 | Pending |
+| VLS-01 | Phase 4 | Complete |
 | VLS-02 | Phase 4 | Pending |
 | VLS-03 | Phase 4 | Pending |
-| QA-01 | Phase 4 | Pending |
+| QA-01 | Phase 4 | Complete |
 | IOS-01 | Phase 5 | Pending |
 | IOS-02 | Phase 5 | Pending |
 | IOS-03 | Phase 5 | Pending |

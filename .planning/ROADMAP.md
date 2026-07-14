@@ -95,7 +95,7 @@ Plans:
   4. Unit-тесты парсера зелёные: валидные ссылки, кривые ссылки, IPv6-хост, percent-encoding, невалидный UUID, отсутствующие параметры
 **Plans**: 6 plans
 Plans:
-- [ ] 04-01-PLAN.md — Доменное ядро: VlessConfig, sealed-модели, абстракции, TDD-парсер vless:// (VLS-01, QA-01)
+- [x] 04-01-PLAN.md — Доменное ядро: VlessConfig, sealed-модели, абстракции, TDD-парсер vless:// (VLS-01, QA-01)
 - [ ] 04-02-PLAN.md — Data: SocketLatencyProbe (tcping, инъекция коннектора) + SystemClipboardSource (VLS-03, VLS-02)
 - [ ] 04-03-PLAN.md — Виджеты: VlessConfigCard (маскировка uuid) + PasteConfigButton + widget-тест (VLS-02)
 - [ ] 04-04-PLAN.md — ServerConfigCubit: paste→parse→measure, sealed-state, bloc-тесты (VLS-02)
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
-| 4. VLESS-конфиг сервера | 0/6 | Not started | - |
+| 4. VLESS-конфиг сервера | 1/6 | In Progress|  |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
 
