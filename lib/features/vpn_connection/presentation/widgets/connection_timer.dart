@@ -55,7 +55,15 @@ class _ConnectionTimerState extends State<ConnectionTimer> {
     return FittedBox(
       child: Text(
         hhmmss(DateTime.now().difference(since)),
-        style: Theme.of(context).textTheme.displayLarge,
+        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+          shadows: [
+            Shadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
       ),
     );
   }
