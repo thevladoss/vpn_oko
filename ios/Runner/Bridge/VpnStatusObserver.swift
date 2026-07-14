@@ -8,7 +8,7 @@ final class VpnStatusObserver {
     self.listener = listener
   }
 
-  func attach(_ connection: NEVPNConnection) {
+  func attach(_ connection: NEVPNConnection, emitInitial: Bool = false) {
     if let token = token {
       NotificationCenter.default.removeObserver(token)
     }
@@ -19,7 +19,9 @@ final class VpnStatusObserver {
     ) { [weak self] _ in
       self?.report(connection)
     }
-    report(connection)
+    if emitInitial {
+      report(connection)
+    }
   }
 
   private func report(_ connection: NEVPNConnection) {
