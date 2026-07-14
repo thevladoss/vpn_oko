@@ -1,5 +1,6 @@
 package com.example.vpn_oko.vpn
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.net.VpnService
@@ -73,7 +74,13 @@ class OkoVpnService : VpnService() {
         startReadLoop(descriptor)
         startTrafficTicker()
         transition(VpnConnectionState.Connected(System.currentTimeMillis()))
+        updateNotification("Connected")
         return START_NOT_STICKY
+    }
+
+    private fun updateNotification(text: String) {
+        getSystemService(NotificationManager::class.java)
+            .notify(VpnNotificationFactory.NOTIFICATION_ID, notificationFactory.building(text))
     }
 
     private fun startReadLoop(pfd: ParcelFileDescriptor) {
