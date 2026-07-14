@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 Phase: 06 (podacha) — EXECUTING
 Plan: 4 of 4
 Status: Executing Phase 06
-Last activity: 2026-07-14 -- Phase 06 execution started
+Last activity: 2026-07-14 -- Completed quick task 260714-ilt: UI-фиксы экрана VPN (панель логов, тень и формат таймера)
 
 Progress: [██████████] 97%
 
@@ -155,6 +155,12 @@ None yet.
 - Phase 5: источник живых статусов в Swift-слое при туннеле без core решить при планировании фазы (см. research Gaps); фаза помечена research-флагом
 - ~~Phase 1: генерация Kotlin StreamHandler в pigeon 27.x~~ — снято (2026-07-13, план 01-01): pigeon 27.1.1 сгенерировал VpnEventsStreamHandler на Kotlin и Swift; @FlutterApi-fallback не нужен
 - Дедлайн 48 часов: дифференциаторы Phase 6 добавляются по остатку времени, каждый независим и отбрасываем
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260714-ilt | UI-фиксы экрана VPN: формат таймера mm:ss, тень таймера, sliding-up панель логов без overflow | 2026-07-14 | bd16d94 | [260714-ilt-ui-vpn-overflow-sliding-up-mm-ss](./quick/260714-ilt-ui-vpn-overflow-sliding-up-mm-ss/) |
 
 ## Deferred Items
 
