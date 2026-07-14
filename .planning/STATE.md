@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-07-14T00:59:29.871Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-07-14T01:06:45.713Z"
 last_activity: 2026-07-14 -- Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 28
-  completed_plans: 25
+  completed_plans: 26
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 04 (vless) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Executing Phase 04
 Last activity: 2026-07-14 -- Phase 04 execution started
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [█████████░] 89%
 | Phase 03 P07 | 8min | 1 tasks | 3 files |
 | Phase 04 P01 | 4min | 2 tasks | 7 files |
 | Phase 04-vless P03 | 2min | 2 tasks | 4 files |
+| Phase 04 P04 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-07: LogConsole использует выданный DraggableScrollableSheet-контроллер и для ListView, и для animateTo (Pattern 8)
 - [Phase 04]: 04-01: ClipboardSource-абстракция в domain/repositories (не data) — presentation зависит только от domain per CONVENTIONS; SystemClipboardSource придёт в 04-02
 - [Phase 04]: 04-01: parseVless — чистая функция String→sealed VlessParseResult поверх Uri.parse; ручная валидация диапазона порта 1..65535 (Uri не валидирует) и uuid-regex; fragment через decodeComponent, queryParameters не редекодятся
+- [Phase 04]: 04-04: ServerConfigLoaded несёт latency nullable-полем — карточка рендерит конфиг сразу, задержка доезжает вторым emit
+- [Phase 04]: 04-04: uuid не выносится в поле state, живёт внутри VlessConfig; маскирует карточка (T-4-02)
 
 ### Pending Todos
 
@@ -146,6 +149,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T00:59:16.743Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-07-14T01:06:45.707Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
