@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
@@ -13,7 +14,15 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
   final LatencyProbe probe;
 
   Future<void> pasteFromClipboard() async {
-    final raw = await clipboard.readText();
+    final String? raw;
+    try {
+      raw = await clipboard.readText();
+    } on Object {
+      if (!isClosed) {
+        emit(const ServerConfigError(VlessError.malformed));
+      }
+      return;
+    }
     if (isClosed) {
       return;
     }
@@ -26,7 +35,17 @@ class ServerConfigCubit extends Cubit<ServerConfigState> {
         emit(ServerConfigError(error));
       case VlessParsed(:final config):
         emit(ServerConfigLoaded(config));
-        final latency = await probe.measure(config.host, config.port);
+        final LatencyResult latency;
+        try {
+          latency = await probe.measure(config.host, config.port);
+        } on Object {
+          if (!isClosed) {
+            emit(
+              ServerConfigLoaded(config, latency: const LatencyUnreachable()),
+            );
+          }
+          return;
+        }
         if (isClosed) {
           return;
         }

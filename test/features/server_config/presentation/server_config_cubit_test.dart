@@ -105,6 +105,31 @@ void main() {
     verify: (_) => expect(probe.measureCallCount, 0),
   );
 
+  blocTest<ServerConfigCubit, ServerConfigState>(
+    'сбой чтения буфера деградирует в error(malformed), measure не зовётся',
+    build: () {
+      clipboard.errorToThrow = Exception('clipboard denied');
+      return ServerConfigCubit(clipboard: clipboard, probe: probe);
+    },
+    act: (cubit) => cubit.pasteFromClipboard(),
+    expect: () => const [ServerConfigError(VlessError.malformed)],
+    verify: (_) => expect(probe.measureCallCount, 0),
+  );
+
+  blocTest<ServerConfigCubit, ServerConfigState>(
+    'исключение пробы деградирует в loaded(unreachable), поток не падает',
+    build: () {
+      clipboard.textToReturn = _validLink;
+      probe.errorToThrow = Exception('probe boom');
+      return ServerConfigCubit(clipboard: clipboard, probe: probe);
+    },
+    act: (cubit) => cubit.pasteFromClipboard(),
+    expect: () => const [
+      ServerConfigLoaded(_expectedConfig),
+      ServerConfigLoaded(_expectedConfig, latency: LatencyUnreachable()),
+    ],
+  );
+
   test('close во время measure не бросает StateError и не эмитит после close',
       () async {
     final gate = Completer<void>();

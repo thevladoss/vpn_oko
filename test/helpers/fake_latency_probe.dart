@@ -2,9 +2,13 @@ import 'package:vpn_oko/features/server_config/domain/entities/latency_result.da
 import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
 
 class FakeLatencyProbe implements LatencyProbe {
-  FakeLatencyProbe({this.resultToReturn = const LatencyUnreachable()});
+  FakeLatencyProbe({
+    this.resultToReturn = const LatencyUnreachable(),
+    this.errorToThrow,
+  });
 
   LatencyResult resultToReturn;
+  Exception? errorToThrow;
   int measureCallCount = 0;
   String? lastHost;
   int? lastPort;
@@ -14,6 +18,10 @@ class FakeLatencyProbe implements LatencyProbe {
     measureCallCount += 1;
     lastHost = host;
     lastPort = port;
+    final error = errorToThrow;
+    if (error != null) {
+      throw error;
+    }
     return resultToReturn;
   }
 }
