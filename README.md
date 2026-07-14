@@ -1,9 +1,6 @@
 # Oko VPN — прототип нативного VPN на Flutter
 
-[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)
-
-> Замените `<owner>/<repo>` на реальные owner и имя репозитория после создания
-> публичного GitHub-репозитория и первого прогона CI (workflow `ci.yml`, name `CI`).
+[![CI](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml/badge.svg)](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml)
 
 Прототип по тестовому заданию. Flutter-приложение управляет реальным Android
 `VpnService` через типобезопасный мост Pigeon и показывает живой поток статусов,
