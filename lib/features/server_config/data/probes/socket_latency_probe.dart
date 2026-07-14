@@ -25,8 +25,8 @@ class SocketLatencyProbe implements LatencyProbe {
     try {
       await connect(host, port, timeout);
       sw.stop();
-      return LatencyMeasured(Duration(milliseconds: sw.elapsedMilliseconds));
-    } on SocketException {
+      return LatencyMeasured(sw.elapsed);
+    } on Object {
       return const LatencyUnreachable();
     }
   }

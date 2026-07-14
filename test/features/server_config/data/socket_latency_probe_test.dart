@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -25,6 +26,28 @@ void main() {
     final probe = SocketLatencyProbe(connector: connect);
 
     final result = await probe.measure('10.0.0.1', 9999);
+
+    expect(result, const LatencyUnreachable());
+  });
+
+  test('measure returns LatencyUnreachable on a non-SocketException timeout',
+      () async {
+    Future<void> connect(String host, int port, Duration timeout) =>
+        Future<void>.error(TimeoutException('slow'));
+    final probe = SocketLatencyProbe(connector: connect);
+
+    final result = await probe.measure('10.0.0.1', 9999);
+
+    expect(result, const LatencyUnreachable());
+  });
+
+  test('measure returns LatencyUnreachable when the connector throws an Error',
+      () async {
+    Future<void> connect(String host, int port, Duration timeout) =>
+        Future<void>.error(StateError('boom'));
+    final probe = SocketLatencyProbe(connector: connect);
+
+    final result = await probe.measure('h', 1);
 
     expect(result, const LatencyUnreachable());
   });
