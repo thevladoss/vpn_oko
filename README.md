@@ -232,3 +232,113 @@ iOS Simulator не хостит packet-tunnel Network Extension: `simctl install
 3. `flutter build ipa` (или Xcode Archive схемы `Runner`) → загрузка в App Store
    Connect → TestFlight.
 4. На устройстве установите сборку из TestFlight, дайте VPN-разрешение, нажмите Connect.
+
+## План интеграции VPN-core
+
+Прототип поднимает туннель, но не проксирует трафик: реального VPN-core в нём нет.
+Шов для core уже подготовлен, и ниже названы точные точки подключения в коде.
+
+### Точки подключения
+
+**Android — `OkoVpnService.startReadLoop()`**
+(`android/app/src/main/kotlin/com/example/vpn_oko/vpn/OkoVpnService.kt`). Сейчас
+поток читает пакеты из `pfd.fileDescriptor` в буфер и дропает их, суммируя только
+прочитанные байты (`rx.addAndGet(read)`); tx не измеряется, тикер шлёт
+`TrafficChangedMessage(rx.get(), 0L)`. Сюда встаёт core:
+
+- `Builder.establish()` уже отдаёт TUN `ParcelFileDescriptor`.
+- Вместо read-loop дескриптор уходит в core: `libbox` / sing-box принимает fd
+  туннеля и берёт на себя чтение, запись и проксирование.
+- Колбэк `VpnService.protect(socket)` защищает исходящий сокет core от зацикливания
+  обратно в туннель.
+
+**iOS — `PacketTunnelProvider.startTunnel`**
+(`ios/PacketTunnel/PacketTunnelProvider.swift`). Сейчас метод только вызывает
+`setTunnelNetworkSettings`, а `self.packetFlow` не читает. Реальный core:
+
+- Тот же sing-box, собранный под iOS, запускается внутри extension-процесса.
+- Цикл `packetFlow.readPackets` ↔ core ↔ `packetFlow.writePackets` (либо core сам
+  держит tun через адаптер `Libbox`).
+
+### Предлагаемый интерфейс VpnCore
+
+В коде такого интерфейса пока нет — это план. Реальный `VpnCore` без реализации не
+вводится, чтобы не плодить мёртвый код (его ловит `very_good_analysis`). Эскиз
+сигнатур для обеих платформ:
+
+```kotlin
+// Android: android/.../vpn/VpnCore.kt (план, файла нет)
+interface VpnCore {
+  fun start(tunFd: ParcelFileDescriptor, config: VlessConfig, protect: (Int) -> Boolean)
+  fun stop()
+  fun stats(): TrafficStats   // rx + tx из core, а не из read-loop
+}
+// LibboxVpnCore оборачивает gomobile-биндинг libbox;
+// OkoVpnService.startReadLoop заменяется на vpnCore.start(descriptor, config, ::protect)
+```
+
+```swift
+// iOS: ios/PacketTunnel/VpnCore.swift (план, файла нет)
+protocol VpnCore {
+  func start(packetFlow: NEPacketTunnelFlow, config: VlessConfig) throws
+  func stop()
+}
+// LibboxVpnCore внутри PacketTunnelProvider.startTunnel вместо голого setTunnelNetworkSettings
+```
+
+Pigeon-контракт при этом не меняется: `startVpn(VpnConfigMessage)` плюс поток
+событий уже покрывают интеграцию. Фасад заложен под core, менять его не придётся.
+
+### Механика gomobile / JNI
+
+| Платформа | Артефакт | Инструмент | Механика |
+|-----------|----------|-----------|----------|
+| Android | `libbox.aar` (или `libXray.aar`) | `gomobile bind -target=android` | AAR несёт `.so` под ABI + JNI-обёртку; core вызывается in-process из `OkoVpnService`, без gRPC/localhost |
+| iOS | `Libbox.xcframework` | `gomobile bind -target=ios` | XCFramework линкуется в extension-таргет; Swift зовёт Obj-C-биндинг core |
+| Flutter ↔ native | — | Pigeon (уже есть) | Dart FFI **не место интеграции**: core живёт в native VPN-процессе, а Flutter остаётся UI-слоем поверх Pigeon-моста |
+
+Частая ошибка — тянуть core в Dart через FFI. Core запускается в нативном
+VPN-процессе (Android Service, iOS NE extension), а Flutter общается с native
+только через Pigeon.
+
+### Варианты core
+
+| Core | Артефакт | Рекомендация |
+|------|----------|--------------|
+| **sing-box / libbox** | `.aar` + `.xcframework` из `gomobile bind` | Первичный: единый core на обе платформы, VLESS-outbound из коробки |
+| **Xray-core / libXray** | gomobile-обёртка Xray → `.aar` / `.xcframework` | Альтернатива, если нужен именно Xray/XTLS |
+| **libv2ray** | легаси gomobile-биндинг v2ray | Исторический вариант эпохи v2ray, не рекомендуется |
+
+`VlessConfig` (распарсен на Dart в фазе 4) передаётся через `startVpn` → на native
+собирается sing-box JSON с `vless`-outbound → отдаётся в core (ориентировочно
+`Libbox.newService(config)`; конкретные имена символов API не проверены и даны как
+план, не как рабочий вызов).
+
+## Ограничения
+
+Прототип честно очерчен. Границы названы прямо, без «полноценного VPN»:
+
+- **Реального core нет — трафик не проксируется.** Туннель поднимается, но пакеты не
+  шифруются и не уходят на сервер. Путь интеграции описан разделом выше.
+- **tx всегда 0.** Read-loop считает только прочитанные байты (rx); отправку никто
+  не измеряет, тикер шлёт `TrafficChangedMessage(rx, 0L)`.
+- **Маршрут узкий — `10.111.222.0/24`, не `0.0.0.0/0`.** Интернет устройства
+  продолжает работать в статусе Connected; счётчик rx растёт от `ping` в подсеть
+  туннеля. Это осознанное решение демо, не забытая настройка.
+- **iOS-туннель проверяется только на устройстве через TestFlight.** Симулятор
+  packet-tunnel Network Extension не исполняет.
+- **Вставленный `vless://`-конфиг — display-only.** Карточка показывает разобранные
+  поля и задержку, но в реальный Connect ссылка не проводится:
+  `VpnConnectionBloc.config` остаётся демо-конфигом (`host echo.oko.vpn`, UUID
+  `00000000-0000-0000-0000-000000000000`).
+
+## Что дальше
+
+Направления по тестовому заданию и требованиям v2, если продолжать прототип:
+
+- **Реальный VPN-core** через `VpnCore` из плана выше: sing-box/libbox как `.aar` и
+  `.xcframework`, подключённый в `startReadLoop` и `startTunnel`.
+- **Чтение трафика на iOS**: цикл `packetFlow.readPackets` / `writePackets`, чтобы
+  extension считал реальные rx/tx, а не только поднимал туннель.
+- **Kill switch и split tunneling**: блокировка трафика при разрыве и маршрутизация
+  по приложениям поверх настоящего core.
