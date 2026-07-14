@@ -13,7 +13,7 @@
 - [x] **Phase 1: Фундамент и Pigeon-мост** - Типобезопасный контракт моста, доменное ядро, echo-реализации на обеих платформах (completed 2026-07-13)
 - [x] **Phase 2: Android VpnService** - Реальный туннель, foreground-сервис, живые события статусов/логов/трафика (completed 2026-07-13)
 - [x] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния (completed 2026-07-13)
-- [ ] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера
+- [x] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера (completed 2026-07-14)
 - [ ] **Phase 5: iOS-мост и Network Extension** - Swift-реализация моста, PacketTunnelProvider, entitlements, TestFlight-готовность
 - [ ] **Phase 6: Подача** - README с диаграммой и планом интеграции core, CI, видео-демо
 
@@ -100,7 +100,7 @@ Plans:
 - [x] 04-03-PLAN.md — Виджеты: VlessConfigCard (маскировка uuid) + PasteConfigButton + widget-тест (VLS-02)
 - [x] 04-04-PLAN.md — ServerConfigCubit: paste→parse→measure, sealed-state, bloc-тесты (VLS-02)
 - [x] 04-05-PLAN.md — Интеграция в экран: DI, BlocProvider, BlocBuilder-карточка, кнопка вставки (VLS-02, VLS-03)
-- [ ] 04-06-PLAN.md — Phase-gate: автотесты + device-проверка вставки и tcping (VLS-01, VLS-02, VLS-03, QA-01)
+- [x] 04-06-PLAN.md — Phase-gate: автотесты + device-проверка вставки и tcping (VLS-01, VLS-02, VLS-03, QA-01)
 
 ### Phase 5: iOS-мост и Network Extension
 **Goal**: Демо на iOS работает: статусы и логи идут из Swift-слоя, туннель стартует и останавливается через реальный Network Extension таргет
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
-| 4. VLESS-конфиг сервера | 5/6 | In Progress|  |
+| 4. VLESS-конфиг сервера | 6/6 | Complete   | 2026-07-14 |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
 
