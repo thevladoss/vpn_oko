@@ -35,6 +35,10 @@ VlessParseResult parseVless(String input) {
     final name = uri.fragment.isEmpty
         ? uri.host
         : Uri.decodeComponent(uri.fragment);
+    final alpn = (q['alpn'] ?? '')
+        .split(',')
+        .where((e) => e.isNotEmpty)
+        .toList();
     return VlessParsed(
       VlessConfig(
         uuid: uuid,
@@ -44,6 +48,14 @@ VlessParseResult parseVless(String input) {
         security: q['security'] ?? 'none',
         sni: q['sni'],
         name: name,
+        flow: q['flow'],
+        publicKey: q['pbk'],
+        shortId: q['sid'],
+        fingerprint: q['fp'],
+        alpn: alpn,
+        wsPath: q['path'],
+        wsHostHeader: q['host'],
+        grpcServiceName: q['serviceName'],
       ),
     );
   } on FormatException {
