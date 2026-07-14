@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-07-14T01:06:45.713Z"
+last_updated: "2026-07-14T01:18:35.566Z"
 last_activity: 2026-07-14 -- Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 28
-  completed_plans: 26
+  completed_plans: 27
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 04 (vless) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Executing Phase 04
 Last activity: 2026-07-14 -- Phase 04 execution started
 
-Progress: [█████████░] 93%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [█████████░] 93%
 | Phase 04 P01 | 4min | 2 tasks | 7 files |
 | Phase 04-vless P03 | 2min | 2 tasks | 4 files |
 | Phase 04 P04 | 2min | 2 tasks | 5 files |
+| Phase 04 P05 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,8 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-01: parseVless — чистая функция String→sealed VlessParseResult поверх Uri.parse; ручная валидация диапазона порта 1..65535 (Uri не валидирует) и uuid-regex; fragment через decodeComponent, queryParameters не редекодятся
 - [Phase 04]: 04-04: ServerConfigLoaded несёт latency nullable-полем — карточка рендерит конфиг сразу, задержка доезжает вторым emit
 - [Phase 04]: 04-04: uuid не выносится в поле state, живёт внутри VlessConfig; маскирует карточка (T-4-02)
+- [Phase 04]: 04-05: VpnHomeScreen рисует VlessConfigCard реактивно через BlocBuilder<ServerConfigCubit> (не context.read, Pitfall 4); карточка+кнопка внутри существующего _Staggered, staggered-анимация фазы 3 не тронута
+- [Phase 04]: 04-05: вставленный vless-конфиг display-only — VpnConnectionBloc.config остаётся demoConfig, в реальный Connect не проводится (T-4-02b, Open Q1)
 
 ### Pending Todos
 
@@ -149,6 +152,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:06:45.707Z
+Last session: 2026-07-14T01:16:42.348Z
 Stopped at: Completed 04-04-PLAN.md
 Resume file: None

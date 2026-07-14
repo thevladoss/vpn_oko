@@ -99,7 +99,7 @@ Plans:
 - [x] 04-02-PLAN.md — Data: SocketLatencyProbe (tcping, инъекция коннектора) + SystemClipboardSource (VLS-03, VLS-02)
 - [x] 04-03-PLAN.md — Виджеты: VlessConfigCard (маскировка uuid) + PasteConfigButton + widget-тест (VLS-02)
 - [x] 04-04-PLAN.md — ServerConfigCubit: paste→parse→measure, sealed-state, bloc-тесты (VLS-02)
-- [ ] 04-05-PLAN.md — Интеграция в экран: DI, BlocProvider, BlocBuilder-карточка, кнопка вставки (VLS-02, VLS-03)
+- [x] 04-05-PLAN.md — Интеграция в экран: DI, BlocProvider, BlocBuilder-карточка, кнопка вставки (VLS-02, VLS-03)
 - [ ] 04-06-PLAN.md — Phase-gate: автотесты + device-проверка вставки и tcping (VLS-01, VLS-02, VLS-03, QA-01)
 
 ### Phase 5: iOS-мост и Network Extension
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Фундамент и Pigeon-мост | 7/7 | Complete   | 2026-07-13 |
 | 2. Android VpnService | 6/6 | Complete   | 2026-07-13 |
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
-| 4. VLESS-конфиг сервера | 4/6 | In Progress|  |
+| 4. VLESS-конфиг сервера | 5/6 | In Progress|  |
 | 5. iOS-мост и Network Extension | 0/TBD | Not started | - |
 | 6. Подача | 0/TBD | Not started | - |
 
