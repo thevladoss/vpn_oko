@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-14T03:47:37.978Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-07-14T03:55:52.403Z"
 last_activity: 2026-07-14 -- Phase 06 execution started
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 35
-  completed_plans: 32
+  completed_plans: 33
   percent: 83
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 06 (podacha) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Executing Phase 06
 Last activity: 2026-07-14 -- Phase 06 execution started
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [█████████░] 91%
 | Phase 05 P01 | 16min | 2 tasks | 6 files |
 | Phase 05 P02 | 14min | 2 tasks | 4 files |
 | Phase 06 P01 | 4min | 3 tasks | 1 files |
+| Phase 06 P02 | 4min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -139,6 +140,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 05-02: VpnStatusObserver (NEVPNStatusDidChange) доводит NEVPNStatus до Flutter только через VpnEventListener.emit (main queue); runtime-демо/реальные переходы — device-checkpoint 05-03 (packet-tunnel NE appex не ставится на симулятор)
 - [Phase ?]: 06-01: интерфейс VpnCore описан только в README (эскиз Kotlin/Swift), в код не введён — very_good_analysis ловит мёртвый код
 - [Phase ?]: 06-01: CI-бейдж README с плейсхолдером <owner>/<repo> — git remote не настроен, реальные owner/repo подставит пользователь на сдаче (план 06-04)
+- [Phase 06]: CI-workflow ci.yml: flutter analyze + flutter test на ubuntu-latest, actions запинены тегами (@v4/@v2), без сборки APK и без секретов
+- [Phase 06]: test/flutter_test_config.dart не создан: офлайн-прогон google_fonts (allowRuntimeFetching=false) зелёный — шрифты из бандла, флейк не подтверждён, гвард избыточен
 
 ### Pending Todos
 
@@ -161,6 +164,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T03:46:18.072Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-07-14T03:55:23.724Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
