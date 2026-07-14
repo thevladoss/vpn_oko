@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 
 enum VlessError { empty, malformed, scheme, uuid, host, port }
 

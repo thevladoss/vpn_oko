@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/vless_error_text.dart';

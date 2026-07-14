@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/vless_config.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
