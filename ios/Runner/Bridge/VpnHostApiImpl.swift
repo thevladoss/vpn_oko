@@ -4,6 +4,7 @@ import NetworkExtension
 final class VpnHostApiImpl: VpnHostApi {
   private let listener: VpnEventListener
   private let observer = VpnStatusObserver()
+  private var manager: NETunnelProviderManager?
 
   init(listener: VpnEventListener = .shared) {
     self.listener = listener
@@ -34,6 +35,7 @@ final class VpnHostApiImpl: VpnHostApi {
       }
 
       let manager = managers?.first ?? NETunnelProviderManager()
+      self.manager = manager
       let proto = NETunnelProviderProtocol()
       proto.providerBundleIdentifier = "com.example.vpnOko.PacketTunnel"
       proto.serverAddress = config.host
@@ -77,8 +79,15 @@ final class VpnHostApiImpl: VpnHostApi {
     #if targetEnvironment(simulator)
     listener.emit(StatusChangedMessage(status: .disconnected))
     #else
-    NETunnelProviderManager.loadAllFromPreferences { managers, _ in
-      managers?.first?.connection.stopVPNTunnel()
+    if let manager = self.manager {
+      manager.connection.stopVPNTunnel()
+    } else {
+      NETunnelProviderManager.loadAllFromPreferences { managers, _ in
+        guard let manager = managers?.first else { return }
+        self.manager = manager
+        self.observer.attach(manager.connection)
+        manager.connection.stopVPNTunnel()
+      }
     }
     #endif
 
