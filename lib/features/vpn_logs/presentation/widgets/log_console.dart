@@ -20,6 +20,7 @@ class _LogConsoleState extends State<LogConsole> {
   static const double _bottomThreshold = 24;
   static const double _collapsed = 0.12;
   static const double _expanded = 0.70;
+  static const double _headerExtent = 60;
 
   final DraggableScrollableController _sheet =
       DraggableScrollableController();
@@ -61,36 +62,44 @@ class _LogConsoleState extends State<LogConsole> {
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          child: Column(
-            children: [
-              _Header(onCopy: () => _copyAll(context), onToggle: _toggle),
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification is UserScrollNotification) {
-                      _syncAutoScroll(context, scrollController);
-                    }
-                    return false;
-                  },
-                  child: BlocConsumer<LogsCubit, LogsState>(
-                    listener: (context, state) =>
-                        _followTail(state, scrollController),
-                    builder: (context, state) {
-                      if (state.entries.isEmpty) {
-                        return _EmptyState(controller: scrollController);
-                      }
-                      return ListView.builder(
-                        controller: scrollController,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification is UserScrollNotification) {
+                _syncAutoScroll(context, scrollController);
+              }
+              return false;
+            },
+            child: BlocConsumer<LogsCubit, LogsState>(
+              listener: (context, state) =>
+                  _followTail(state, scrollController),
+              builder: (context, state) {
+                return CustomScrollView(
+                  controller: scrollController,
+                  physics: const ClampingScrollPhysics(),
+                  slivers: [
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _HeaderDelegate(
+                        extent: _headerExtent,
+                        onCopy: () => _copyAll(context),
+                        onToggle: _toggle,
+                      ),
+                    ),
+                    if (state.entries.isEmpty)
+                      const SliverToBoxAdapter(child: _EmptyState())
+                    else
+                      SliverPadding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        itemCount: state.entries.length,
-                        itemBuilder: (_, index) =>
-                            LogLine(entry: state.entries[index]),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
+                        sliver: SliverList.builder(
+                          itemCount: state.entries.length,
+                          itemBuilder: (_, index) =>
+                              LogLine(entry: state.entries[index]),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
         );
       },
@@ -114,9 +123,11 @@ class _LogConsoleState extends State<LogConsole> {
     if (!state.autoScroll || !controller.hasClients) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!controller.hasClients) return;
+      final position = controller.position;
+      if (!position.hasContentDimensions) return;
       unawaited(
         controller.animateTo(
-          controller.position.maxScrollExtent,
+          position.maxScrollExtent,
           duration: OkoMotion.autoscroll,
           curve: OkoMotion.autoscrollCurve,
         ),
@@ -136,14 +147,29 @@ class _LogConsoleState extends State<LogConsole> {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.onCopy, required this.onToggle});
+class _HeaderDelegate extends SliverPersistentHeaderDelegate {
+  const _HeaderDelegate({
+    required this.extent,
+    required this.onCopy,
+    required this.onToggle,
+  });
 
+  final double extent;
   final Future<void> Function() onCopy;
   final VoidCallback onToggle;
 
   @override
-  Widget build(BuildContext context) {
+  double get minExtent => extent;
+
+  @override
+  double get maxExtent => extent;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
     return Semantics(
@@ -152,90 +178,94 @@ class _Header extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onToggle,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: tones.textSecondary,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      'Logs',
-                      style: textTheme.titleMedium
-                          ?.copyWith(color: tones.textPrimary),
+        child: ColoredBox(
+          color: tones.surfaceElevated,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: tones.textSecondary,
+                      borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                  Icon(Icons.expand_less_rounded, color: tones.textSecondary),
-                  const Spacer(),
-                  Semantics(
-                    button: true,
-                    label: 'Copy all logs',
-                    child: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: IconButton(
-                        onPressed: onCopy,
-                        icon: Icon(
-                          Icons.copy_rounded,
-                          color: tones.textSecondary,
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        'Logs',
+                        style: textTheme.titleMedium
+                            ?.copyWith(color: tones.textPrimary),
+                      ),
+                    ),
+                    Icon(Icons.expand_less_rounded, color: tones.textSecondary),
+                    const Spacer(),
+                    Semantics(
+                      button: true,
+                      label: 'Copy all logs',
+                      child: SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: IconButton(
+                          onPressed: onCopy,
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            Icons.copy_rounded,
+                            color: tones.textSecondary,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  @override
+  bool shouldRebuild(_HeaderDelegate oldDelegate) {
+    return extent != oldDelegate.extent;
+  }
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.controller});
-
-  final ScrollController controller;
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
-    return ListView(
-      controller: controller,
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.terminal_rounded, size: 32, color: tones.textSecondary),
-            const SizedBox(height: 16),
-            Text(
-              'Waiting for events',
-              style: textTheme.bodyMedium?.copyWith(color: tones.textSecondary),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Tunnel logs stream here in real time.',
-              textAlign: TextAlign.center,
-              style: textTheme.bodySmall?.copyWith(color: tones.textSecondary),
-            ),
-          ],
-        ),
-      ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.terminal_rounded, size: 32, color: tones.textSecondary),
+          const SizedBox(height: 16),
+          Text(
+            'Waiting for events',
+            style: textTheme.bodyMedium?.copyWith(color: tones.textSecondary),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Tunnel logs stream here in real time.',
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(color: tones.textSecondary),
+          ),
+        ],
+      ),
     );
   }
 }
