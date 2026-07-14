@@ -109,3 +109,126 @@ test/                         # 122 теста: парсер, мапперы, Bl
 | VLESS | Парсер `vless://` (чистая функция поверх `Uri.parse` с валидацией порта и UUID), `SocketLatencyProbe` (tcping), маскировка UUID |
 | UI | `iris_painter.dart` (CustomPainter ирис-индикатора), `VpnConnectionBloc`, `LogsCubit`, `ServerConfigCubit`, виджеты (кнопка с прогрессом, таймер, панели трафика и логов, карточка сервера), дизайн-система `core/theme/` (токены, обе темы, типографика, motion) |
 | Тесты | 122 объявления в `test/`: парсер, мапперы, переходы Bloc/Cubit (включая error и `onRevoke`), виджеты |
+
+## Архитектура
+
+Feature-first clean architecture. Presentation зависит только от domain, data
+реализует доменные интерфейсы, а весь обмен с native идёт через один Pigeon-мост.
+Диаграмма прослеживает сценарий Connect слева направо и вниз: тап пользователя →
+Bloc → usecase → repository → `VpnBridge` → Pigeon → Android `OkoVpnService` или
+iOS `PacketTunnelProvider`. Пунктирные стрелки — обратный поток событий
+(`StatusChanged`, `LogMessage`, `TrafficChanged`, `Error`).
+
+```mermaid
+flowchart TD
+  UI["Presentation: VpnHomeScreen + widgets<br/>(iris indicator, logs, server card)"] -->|user intent| BLOC["Bloc/Cubit: VpnConnectionBloc,<br/>LogsCubit, ServerConfigCubit"]
+  BLOC -->|calls| UC["Usecases: ConnectVpn, DisconnectVpn,<br/>WatchVpnState, WatchTraffic, WatchLogs"]
+  UC -->|domain interfaces| REPO["Repositories: VpnRepository, LogRepository"]
+  REPO -->|impl| DS["Datasources: VpnNativeDatasource,<br/>LogNativeDatasource"]
+  DS --> BR["VpnBridge<br/>(single owner of Pigeon stream)"]
+  BR -->|VpnHostApi: startVpn / stopVpn / getStatus| PG["Pigeon generated<br/>(Dart / Kotlin / Swift)"]
+  PG -.->|@EventChannelApi vpnEvents| BR
+  PG --> ANDROID["Android: VpnHostApiImpl<br/>-> OkoVpnService"]
+  PG --> IOS["iOS: VpnHostApiImpl<br/>-> NETunnelProviderManager"]
+  ANDROID --> TUN["VpnService.Builder.establish()<br/>-> TUN fd -> read-loop (counts rx, drops packets)"]
+  IOS --> NE["PacketTunnelProvider (NE extension)<br/>setTunnelNetworkSettings"]
+  TUN -.->|StatusChanged / LogMessage / TrafficChanged / Error| PG
+  NE -.->|NEVPNStatus observer| IOS
+  IOS -.->|events| PG
+```
+
+Поток одного Connect по шагам:
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant W as VpnHomeScreen
+  participant B as VpnConnectionBloc
+  participant R as VpnRepository
+  participant P as Pigeon (VpnHostApi)
+  participant S as OkoVpnService
+  U->>W: tap Connect
+  W->>B: ConnectRequested
+  B->>R: connect(config)
+  R->>P: startVpn(config)
+  P->>S: onStartCommand (prepare + establish)
+  S-->>P: StatusChanged(connecting) / LogMessage
+  S-->>P: StatusChanged(connected) / TrafficChanged
+  P-->>R: vpnEvents stream
+  R-->>B: VpnState(connected)
+  B-->>W: rebuild (iris + timer + traffic)
+```
+
+Маппинг слоёв на файлы:
+
+| Слой | Файлы | Роль |
+|------|-------|------|
+| presentation | `lib/features/*/presentation/` | Виджеты + Bloc/Cubit; ирис-индикатор `iris_painter.dart` (CustomPainter), панель логов, карточка сервера |
+| domain | `lib/features/*/domain/` | sealed/immutable entity, usecases, интерфейсы репозиториев |
+| data | `lib/features/*/data/` | Реализации репозиториев, мапперы DTO → entity, датасорсы поверх `VpnBridge` |
+| core/bridge | `lib/core/bridge/` | `vpn_api.g.dart` (Pigeon) + `VpnBridge` — единственный подписчик event-канала |
+| Android native | `android/.../vpn/`, `android/.../bridge/` | `OkoVpnService`, `VpnConsentGateway`, `VpnEventBus`, `VpnConnectionState`, `VpnHostApiImpl` |
+| iOS native | `ios/Runner/Bridge/`, `ios/PacketTunnel/` | `VpnHostApiImpl`, `VpnStatusObserver`, `PacketTunnelProvider` |
+
+## iOS: Network Extension
+
+iOS-туннель живёт в отдельном extension-процессе. Контейнерное приложение
+`Runner.app` держит `NETunnelProviderManager` и стартует туннель, а
+`PacketTunnel.appex` исполняет `PacketTunnelProvider`. Приложение и расширение
+обмениваются данными через App Group `group.com.example.vpnOko`.
+
+```
+Runner.app (контейнер)                     PacketTunnel.appex (extension)
+  Bridge/VpnHostApiImpl.swift                PacketTunnelProvider : NEPacketTunnelProvider
+    NETunnelProviderManager                    startTunnel -> setTunnelNetworkSettings
+    load -> save -> loadFromPreferences ->       (NEPacketTunnelNetworkSettings +
+    connection.startVPNTunnel/stopVPNTunnel       узкий маршрут 10.111.222.0/24)
+  Bridge/VpnStatusObserver.swift               stopTunnel
+    NEVPNStatusDidChange -> VpnStatusMessage
+       | App Group: group.com.example.vpnOko (обмен app <-> extension)
+```
+
+### Bundle identifiers
+
+- Контейнер: `com.example.vpnOko`
+- Extension: `com.example.vpnOko.PacketTunnel`
+- App Group: `group.com.example.vpnOko`
+
+### Capabilities и entitlements
+
+Оба таргета несут одинаковые entitlements (`ios/Runner/Runner.entitlements`,
+`ios/PacketTunnel/PacketTunnel.entitlements`):
+
+- `com.apple.developer.networking.networkextension` → `packet-tunnel-provider`
+- `com.apple.security.application-groups` → `group.com.example.vpnOko`
+
+Info.plist расширения (`ios/PacketTunnel/Info.plist`):
+
+- `NSExtensionPointIdentifier` = `com.apple.networkextension.packet-tunnel` (без `-provider`)
+- `NSExtensionPrincipalClass` = `$(PRODUCT_MODULE_NAME).PacketTunnelProvider`
+
+### Ограничение симулятора
+
+iOS Simulator не хостит packet-tunnel Network Extension: `simctl install`
+приложения со встроенным NE-appex падает с `Invalid placeholder attributes`. Это
+ограничение платформы Apple, не проекта. Поэтому:
+
+- **Автоматически проверено:** обе цели (`Runner` и `PacketTunnel.appex`)
+  компилируются под device и simulator; строки bundle id, entitlements и App Group
+  корректны; Dart-маппинг NE-статусов и ошибок покрыт unit-тестами.
+- **На симуляторе** Swift-мост исполняет честный путь ошибки: `connecting → error`
+  плюс лог «Network Extension недоступен в симуляторе». Это доказывает реальный
+  вызов `NETunnelProviderManager.loadAllFromPreferences`, а не заглушку.
+- **На устройстве (TestFlight)** проверяется реальный старт туннеля через
+  `NETunnelProviderManager` → `PacketTunnelProvider.startTunnel`, применение
+  `NEPacketTunnelNetworkSettings` и доведение `NEVPNStatus` до Flutter-экрана.
+
+### Путь к TestFlight
+
+1. В Apple Developer portal зарегистрируйте два App ID: `com.example.vpnOko` и
+   `com.example.vpnOko.PacketTunnel`; включите у обоих Network Extensions и App
+   Groups (`group.com.example.vpnOko`).
+2. Заведите provisioning profiles для обоих таргетов.
+3. `flutter build ipa` (или Xcode Archive схемы `Runner`) → загрузка в App Store
+   Connect → TestFlight.
+4. На устройстве установите сборку из TestFlight, дайте VPN-разрешение, нажмите Connect.
