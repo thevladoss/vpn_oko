@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-07-14T01:18:35.566Z"
-last_activity: 2026-07-14 -- Phase 04 execution started
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-07-14T02:38:59.636Z"
+last_activity: 2026-07-14 -- Phase 05 execution started
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 28
-  completed_plans: 27
-  percent: 50
+  completed_phases: 4
+  total_plans: 31
+  completed_plans: 29
+  percent: 67
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Реально работающий Android VpnService с живым потоком статусов и логов из native во Flutter через чистый типобезопасный мост.
-**Current focus:** Phase 04 — vless
+**Current focus:** Phase 05 — ios-network-extension
 
 ## Current Position
 
-Phase: 04 (vless) — EXECUTING
-Plan: 6 of 6
-Status: Executing Phase 04
-Last activity: 2026-07-14 -- Phase 04 execution started
+Phase: 05 (ios-network-extension) — EXECUTING
+Plan: 2 of 3
+Status: Executing Phase 05
+Last activity: 2026-07-14 -- Phase 05 execution started
 
-Progress: [██████████] 96%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [██████████] 96%
 | Phase 04-vless P03 | 2min | 2 tasks | 4 files |
 | Phase 04 P04 | 2min | 2 tasks | 5 files |
 | Phase 04 P05 | 6min | 2 tasks | 4 files |
+| Phase 05 P01 | 16min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,8 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-04: uuid не выносится в поле state, живёт внутри VlessConfig; маскирует карточка (T-4-02)
 - [Phase 04]: 04-05: VpnHomeScreen рисует VlessConfigCard реактивно через BlocBuilder<ServerConfigCubit> (не context.read, Pitfall 4); карточка+кнопка внутри существующего _Staggered, staggered-анимация фазы 3 не тронута
 - [Phase 04]: 04-05: вставленный vless-конфиг display-only — VpnConnectionBloc.config остаётся demoConfig, в реальный Connect не проводится (T-4-02b, Open Q1)
+- [Phase 05]: 05-01: Embed App Extensions переставлена перед Thin Binary (build_phases.move) — снимает dependency-cycle Flutter build + app-extension; NE-таргет добавлен идемпотентным xcodeproj-скриптом, не ручной правкой pbxproj
+- [Phase 05]: 05-01: entitlement packet-tunnel-provider + App Group group.com.example.vpnOko у обоих таргетов (Runner+PacketTunnel); Info.plist NSExtensionPointIdentifier com.apple.networkextension.packet-tunnel (без -provider); bundle id com.example.vpnOko.PacketTunnel
 
 ### Pending Todos
 
@@ -152,6 +155,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T01:16:42.348Z
-Stopped at: Completed 04-04-PLAN.md
+Last session: 2026-07-14T02:38:59.630Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
