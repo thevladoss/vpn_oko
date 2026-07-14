@@ -15,7 +15,7 @@
 - [x] **Phase 3: Flutter UI** - Экран по DESIGN.md: ирис-индикатор, кнопки, логи, таймер, трафик, восстановление состояния (completed 2026-07-13)
 - [x] **Phase 4: VLESS-конфиг сервера** - Парсер vless://, карточка конфига, tcping, тесты парсера (completed 2026-07-14)
 - [x] **Phase 5: iOS-мост и Network Extension** - Swift-реализация моста, PacketTunnelProvider, entitlements, TestFlight-готовность (completed 2026-07-14)
-- [ ] **Phase 6: Подача** - README с диаграммой и планом интеграции core, CI, видео-демо
+- [x] **Phase 6: Подача** - README с диаграммой и планом интеграции core, CI, видео-демо (completed 2026-07-14)
 
 ## Phase Details
 
@@ -134,7 +134,7 @@ Plans:
 - [x] 06-01-PLAN.md — README на русском: запуск, mermaid-архитектура, open-source/своё, iOS, план интеграции core, ограничения (DOC-01, DOC-02, DOC-03, DOC-04)
 - [x] 06-02-PLAN.md — CI GitHub Actions (analyze+test, subosito/flutter-action@v2) + локальный self-validating прогон (DOC-04)
 - [x] 06-03-PLAN.md — Покадровый сценарий демо-видео + чеклист записи (DOC-05)
-- [ ] 06-04-PLAN.md — Checkpoints пользователя: публичный репо + push + зелёный бейдж, запись видео (DOC-04, DOC-05)
+- [x] 06-04-PLAN.md — Checkpoints пользователя: публичный репо + push + зелёный бейдж, запись видео (DOC-04, DOC-05)
 
 ## Progress
 
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Flutter UI | 9/9 | Complete   | 2026-07-13 |
 | 4. VLESS-конфиг сервера | 6/6 | Complete   | 2026-07-14 |
 | 5. iOS-мост и Network Extension | 3/3 | Complete   | 2026-07-14 |
-| 6. Подача | 3/4 | In Progress|  |
+| 6. Подача | 4/4 | Complete   | 2026-07-14 |
 
 ---
 *Создано: 2026-07-13*
