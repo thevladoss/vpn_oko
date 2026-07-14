@@ -28,6 +28,14 @@ void main() {
     singboxConfigJson: '',
   );
 
+  const selectedConfig = VpnConfig(
+    host: 'real.server',
+    port: 8443,
+    userId: '',
+    serverName: 'Real',
+    singboxConfigJson: '{"outbounds":[{"type":"vless"}]}',
+  );
+
   final connectedSince = DateTime(2026, 7, 14, 9);
 
   setUpAll(() {
@@ -231,6 +239,40 @@ void main() {
     build: buildBloc,
     act: (bloc) => bloc.add(const ConnectRequested()),
     verify: (_) => verify(() => connectVpn(config)).called(1),
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'ConfigSelected делает конфиг активным: ConnectRequested зовёт connectVpn '
+    'с выбранным, не с демо',
+    setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const ConfigSelected(selectedConfig))
+      ..add(const ConnectRequested()),
+    verify: (_) {
+      verify(() => connectVpn(selectedConfig)).called(1);
+      verifyNever(() => connectVpn(config));
+    },
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'без ConfigSelected ConnectRequested остаётся на демо-конфиге',
+    setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
+    build: buildBloc,
+    act: (bloc) => bloc.add(const ConnectRequested()),
+    verify: (_) {
+      verify(() => connectVpn(config)).called(1);
+      verifyNever(() => connectVpn(selectedConfig));
+    },
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'ConfigSelected в isBusy не роняет Bloc и сохраняет активный конфиг',
+    seed: () => const VpnConnectionState(status: VpnStatus.connecting),
+    build: buildBloc,
+    act: (bloc) => bloc.add(const ConfigSelected(selectedConfig)),
+    expect: () => const <VpnConnectionState>[],
+    verify: (bloc) => expect(bloc.config, selectedConfig),
   );
 
   test(
