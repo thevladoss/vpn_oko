@@ -3,12 +3,20 @@ import 'package:vpn_oko/features/vpn_connection/presentation/formatters/duration
 
 void main() {
   group('hhmmss', () {
-    test('zero-pads a short duration', () {
-      expect(hhmmss(const Duration(seconds: 5)), '00:00:05');
-      expect(hhmmss(Duration.zero), '00:00:00');
+    test('renders mm:ss below one hour', () {
+      expect(hhmmss(Duration.zero), '00:00');
+      expect(hhmmss(const Duration(seconds: 5)), '00:05');
+      expect(hhmmss(const Duration(seconds: 59)), '00:59');
+      expect(hhmmss(const Duration(seconds: 60)), '01:00');
+      expect(hhmmss(const Duration(seconds: 3599)), '59:59');
     });
 
-    test('keeps hours, minutes and seconds together', () {
+    test('switches to hh:mm:ss starting at one hour', () {
+      expect(hhmmss(const Duration(seconds: 3600)), '01:00:00');
+      expect(
+        hhmmss(const Duration(hours: 1, minutes: 1, seconds: 1)),
+        '01:01:01',
+      );
       expect(
         hhmmss(const Duration(hours: 1, minutes: 2, seconds: 3)),
         '01:02:03',
@@ -24,9 +32,11 @@ void main() {
     });
 
     test('clamps negative durations to zero', () {
-      expect(hhmmss(const Duration(seconds: -1)), '00:00:00');
-      expect(hhmmss(const Duration(hours: -2, minutes: -3, seconds: -4)),
-          '00:00:00');
+      expect(hhmmss(const Duration(seconds: -1)), '00:00');
+      expect(
+        hhmmss(const Duration(hours: -2, minutes: -3, seconds: -4)),
+        '00:00',
+      );
     });
   });
 }
