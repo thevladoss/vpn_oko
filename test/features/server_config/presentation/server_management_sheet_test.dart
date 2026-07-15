@@ -266,7 +266,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(TextField), findsOneWidget);
-      expect(find.text(longName), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text(longName),
+        ),
+        findsOneWidget,
+      );
       final fieldWidth = tester.getSize(find.byType(TextField)).width;
       expect(fieldWidth, greaterThan(200));
     });
