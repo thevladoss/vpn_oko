@@ -9,6 +9,7 @@ import 'package:vpn_oko/features/server_config/domain/entities/server_profile.da
 import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/screens/server_management_sheet.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/add_server_sheet.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
@@ -122,6 +123,19 @@ void main() {
       expect(find.byType(ServerListTile), findsNothing);
     });
 
+    testWidgets('пустое состояние ведёт к шиту добавления с превью', (
+      tester,
+    ) async {
+      cubit = makeCubit();
+      await pumpSheet(tester);
+
+      await tester.tap(find.text('Добавить сервер'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AddServerSheet), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
     testWidgets('маскирует секреты: uuid не попадает в дерево', (tester) async {
       cubit = makeCubit(servers: [_tokyo, _osaka], active: _tokyo);
       await pumpSheet(tester);
@@ -134,8 +148,9 @@ void main() {
       tester,
     ) async {
       clipboard.textToReturn = _tokyoLink;
-      when(() => repository.add(any(), any()))
-          .thenAnswer((_) async => ServerSaved(_tokyo));
+      when(
+        () => repository.add(any(), any()),
+      ).thenAnswer((_) async => ServerSaved(_tokyo));
       cubit = makeCubit();
       await pumpSheet(tester);
 

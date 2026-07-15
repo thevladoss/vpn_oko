@@ -27,7 +27,7 @@ class ServerListEmptyState extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Вставьте vless://-ссылку или отсканируйте QR-код.',
+          'Вставьте vless://-ссылку — покажем превью перед добавлением.',
           textAlign: TextAlign.center,
           style: textTheme.bodySmall?.copyWith(color: tones.textSecondary),
         ),
@@ -35,8 +35,8 @@ class ServerListEmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           FilledButton.tonalIcon(
             onPressed: onAdd,
-            icon: const Icon(Icons.content_paste_rounded),
-            label: const Text('Вставить из буфера'),
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Добавить сервер'),
           ),
         ],
       ],
