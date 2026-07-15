@@ -9,10 +9,16 @@ import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connection_
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/iris_painter.dart';
 
 class IrisIndicator extends StatefulWidget {
-  const IrisIndicator({required this.status, this.connectedSince, super.key});
+  const IrisIndicator({
+    required this.status,
+    this.connectedSince,
+    this.onTap,
+    super.key,
+  });
 
   final VpnStatus status;
   final DateTime? connectedSince;
+  final VoidCallback? onTap;
 
   @override
   State<IrisIndicator> createState() => _IrisIndicatorState();
@@ -133,30 +139,47 @@ class _IrisIndicatorState extends State<IrisIndicator>
     final tones = context.okoTones;
     final since =
         widget.status == VpnStatus.connected ? widget.connectedSince : null;
-    return Semantics(
-      liveRegion: true,
-      label: _semanticsLabel,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          AnimatedBuilder(
-            animation: Listenable.merge(
-              [_segment, _breath, _pupilCurve, _shake],
-            ),
-            builder: (context, _) => CustomPaint(
-              painter: IrisPainter(
-                status: widget.status,
-                segment: _segment.value,
-                breath: _breath.value,
-                pupil: _pupilCurve.value,
-                shake: _shake.value,
-                accent: tones.accentFor(widget.status),
-                glow: tones.glow,
-              ),
+    final stack = Stack(
+      fit: StackFit.expand,
+      children: [
+        AnimatedBuilder(
+          animation: Listenable.merge(
+            [_segment, _breath, _pupilCurve, _shake],
+          ),
+          builder: (context, _) => CustomPaint(
+            painter: IrisPainter(
+              status: widget.status,
+              segment: _segment.value,
+              breath: _breath.value,
+              pupil: _pupilCurve.value,
+              shake: _shake.value,
+              accent: tones.accentFor(widget.status),
+              glow: tones.glow,
             ),
           ),
-          Center(child: ConnectionTimer(connectedSince: since)),
-        ],
+        ),
+        Center(child: ConnectionTimer(connectedSince: since)),
+      ],
+    );
+    final onTap = widget.onTap;
+    if (onTap == null) {
+      return Semantics(
+        liveRegion: true,
+        label: _semanticsLabel,
+        child: stack,
+      );
+    }
+    return Semantics(
+      button: true,
+      enabled: true,
+      label: _semanticsLabel,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          unawaited(HapticFeedback.mediumImpact());
+          onTap();
+        },
+        child: stack,
       ),
     );
   }
