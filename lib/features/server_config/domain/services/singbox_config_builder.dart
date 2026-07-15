@@ -10,14 +10,15 @@ Map<String, Object?> buildSingboxConfig(ProxyConfig config) {
     'outbounds': [
       _proxyOutbound(config),
       {'type': 'direct', 'tag': 'direct'},
-      {'type': 'dns', 'tag': 'dns-out'},
     ],
     'route': {
       'rules': [
-        {'protocol': 'dns', 'outbound': 'dns-out'},
+        {'action': 'sniff'},
+        {'protocol': 'dns', 'action': 'hijack-dns'},
       ],
       'final': 'proxy',
       'auto_detect_interface': true,
+      'default_domain_resolver': 'local',
     },
   };
 }
@@ -28,11 +29,13 @@ String toSingboxJson(ProxyConfig config) =>
 Map<String, Object?> _dns() {
   return {
     'servers': [
-      {'tag': 'proxy-dns', 'address': '1.1.1.1', 'detour': 'proxy'},
-      {'tag': 'local', 'address': 'local', 'detour': 'direct'},
-    ],
-    'rules': [
-      {'outbound': 'any', 'server': 'local'},
+      {
+        'tag': 'proxy-dns',
+        'type': 'udp',
+        'server': '1.1.1.1',
+        'detour': 'proxy',
+      },
+      {'tag': 'local', 'type': 'local'},
     ],
     'final': 'proxy-dns',
     'strategy': 'prefer_ipv4',
@@ -43,13 +46,11 @@ Map<String, Object?> _tunInbound() {
   return {
     'type': 'tun',
     'tag': 'tun-in',
-    'inet4_address': '172.19.0.1/28',
-    'inet6_address': 'fdfe:dcba:9876::1/126',
+    'address': ['172.19.0.1/28', 'fdfe:dcba:9876::1/126'],
     'mtu': 1500,
     'auto_route': true,
     'strict_route': false,
     'stack': 'gvisor',
-    'sniff': true,
   };
 }
 

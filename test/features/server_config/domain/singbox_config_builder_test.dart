@@ -98,7 +98,7 @@ void main() {
   group('каркас конфига', () {
     final map = buildSingboxConfig(_vlessReality);
 
-    test('tun-inbound с auto_route/gvisor/mtu 1500 и адресами', () {
+    test('tun-inbound с auto_route/gvisor/mtu 1500 и адрес-списком', () {
       final inbounds = (map['inbounds']! as List<Object?>)
           .cast<Map<String, Object?>>();
       final tun = inbounds.firstWhere((i) => i['type'] == 'tun');
@@ -107,9 +107,9 @@ void main() {
       expect(tun['stack'], 'gvisor');
       expect(tun['mtu'], 1500);
       expect(tun['strict_route'], isFalse);
-      expect(tun['sniff'], isTrue);
-      expect(tun['inet4_address']! as String, isNotEmpty);
-      expect(tun['inet6_address']! as String, isNotEmpty);
+      final addresses = (tun['address']! as List<Object?>).cast<String>();
+      expect(addresses, hasLength(2));
+      expect(addresses.every((a) => a.isNotEmpty), isTrue);
     });
 
     test('route.final == proxy и auto_detect_interface', () {
@@ -117,6 +117,17 @@ void main() {
 
       expect(route['final'], 'proxy');
       expect(route['auto_detect_interface'], isTrue);
+    });
+
+    test('нет legacy dns-outbound; DNS-хайджек через route action', () {
+      final outbounds = (map['outbounds']! as List<Object?>)
+          .cast<Map<String, Object?>>();
+      expect(outbounds.any((o) => o['type'] == 'dns'), isFalse);
+
+      final rules = ((map['route']! as Map<String, Object?>)['rules']!
+              as List<Object?>)
+          .cast<Map<String, Object?>>();
+      expect(rules.any((r) => r['action'] == 'hijack-dns'), isTrue);
     });
 
     test('DNS anti-leak: сервер с detour proxy присутствует', () {
