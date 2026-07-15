@@ -137,10 +137,13 @@ class _ServerListTileState extends State<ServerListTile>
         decoration: BoxDecoration(
           color: tones.surfaceCard,
           borderRadius: BorderRadius.circular(20),
-          border: widget.active
-              ? Border.all(color: tones.accentConnected, width: 1.5)
-              : null,
         ),
+        foregroundDecoration: widget.active
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: tones.accentConnected, width: 1.5),
+              )
+            : null,
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
