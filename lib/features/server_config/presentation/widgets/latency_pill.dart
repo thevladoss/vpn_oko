@@ -28,15 +28,17 @@ class LatencyPill extends StatelessWidget {
     final tones = context.okoTones;
     final color = _color(tones);
     final style = Theme.of(context).textTheme.labelSmall ?? const TextStyle();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        _label,
-        style: style.copyWith(color: color),
+    return ExcludeSemantics(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          _label,
+          style: style.copyWith(color: color),
+        ),
       ),
     );
   }

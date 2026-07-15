@@ -190,6 +190,7 @@ class _TileMenu extends StatelessWidget {
     final tones = context.okoTones;
     return PopupMenuButton<_TileMenuAction>(
       icon: Icon(Icons.more_vert_rounded, color: tones.textSecondary),
+      tooltip: 'Действия',
       onSelected: (action) => switch (action) {
         _TileMenuAction.rename => onRename(),
         _TileMenuAction.delete => onDelete(),
