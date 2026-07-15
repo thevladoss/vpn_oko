@@ -5,7 +5,8 @@ project = Xcodeproj::Project.open(project_path)
 
 sources = {
   'Shared/AppGroup.swift' => %w[Runner PacketTunnel],
-  'PacketTunnel/RunBlocking.swift' => %w[PacketTunnel]
+  'PacketTunnel/RunBlocking.swift' => %w[PacketTunnel],
+  'PacketTunnel/OkoPlatformInterface.swift' => %w[PacketTunnel]
 }
 
 def find_or_create_group(project, name)

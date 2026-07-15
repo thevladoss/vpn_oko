@@ -28,6 +28,7 @@
 		A00000000000000000000202 /* VpnHostApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* VpnHostApiImpl.swift */; };
 		A00000000000000000000203 /* VpnEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* VpnEventListener.swift */; };
 		AE4EA8CCBEF6951852E5F57A /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
+		B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */; };
 		EC544E8BF826C8DBCBF97A6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2ECB3FB0CB3600551034B2B /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -102,6 +103,7 @@
 		A00000000000000000000103 /* VpnEventListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VpnEventListener.swift; sourceTree = "<group>"; };
 		A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VpnStatusObserver.swift; sourceTree = "<group>"; };
 		A2CF2941E667E304CBF4C002 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OkoPlatformInterface.swift; sourceTree = "<group>"; };
 		C2ECB3FB0CB3600551034B2B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		CA63A8D84FD63706D202B964 /* RunBlocking.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RunBlocking.swift; sourceTree = "<group>"; };
 		CAF530FE538020C5A9B7A141 /* PacketTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +150,7 @@
 				555482DCF2B991679CCD1756 /* Info.plist */,
 				0C2B212238846A6AA985885C /* PacketTunnel.entitlements */,
 				CA63A8D84FD63706D202B964 /* RunBlocking.swift */,
+				C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */,
 			);
 			name = PacketTunnel;
 			path = PacketTunnel;
@@ -508,6 +511,7 @@
 				6FBB9F0ABA49D6B92D5296BA /* PacketTunnelProvider.swift in Sources */,
 				639CBDF821367FDC399A07E8 /* AppGroup.swift in Sources */,
 				31F31C5D1EA3AC26A44A706C /* RunBlocking.swift in Sources */,
+				B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
