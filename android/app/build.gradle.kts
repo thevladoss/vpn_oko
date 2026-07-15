@@ -45,5 +45,6 @@ flutter {
 }
 
 dependencies {
+    implementation(files("libs/libbox.aar"))
     testImplementation("junit:junit:4.13.2")
 }
