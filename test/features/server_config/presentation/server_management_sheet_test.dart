@@ -162,6 +162,24 @@ void main() {
       expect(find.textContaining('сохранён'), findsOneWidget);
     });
 
+    testWidgets('дубликат показывает тост поверх шита без SnackBar', (
+      tester,
+    ) async {
+      clipboard.textToReturn = _tokyoLink;
+      when(
+        () => repository.add(any(), any()),
+      ).thenAnswer((_) async => ServerDuplicate(_tokyo));
+      cubit = makeCubit();
+      await pumpSheet(tester);
+
+      await tester.tap(find.text('Вставить из буфера'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('Такой сервер уже есть'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
     testWidgets('кривая ссылка из буфера показывает ошибку', (tester) async {
       clipboard.textToReturn = 'not-a-url';
       cubit = makeCubit();
@@ -175,21 +193,82 @@ void main() {
       expect(find.text('Неподдерживаемая ссылка'), findsOneWidget);
     });
 
-    testWidgets('удаление профиля запрашивает подтверждение и зовёт delete', (
+    testWidgets('свайп по тайлу и «Удалить» запрашивают подтверждение', (
       tester,
     ) async {
       when(() => repository.delete(any())).thenAnswer((_) async {});
       cubit = makeCubit(servers: [_tokyo]);
       await pumpSheet(tester);
-
-      await tester.tap(find.byIcon(Icons.more_vert_rounded));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Удалить').last);
+
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Удалить'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Удалить'));
       await tester.pump();
 
       verify(() => repository.delete(1)).called(1);
+    });
+
+    testWidgets('высота шита ограничена, длинный список скроллится', (
+      tester,
+    ) async {
+      final many = List<ServerProfile>.generate(
+        20,
+        (index) => ServerProfile(
+          id: index + 1,
+          label: 'Server ${index + 1}',
+          config: _osakaConfig,
+          rawUrl: 'vless://$_fakeUuid@osaka.example:8443#Server${index + 1}',
+          createdAt: DateTime(2026, 7, 15),
+        ),
+      );
+      cubit = makeCubit(servers: many);
+      await pumpSheet(tester);
+      await tester.pumpAndSettle();
+
+      final appHeight = tester.getSize(find.byType(MaterialApp)).height;
+      final sheetHeight = tester
+          .getSize(find.byKey(const ValueKey('sheet-bounds')))
+          .height;
+      expect(sheetHeight, lessThanOrEqualTo(appHeight * 0.85 + 0.5));
+      expect(sheetHeight, greaterThan(appHeight * 0.5));
+
+      expect(find.text('Server 20'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.text('Server 20'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Server 20'), findsOneWidget);
+    });
+
+    testWidgets('диалог переименования растягивает поле под длинное имя', (
+      tester,
+    ) async {
+      const longName = 'Токийский сервер с очень длинным именем для проверки';
+      final longProfile = ServerProfile(
+        id: 7,
+        label: longName,
+        config: _tokyoConfig,
+        rawUrl: _tokyoLink,
+        createdAt: DateTime(2026, 7, 15),
+      );
+      when(() => repository.rename(any(), any())).thenAnswer((_) async {});
+      cubit = makeCubit(servers: [longProfile]);
+      await pumpSheet(tester);
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Переименовать'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text(longName), findsOneWidget);
+      final fieldWidth = tester.getSize(find.byType(TextField)).width;
+      expect(fieldWidth, greaterThan(200));
     });
   });
 }
