@@ -58,5 +58,33 @@ void main() {
         expect(find.byType(EmptyServerPasteField), findsOneWidget);
       }
     });
+
+    testWidgets('пунктир рисуется поверх клипающего контента (обе темы)', (
+      tester,
+    ) async {
+      final dashed = find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint &&
+            widget.foregroundPainter.runtimeType.toString() ==
+                '_DashedBorderPainter',
+      );
+      final clippedContent = find.byWidgetPredicate(
+        (widget) => widget is Material && widget.clipBehavior == Clip.antiAlias,
+      );
+
+      for (final dark in [true, false]) {
+        await tester.pumpWidget(
+          host(EmptyServerPasteField(onPaste: () {}), dark: dark),
+        );
+        await tester.pumpAndSettle();
+
+        expect(dashed, findsOneWidget);
+        expect(
+          find.descendant(of: dashed, matching: clippedContent),
+          findsWidgets,
+        );
+        expect(find.text('Добавьте свой первый сервер'), findsOneWidget);
+      }
+    });
   });
 }
