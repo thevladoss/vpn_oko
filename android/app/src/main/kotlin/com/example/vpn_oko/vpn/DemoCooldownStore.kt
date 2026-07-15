@@ -1,5 +1,7 @@
 package com.example.vpn_oko.vpn
 
+import android.content.Context
+
 interface LongStore {
     fun get(key: String): Long?
     fun set(key: String, value: Long)
@@ -21,5 +23,20 @@ class DemoCooldownStore(private val store: LongStore) {
 
     companion object {
         private const val KEY_LAST_EXPIRED = "last_expired_at"
+
+        fun from(context: Context): DemoCooldownStore =
+            DemoCooldownStore(SharedPreferencesLongStore(context.applicationContext))
+    }
+}
+
+class SharedPreferencesLongStore(context: Context) : LongStore {
+
+    private val prefs = context.getSharedPreferences("oko_demo_limit", Context.MODE_PRIVATE)
+
+    override fun get(key: String): Long? =
+        if (prefs.contains(key)) prefs.getLong(key, 0L) else null
+
+    override fun set(key: String, value: Long) {
+        prefs.edit().putLong(key, value).apply()
     }
 }
