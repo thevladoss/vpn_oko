@@ -99,6 +99,24 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     );
   }
 
+  VoidCallback? _irisToggle(
+    VpnConnectionState state,
+    ServerProfile? activeProfile,
+  ) {
+    return switch (state.status) {
+      VpnStatus.disconnected || VpnStatus.error =>
+        state.cooldownActive || activeProfile == null
+            ? null
+            : () => context
+                  .read<VpnConnectionBloc>()
+                  .add(const ConnectRequested()),
+      VpnStatus.connected => () => context
+          .read<VpnConnectionBloc>()
+          .add(const DisconnectRequested()),
+      VpnStatus.connecting || VpnStatus.disconnecting => null,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
@@ -152,6 +170,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               child: IrisIndicator(
                                 status: state.status,
                                 connectedSince: state.connectedSince,
+                                onTap: _irisToggle(state, activeProfile),
                               ),
                             ),
                           ),
@@ -179,27 +198,18 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                         _Staggered(
                           animation: _entrance,
                           interval: _interval(OkoMotion.staggerServerCard),
-                          child: Column(
-                            children: [
-                              if (activeProfile != null)
-                                ServerCard(
+                          child: activeProfile != null
+                              ? ServerCard(
                                   serverName: activeProfile.label,
                                   host: activeProfile.config.host,
                                   port: activeProfile.config.port,
+                                  onTap: () => _openServerSheet(context),
                                 )
-                              else
-                                _NoServerCard(
+                              : _NoServerCard(
                                   tones: tones,
                                   textTheme: textTheme,
+                                  onTap: () => _openServerSheet(context),
                                 ),
-                              const SizedBox(height: 12),
-                              OutlinedButton.icon(
-                                onPressed: () => _openServerSheet(context),
-                                icon: const Icon(Icons.dns_rounded),
-                                label: const Text('Управление серверами'),
-                              ),
-                            ],
-                          ),
                         ),
                         const SizedBox(height: 24),
                         _Staggered(
@@ -260,19 +270,20 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 }
 
 class _NoServerCard extends StatelessWidget {
-  const _NoServerCard({required this.tones, required this.textTheme});
+  const _NoServerCard({
+    required this.tones,
+    required this.textTheme,
+    this.onTap,
+  });
 
   final OkoTones tones;
   final TextTheme textTheme;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final content = Padding(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: tones.surfaceCard,
-        borderRadius: BorderRadius.circular(20),
-      ),
       child: Row(
         children: [
           Icon(Icons.dns_rounded, color: tones.textSecondary),
@@ -298,7 +309,33 @@ class _NoServerCard extends StatelessWidget {
               ],
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 12),
+            Icon(Icons.chevron_right_rounded, color: tones.textSecondary),
+          ],
         ],
+      ),
+    );
+    final decoration = BoxDecoration(
+      color: tones.surfaceCard,
+      borderRadius: BorderRadius.circular(20),
+    );
+    if (onTap == null) {
+      return Container(decoration: decoration, child: content);
+    }
+    return Container(
+      decoration: decoration,
+      child: Semantics(
+        button: true,
+        child: Material(
+          type: MaterialType.transparency,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: onTap,
+            child: content,
+          ),
+        ),
       ),
     );
   }

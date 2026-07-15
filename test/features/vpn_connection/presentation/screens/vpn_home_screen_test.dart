@@ -189,7 +189,6 @@ void main() {
     expect(find.byType(ConnectButton), findsOneWidget);
     expect(find.byType(LogConsole), findsOneWidget);
     expect(find.text('Tokyo'), findsOneWidget);
-    expect(find.text('Управление серверами'), findsOneWidget);
   });
 
   testWidgets(
@@ -221,26 +220,80 @@ void main() {
       final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
       expect(button.onConnect, isNull);
       expect(find.text('Сервер не выбран'), findsOneWidget);
-      expect(find.text('Управление серверами'), findsOneWidget);
       expect(find.byType(ServerCard), findsNothing);
 
       await tester.tap(find.byType(ConnectButton));
       await tester.pump();
 
       verifyNever(() => connectVpn(any()));
+
+      await tester.tap(find.text('Сервер не выбран'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Серверы'), findsOneWidget);
     },
   );
 
-  testWidgets('кнопка «Управление серверами» открывает шит', (tester) async {
+  testWidgets('тап по карточке сервера открывает шит', (tester) async {
     useLargeSurface(tester);
 
-    await pumpScreen(tester);
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
-    await tester.tap(find.text('Управление серверами'));
+    await tester.tap(find.byType(ServerCard));
     await tester.pumpAndSettle();
 
     expect(find.text('Серверы'), findsOneWidget);
     expect(find.text('Вставить из буфера'), findsOneWidget);
+  });
+
+  testWidgets('ирис в disconnected запускает подключение как Connect', (
+    tester,
+  ) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
+
+    await tester.tap(find.byType(IrisIndicator));
+    await tester.pump();
+
+    verify(() => connectVpn(proxyConfigToVpnConfig(_tokyoConfig))).called(1);
+  });
+
+  testWidgets('ирис в connected останавливает VPN', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
+
+    stateController.add(VpnConnected(connectedSince: DateTime.now()));
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byType(IrisIndicator));
+    await tester.pump();
+
+    verify(() => disconnectVpn()).called(1);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('ирис в connecting не трогает VPN', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
+
+    stateController.add(const VpnConnecting());
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byType(IrisIndicator), warnIfMissed: false);
+    await tester.pump();
+
+    verifyNever(() => connectVpn(any()));
+    verifyNever(() => disconnectVpn());
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
   });
 
   testWidgets('connected: показывает обратный отсчёт сессии', (tester) async {
