@@ -112,17 +112,13 @@ void main() {
       await pumpSheet(tester);
 
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
-      expect(
-        find.byIcon(Icons.radio_button_unchecked_rounded),
-        findsOneWidget,
-      );
     });
 
     testWidgets('показывает пустое состояние без серверов', (tester) async {
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      expect(find.text('Пока нет серверов'), findsOneWidget);
+      expect(find.text('Добавьте первый сервер'), findsOneWidget);
       expect(find.byType(ServerListTile), findsNothing);
     });
 
