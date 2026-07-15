@@ -176,6 +176,8 @@ class VpnStatusSnapshotMessage {
     this.connectedSinceEpochMs,
     required this.rxBytes,
     required this.txBytes,
+    this.sessionEndsAtEpochMs,
+    this.cooldownUntilEpochMs,
   });
 
   VpnStatusMessage status;
@@ -186,12 +188,18 @@ class VpnStatusSnapshotMessage {
 
   int txBytes;
 
+  int? sessionEndsAtEpochMs;
+
+  int? cooldownUntilEpochMs;
+
   List<Object?> _toList() {
     return <Object?>[
       status,
       connectedSinceEpochMs,
       rxBytes,
       txBytes,
+      sessionEndsAtEpochMs,
+      cooldownUntilEpochMs,
     ];
   }
 
@@ -205,6 +213,8 @@ class VpnStatusSnapshotMessage {
       connectedSinceEpochMs: result[1] as int?,
       rxBytes: result[2]! as int,
       txBytes: result[3]! as int,
+      sessionEndsAtEpochMs: result[4] as int?,
+      cooldownUntilEpochMs: result[5] as int?,
     );
   }
 
@@ -217,7 +227,7 @@ class VpnStatusSnapshotMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(status, other.status) && _deepEquals(connectedSinceEpochMs, other.connectedSinceEpochMs) && _deepEquals(rxBytes, other.rxBytes) && _deepEquals(txBytes, other.txBytes);
+    return _deepEquals(status, other.status) && _deepEquals(connectedSinceEpochMs, other.connectedSinceEpochMs) && _deepEquals(rxBytes, other.rxBytes) && _deepEquals(txBytes, other.txBytes) && _deepEquals(sessionEndsAtEpochMs, other.sessionEndsAtEpochMs) && _deepEquals(cooldownUntilEpochMs, other.cooldownUntilEpochMs);
   }
 
   @override
@@ -226,7 +236,7 @@ class VpnStatusSnapshotMessage {
 
   @override
   String toString() {
-    return 'VpnStatusSnapshotMessage(status: $status, connectedSinceEpochMs: $connectedSinceEpochMs, rxBytes: $rxBytes, txBytes: $txBytes)';
+    return 'VpnStatusSnapshotMessage(status: $status, connectedSinceEpochMs: $connectedSinceEpochMs, rxBytes: $rxBytes, txBytes: $txBytes, sessionEndsAtEpochMs: $sessionEndsAtEpochMs, cooldownUntilEpochMs: $cooldownUntilEpochMs)';
   }
 }
 
@@ -438,6 +448,51 @@ class ErrorMessage extends VpnEventMessage {
   }
 }
 
+class DemoExpiredMessage extends VpnEventMessage {
+  DemoExpiredMessage({
+    required this.cooldownUntilEpochMs,
+  });
+
+  int cooldownUntilEpochMs;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      cooldownUntilEpochMs,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static DemoExpiredMessage decode(Object result) {
+    result as List<Object?>;
+    return DemoExpiredMessage(
+      cooldownUntilEpochMs: result[0]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! DemoExpiredMessage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(cooldownUntilEpochMs, other.cooldownUntilEpochMs);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'DemoExpiredMessage(cooldownUntilEpochMs: $cooldownUntilEpochMs)';
+  }
+}
+
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -467,6 +522,9 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is ErrorMessage) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
+    }    else if (value is DemoExpiredMessage) {
+      buffer.putUint8(136);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -490,6 +548,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return TrafficChangedMessage.decode(readValue(buffer)!);
       case 135:
         return ErrorMessage.decode(readValue(buffer)!);
+      case 136:
+        return DemoExpiredMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }

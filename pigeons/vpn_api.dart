@@ -40,6 +40,8 @@ class VpnStatusSnapshotMessage {
   int? connectedSinceEpochMs;
   int rxBytes;
   int txBytes;
+  int? sessionEndsAtEpochMs;
+  int? cooldownUntilEpochMs;
 }
 
 sealed class VpnEventMessage {}
@@ -75,6 +77,12 @@ class ErrorMessage extends VpnEventMessage {
 
   String code;
   String message;
+}
+
+class DemoExpiredMessage extends VpnEventMessage {
+  DemoExpiredMessage({required this.cooldownUntilEpochMs});
+
+  int cooldownUntilEpochMs;
 }
 
 @HostApi()

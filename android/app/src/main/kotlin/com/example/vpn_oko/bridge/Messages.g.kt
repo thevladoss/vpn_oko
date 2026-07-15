@@ -264,7 +264,9 @@ data class VpnStatusSnapshotMessage (
   val status: VpnStatusMessage,
   val connectedSinceEpochMs: Long? = null,
   val rxBytes: Long,
-  val txBytes: Long
+  val txBytes: Long,
+  val sessionEndsAtEpochMs: Long? = null,
+  val cooldownUntilEpochMs: Long? = null
 )
  {
   companion object {
@@ -273,7 +275,9 @@ data class VpnStatusSnapshotMessage (
       val connectedSinceEpochMs = pigeonVar_list[1] as Long?
       val rxBytes = pigeonVar_list[2] as Long
       val txBytes = pigeonVar_list[3] as Long
-      return VpnStatusSnapshotMessage(status, connectedSinceEpochMs, rxBytes, txBytes)
+      val sessionEndsAtEpochMs = pigeonVar_list[4] as Long?
+      val cooldownUntilEpochMs = pigeonVar_list[5] as Long?
+      return VpnStatusSnapshotMessage(status, connectedSinceEpochMs, rxBytes, txBytes, sessionEndsAtEpochMs, cooldownUntilEpochMs)
     }
   }
   fun toList(): List<Any?> {
@@ -282,6 +286,8 @@ data class VpnStatusSnapshotMessage (
       connectedSinceEpochMs,
       rxBytes,
       txBytes,
+      sessionEndsAtEpochMs,
+      cooldownUntilEpochMs,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -292,7 +298,7 @@ data class VpnStatusSnapshotMessage (
       return true
     }
     val other = other as VpnStatusSnapshotMessage
-    return MessagesPigeonUtils.deepEquals(this.status, other.status) && MessagesPigeonUtils.deepEquals(this.connectedSinceEpochMs, other.connectedSinceEpochMs) && MessagesPigeonUtils.deepEquals(this.rxBytes, other.rxBytes) && MessagesPigeonUtils.deepEquals(this.txBytes, other.txBytes)
+    return MessagesPigeonUtils.deepEquals(this.status, other.status) && MessagesPigeonUtils.deepEquals(this.connectedSinceEpochMs, other.connectedSinceEpochMs) && MessagesPigeonUtils.deepEquals(this.rxBytes, other.rxBytes) && MessagesPigeonUtils.deepEquals(this.txBytes, other.txBytes) && MessagesPigeonUtils.deepEquals(this.sessionEndsAtEpochMs, other.sessionEndsAtEpochMs) && MessagesPigeonUtils.deepEquals(this.cooldownUntilEpochMs, other.cooldownUntilEpochMs)
   }
 
   override fun hashCode(): Int {
@@ -301,10 +307,12 @@ data class VpnStatusSnapshotMessage (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.connectedSinceEpochMs)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.rxBytes)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.txBytes)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.sessionEndsAtEpochMs)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.cooldownUntilEpochMs)
     return result
   }
   override fun toString(): String {
-    return "VpnStatusSnapshotMessage(status=$status, connectedSinceEpochMs=$connectedSinceEpochMs, rxBytes=$rxBytes, txBytes=$txBytes)"
+    return "VpnStatusSnapshotMessage(status=$status, connectedSinceEpochMs=$connectedSinceEpochMs, rxBytes=$rxBytes, txBytes=$txBytes, sessionEndsAtEpochMs=$sessionEndsAtEpochMs, cooldownUntilEpochMs=$cooldownUntilEpochMs)"
   }
 }
 
@@ -480,6 +488,43 @@ data class ErrorMessage (
     return "ErrorMessage(code=$code, message=$message)"
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class DemoExpiredMessage (
+  val cooldownUntilEpochMs: Long
+) : VpnEventMessage()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): DemoExpiredMessage {
+      val cooldownUntilEpochMs = pigeonVar_list[0] as Long
+      return DemoExpiredMessage(cooldownUntilEpochMs)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      cooldownUntilEpochMs,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as DemoExpiredMessage
+    return MessagesPigeonUtils.deepEquals(this.cooldownUntilEpochMs, other.cooldownUntilEpochMs)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.cooldownUntilEpochMs)
+    return result
+  }
+  override fun toString(): String {
+    return "DemoExpiredMessage(cooldownUntilEpochMs=$cooldownUntilEpochMs)"
+  }
+}
 private open class MessagesPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -518,6 +563,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
           ErrorMessage.fromList(it)
         }
       }
+      136.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          DemoExpiredMessage.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -549,6 +599,10 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       is ErrorMessage -> {
         stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is DemoExpiredMessage -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
