@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/core/theme/oko_motion.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_oko/core/widgets/top_alert.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
@@ -51,6 +53,11 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
   late final AnimationController _entrance;
   bool _started = false;
 
+  Timer? _alertTimer;
+  String? _alertText;
+  TopAlertKind _alertKind = TopAlertKind.warning;
+  bool _alertVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -73,8 +80,23 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 
   @override
   void dispose() {
+    _alertTimer?.cancel();
     _entrance.dispose();
     super.dispose();
+  }
+
+  void _showAlert(String text, TopAlertKind kind) {
+    _alertTimer?.cancel();
+    unawaited(HapticFeedback.mediumImpact());
+    setState(() {
+      _alertText = text;
+      _alertKind = kind;
+      _alertVisible = true;
+    });
+    _alertTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() => _alertVisible = false);
+    });
   }
 
   Interval _interval(Duration start) {
@@ -118,21 +140,34 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
-    return BlocListener<ServerListCubit, ServerListState>(
-      listenWhen: (previous, current) {
-        final before = activeServerProfile(previous);
-        final after = activeServerProfile(current);
-        return before?.id != after?.id || before?.config != after?.config;
-      },
-      listener: (context, serverState) {
-        final active = activeServerProfile(serverState);
-        final bloc = context.read<VpnConnectionBloc>();
-        if (active == null) {
-          bloc.add(const ConfigCleared());
-        } else {
-          bloc.add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ServerListCubit, ServerListState>(
+          listenWhen: (previous, current) {
+            final before = activeServerProfile(previous);
+            final after = activeServerProfile(current);
+            return before?.id != after?.id || before?.config != after?.config;
+          },
+          listener: (context, serverState) {
+            final active = activeServerProfile(serverState);
+            final bloc = context.read<VpnConnectionBloc>();
+            if (active == null) {
+              bloc.add(const ConfigCleared());
+            } else {
+              bloc.add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
+            }
+          },
+        ),
+        BlocListener<VpnConnectionBloc, VpnConnectionState>(
+          listenWhen: (previous, current) =>
+              current.status == VpnStatus.error &&
+              current.errorMessage == VpnConnectionBloc.noServerHint,
+          listener: (context, state) => _showAlert(
+            VpnConnectionBloc.noServerHint,
+            TopAlertKind.warning,
+          ),
+        ),
+      ],
       child: Scaffold(
         body: BlocBuilder<VpnConnectionBloc, VpnConnectionState>(
           builder: (context, state) {
@@ -181,7 +216,9 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                             ),
                           ),
                         if (state.status == VpnStatus.error &&
-                            state.errorMessage != null)
+                            state.errorMessage != null &&
+                            state.errorMessage !=
+                                VpnConnectionBloc.noServerHint)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Text(
@@ -256,6 +293,19 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                 ),
                 if (state.demoExpired && state.cooldownUntil != null)
                   DemoExpiredOverlay(cooldownUntil: state.cooldownUntil!),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  top: 8,
+                  child: SafeArea(
+                    bottom: false,
+                    child: TopAlert(
+                      message: _alertText,
+                      kind: _alertKind,
+                      visible: _alertVisible,
+                    ),
+                  ),
+                ),
               ],
             );
           },

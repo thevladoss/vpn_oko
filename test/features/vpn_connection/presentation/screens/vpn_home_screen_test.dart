@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
 import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_oko/core/widgets/top_alert.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
@@ -261,6 +262,48 @@ void main() {
       expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
     },
   );
+
+  testWidgets(
+    'нет сервера: тап Connect даёт верхний алерт warning без инлайна',
+    (tester) async {
+      useLargeSurface(tester);
+
+      await pumpScreen(tester);
+
+      expect(find.text(VpnConnectionBloc.noServerHint), findsOneWidget);
+
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pumpAndSettle();
+
+      final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+      expect(alert.visible, isTrue);
+      expect(alert.kind, TopAlertKind.warning);
+      expect(alert.message, VpnConnectionBloc.noServerHint);
+
+      expect(find.text(VpnConnectionBloc.noServerHint), findsNWidgets(2));
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    },
+  );
+
+  testWidgets('реальная ошибка показывается инлайн под ирисом', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
+
+    stateController.add(const VpnError('Туннель отклонён устройством'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Туннель отклонён устройством'), findsOneWidget);
+
+    final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+    expect(alert.visible, isFalse);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
 
   testWidgets('тап по карточке сервера открывает шит', (tester) async {
     useLargeSurface(tester);
