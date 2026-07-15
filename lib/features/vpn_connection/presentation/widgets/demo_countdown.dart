@@ -4,10 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/formatters/duration_format.dart';
 
 class DemoCountdown extends StatefulWidget {
-  const DemoCountdown({required this.deadline, this.style, super.key});
+  const DemoCountdown({
+    required this.deadline,
+    this.style,
+    this.warnStyle,
+    this.warnUnder = const Duration(seconds: 60),
+    super.key,
+  });
 
   final DateTime deadline;
   final TextStyle? style;
+  final TextStyle? warnStyle;
+  final Duration warnUnder;
 
   @override
   State<DemoCountdown> createState() => _DemoCountdownState();
@@ -58,6 +66,14 @@ class _DemoCountdownState extends State<DemoCountdown> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(hhmmss(_remaining()), style: widget.style);
+    final remaining = _remaining();
+    final warning = widget.warnStyle != null && remaining <= widget.warnUnder;
+    return Semantics(
+      liveRegion: true,
+      child: Text(
+        hhmmss(remaining),
+        style: warning ? widget.warnStyle : widget.style,
+      ),
+    );
   }
 }
