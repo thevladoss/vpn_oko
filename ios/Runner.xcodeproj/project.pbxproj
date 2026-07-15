@@ -9,15 +9,18 @@
 /* Begin PBXBuildFile section */
 		0CCC06570204B2C57DA01012 /* PacketTunnel.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CAF530FE538020C5A9B7A141 /* PacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		31F31C5D1EA3AC26A44A706C /* RunBlocking.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA63A8D84FD63706D202B964 /* RunBlocking.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		500F6A28F843EC0715394AC8 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C1179F7D4311B8D8BA03EE3 /* Pods_Runner.framework */; };
 		50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */; };
+		639CBDF821367FDC399A07E8 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA3E17C517EE615B0B065E /* AppGroup.swift */; };
 		67C7F9BC1B3B0F1C7EEA41C1 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71472FBE806C4ED6F6BDF453 /* Pods_RunnerTests.framework */; };
 		6D8D4CB447B14827F079865B /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
 		6FBB9F0ABA49D6B92D5296BA /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799B037CD820DEE4342AED0 /* PacketTunnelProvider.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		931173EC9349A7A6B2141E3E /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA3E17C517EE615B0B065E /* AppGroup.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -100,8 +103,10 @@
 		A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VpnStatusObserver.swift; sourceTree = "<group>"; };
 		A2CF2941E667E304CBF4C002 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		C2ECB3FB0CB3600551034B2B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		CA63A8D84FD63706D202B964 /* RunBlocking.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RunBlocking.swift; sourceTree = "<group>"; };
 		CAF530FE538020C5A9B7A141 /* PacketTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1B0A6C7AA0D75CF43A1E4 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		E4CA3E17C517EE615B0B065E /* AppGroup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = Libbox.xcframework; path = Frameworks/Libbox.xcframework; sourceTree = SOURCE_ROOT; };
 		FEE9360B2C49CED36AB45730 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,6 +147,7 @@
 				2799B037CD820DEE4342AED0 /* PacketTunnelProvider.swift */,
 				555482DCF2B991679CCD1756 /* Info.plist */,
 				0C2B212238846A6AA985885C /* PacketTunnel.entitlements */,
+				CA63A8D84FD63706D202B964 /* RunBlocking.swift */,
 			);
 			name = PacketTunnel;
 			path = PacketTunnel;
@@ -209,6 +215,7 @@
 				74816AF57CD398CE557CBA82 /* Frameworks */,
 				26A4E309971B7DEA61630A2F /* PacketTunnel */,
 				44FE91AB257E12348D55813A /* Pods */,
+				FBE6BF5BEC5007FF7D3BF984 /* Shared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -248,6 +255,15 @@
 				A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */,
 			);
 			path = Bridge;
+			sourceTree = "<group>";
+		};
+		FBE6BF5BEC5007FF7D3BF984 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E4CA3E17C517EE615B0B065E /* AppGroup.swift */,
+			);
+			name = Shared;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -490,6 +506,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FBB9F0ABA49D6B92D5296BA /* PacketTunnelProvider.swift in Sources */,
+				639CBDF821367FDC399A07E8 /* AppGroup.swift in Sources */,
+				31F31C5D1EA3AC26A44A706C /* RunBlocking.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,6 +522,7 @@
 				A00000000000000000000202 /* VpnHostApiImpl.swift in Sources */,
 				A00000000000000000000203 /* VpnEventListener.swift in Sources */,
 				50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */,
+				931173EC9349A7A6B2141E3E /* AppGroup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
