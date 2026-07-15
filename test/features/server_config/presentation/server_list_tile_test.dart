@@ -101,7 +101,7 @@ void main() {
       );
     });
 
-    testWidgets('тап по тайлу вызывает onSelect', (tester) async {
+    testWidgets('тап по закрытому тайлу вызывает onSelect', (tester) async {
       var selected = false;
       await tester.pumpWidget(
         host(
@@ -117,7 +117,22 @@ void main() {
       expect(selected, isTrue);
     });
 
-    testWidgets('свайп влево вызывает onDelete', (tester) async {
+    testWidgets('свайп влево открывает панель «Переименовать»/«Удалить»', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(buildTile(active: false), dark: true));
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Переименовать'), findsOneWidget);
+      expect(find.text('Удалить'), findsOneWidget);
+    });
+
+    testWidgets('тап по «Удалить» открытой панели вызывает onDelete', (
+      tester,
+    ) async {
       var deleted = false;
       await tester.pumpWidget(
         host(
@@ -127,13 +142,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Удалить'));
       await tester.pumpAndSettle();
 
       expect(deleted, isTrue);
     });
 
-    testWidgets('свайп вправо вызывает onRename', (tester) async {
+    testWidgets('тап по «Переименовать» открытой панели вызывает onRename', (
+      tester,
+    ) async {
       var renamed = false;
       await tester.pumpWidget(
         host(
@@ -143,39 +162,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Переименовать'));
       await tester.pumpAndSettle();
 
       expect(renamed, isTrue);
     });
 
-    testWidgets('меню предлагает переименовать и удалить', (tester) async {
-      var renamed = false;
-      var deleted = false;
-      await tester.pumpWidget(
-        host(
-          buildTile(
-            active: false,
-            onRename: () => renamed = true,
-            onDelete: () => deleted = true,
-          ),
-          dark: true,
-        ),
-      );
+    testWidgets('в тайле нет троеточия-меню', (tester) async {
+      await tester.pumpWidget(host(buildTile(active: false), dark: true));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.more_vert_rounded));
-      await tester.pumpAndSettle();
-      expect(find.text('Переименовать'), findsOneWidget);
-      await tester.tap(find.text('Переименовать'));
-      await tester.pumpAndSettle();
-      expect(renamed, isTrue);
-
-      await tester.tap(find.byIcon(Icons.more_vert_rounded));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Удалить'));
-      await tester.pumpAndSettle();
-      expect(deleted, isTrue);
+      expect(find.byIcon(Icons.more_vert_rounded), findsNothing);
+      expect(find.byType(Dismissible), findsNothing);
     });
 
     testWidgets('рендерится в обеих темах', (tester) async {
