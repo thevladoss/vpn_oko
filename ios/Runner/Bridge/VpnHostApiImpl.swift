@@ -3,12 +3,14 @@ import NetworkExtension
 
 final class VpnHostApiImpl: VpnHostApi {
   private let listener: VpnEventListener
+  private let store: DemoCooldownStore
   private let observer = VpnStatusObserver()
   private let trafficClient = TrafficLogClient()
   private var manager: NETunnelProviderManager?
 
-  init(listener: VpnEventListener = .shared) {
+  init(listener: VpnEventListener = .shared, store: DemoCooldownStore = .shared()) {
     self.listener = listener
+    self.store = store
     restoreExistingTunnel()
     observer.onStatus = { [weak self] status in
       switch status {
@@ -33,6 +35,14 @@ final class VpnHostApiImpl: VpnHostApi {
   }
 
   func startVpn(config: VpnConfigMessage, completion: @escaping (Result<Void, Error>) -> Void) {
+    let now = nowMillis()
+    if let until = store.cooldownUntil(now) {
+      listener.emit(LogMessage(text: "connect blocked: cooldown", timestampMillis: now, level: "warning"))
+      listener.emit(DemoExpiredMessage(cooldownUntilEpochMs: until))
+      completion(.success(()))
+      return
+    }
+
     listener.emit(LogMessage(text: "starting vpn", timestampMillis: nowMillis(), level: "info"))
     listener.emit(StatusChangedMessage(status: .connecting))
 
@@ -119,7 +129,13 @@ final class VpnHostApiImpl: VpnHostApi {
   }
 
   func getStatus() throws -> VpnStatusSnapshotMessage {
-    return listener.snapshot()
+    var snapshot = listener.snapshot()
+    let now = nowMillis()
+    snapshot.cooldownUntilEpochMs = store.cooldownUntil(now)
+    if snapshot.status == .connected, let since = snapshot.connectedSinceEpochMs {
+      snapshot.sessionEndsAtEpochMs = since + DemoLimit.sessionMs
+    }
+    return snapshot
   }
 
   private func fail(code: String, message: String) {
