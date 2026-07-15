@@ -10,18 +10,32 @@ class CooldownNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
-    final muted = Theme.of(
+    final labelStyle = Theme.of(
       context,
-    ).textTheme.bodySmall?.copyWith(color: tones.textSecondary);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.lock_clock_rounded, size: 16, color: tones.textSecondary),
-        const SizedBox(width: 6),
-        Text('Доступно через ', style: muted),
-        DemoCountdown(deadline: cooldownUntil, style: muted),
-      ],
+    ).textTheme.labelSmall?.copyWith(color: tones.accentTransitional);
+    return Semantics(
+      liveRegion: true,
+      label: 'Кулдаун демо, повторное подключение будет доступно позже',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: tones.accentTransitional.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lock_clock_rounded,
+              size: 16,
+              color: tones.accentTransitional,
+            ),
+            const SizedBox(width: 6),
+            Text('Доступно через ', style: labelStyle),
+            DemoCountdown(deadline: cooldownUntil, style: labelStyle),
+          ],
+        ),
+      ),
     );
   }
 }
