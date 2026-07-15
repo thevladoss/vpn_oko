@@ -76,6 +76,12 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     } else {
       unawaited(_entrance.forward());
     }
+    final active = activeServerProfile(context.read<ServerListCubit>().state);
+    if (active != null) {
+      context
+          .read<VpnConnectionBloc>()
+          .add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
+    }
   }
 
   @override
