@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/core/theme/oko_motion.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_oko/core/widgets/top_alert.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
@@ -35,9 +37,10 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
   late final AnimationController _entrance;
   bool _started = false;
 
-  Timer? _toastTimer;
-  String? _toastText;
-  bool _toastVisible = false;
+  Timer? _alertTimer;
+  String? _alertText;
+  TopAlertKind _alertKind = TopAlertKind.success;
+  bool _alertVisible = false;
 
   @override
   void initState() {
@@ -59,22 +62,32 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
 
   @override
   void dispose() {
-    _toastTimer?.cancel();
+    _alertTimer?.cancel();
     _entrance.dispose();
     super.dispose();
   }
 
-  void _showToast(String text) {
-    _toastTimer?.cancel();
+  void _showAlert(String text, TopAlertKind kind) {
+    _alertTimer?.cancel();
+    unawaited(
+      HapticFeedback.mediumImpact(),
+    );
     setState(() {
-      _toastText = text;
-      _toastVisible = true;
+      _alertText = text;
+      _alertKind = kind;
+      _alertVisible = true;
     });
-    _toastTimer = Timer(const Duration(seconds: 2), () {
+    _alertTimer = Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
-      setState(() => _toastVisible = false);
+      setState(() => _alertVisible = false);
     });
   }
+
+  TopAlertKind _kindFor(ServerListNotice notice) => switch (notice) {
+    NoticeSaved() => TopAlertKind.success,
+    NoticeDuplicate() => TopAlertKind.error,
+    NoticeInvalid() => TopAlertKind.error,
+  };
 
   Interval _interval(Duration start) {
     final begin = start.inMilliseconds / _total.inMilliseconds;
@@ -99,7 +112,7 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
       listener: (context, state) {
         final notice = state.notice;
         if (notice == null) return;
-        _showToast(_noticeText(notice));
+        _showAlert(_noticeText(notice), _kindFor(notice));
       },
       builder: (context, state) {
         return SafeArea(
@@ -182,10 +195,11 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
                 Positioned(
                   left: 20,
                   right: 20,
-                  bottom: 20,
-                  child: _SheetToast(
-                    text: _toastText,
-                    visible: _toastVisible,
+                  top: 12,
+                  child: TopAlert(
+                    message: _alertText,
+                    kind: _alertKind,
+                    visible: _alertVisible,
                   ),
                 ),
               ],
@@ -212,6 +226,8 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
     final trimmed = label.trim();
     if (trimmed.isEmpty) return;
     await cubit.rename(profile.id, trimmed);
+    if (!mounted) return;
+    _showAlert('Имя обновлено', TopAlertKind.success);
   }
 
   Future<void> _delete(BuildContext context, ServerProfile profile) async {
@@ -267,63 +283,6 @@ class _Staggered extends StatelessWidget {
         );
       },
       child: child,
-    );
-  }
-}
-
-class _SheetToast extends StatelessWidget {
-  const _SheetToast({required this.text, required this.visible});
-
-  final String? text;
-  final bool visible;
-
-  @override
-  Widget build(BuildContext context) {
-    final tones = context.okoTones;
-    final textTheme = Theme.of(context).textTheme;
-    final text = this.text;
-    final duration = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : OkoMotion.statusCrossfade;
-    return IgnorePointer(
-      child: AnimatedSlide(
-        offset: visible ? Offset.zero : const Offset(0, 0.4),
-        duration: duration,
-        curve: OkoMotion.statusCrossfadeCurve,
-        child: AnimatedOpacity(
-          opacity: visible ? 1 : 0,
-          duration: duration,
-          curve: OkoMotion.statusCrossfadeCurve,
-          child: text == null
-              ? const SizedBox.shrink()
-              : Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: tones.surfaceElevated,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: tones.glow),
-                    boxShadow: [
-                      BoxShadow(
-                        color: tones.glow,
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: tones.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-        ),
-      ),
     );
   }
 }

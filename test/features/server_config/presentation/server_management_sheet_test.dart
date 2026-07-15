@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
+import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_oko/core/widgets/top_alert.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
@@ -164,9 +166,16 @@ void main() {
 
       verify(() => repository.add(any(), any())).called(1);
       expect(find.textContaining('сохранён'), findsOneWidget);
+      final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+      expect(alert.kind, TopAlertKind.success);
+      expect(alert.visible, isTrue);
+      final icon = tester.widget<Icon>(
+        find.descendant(of: find.byType(TopAlert), matching: find.byType(Icon)),
+      );
+      expect(icon.color, OkoTones.dark.accentConnected);
     });
 
-    testWidgets('дубликат показывает тост поверх шита без SnackBar', (
+    testWidgets('дубликат показывает красный алерт сверху без SnackBar', (
       tester,
     ) async {
       clipboard.textToReturn = _tokyoLink;
@@ -182,6 +191,23 @@ void main() {
 
       expect(find.text('Такой сервер уже есть'), findsOneWidget);
       expect(find.byType(SnackBar), findsNothing);
+
+      final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+      expect(alert.kind, TopAlertKind.error);
+      final icon = tester.widget<Icon>(
+        find.descendant(of: find.byType(TopAlert), matching: find.byType(Icon)),
+      );
+      expect(icon.color, OkoTones.dark.accentError);
+
+      final sheetTop = tester
+          .getTopLeft(find.byKey(const ValueKey('sheet-bounds')))
+          .dy;
+      final sheetCenter = tester
+          .getCenter(find.byKey(const ValueKey('sheet-bounds')))
+          .dy;
+      final alertCenter = tester.getCenter(find.byType(TopAlert)).dy;
+      expect(alertCenter, greaterThanOrEqualTo(sheetTop));
+      expect(alertCenter, lessThan(sheetCenter));
     });
 
     testWidgets('кривая ссылка из буфера показывает ошибку', (tester) async {
