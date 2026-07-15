@@ -22,14 +22,6 @@ void main() {
   late MockDisconnectVpn disconnectVpn;
   late MockSyncStatus syncStatus;
 
-  const config = VpnConfig(
-    host: 'echo.oko.vpn',
-    port: 443,
-    userId: 'user-1',
-    serverName: 'Echo',
-    singboxConfigJson: '',
-  );
-
   const selectedConfig = VpnConfig(
     host: 'real.server',
     port: 8443,
@@ -38,10 +30,20 @@ void main() {
     singboxConfigJson: '{"outbounds":[{"type":"vless"}]}',
   );
 
+  const otherConfig = VpnConfig(
+    host: 'other.server',
+    port: 443,
+    userId: '',
+    serverName: 'Other',
+    singboxConfigJson: '{"outbounds":[{"type":"trojan"}]}',
+  );
+
+  const noServerHint = 'Выберите сервер, чтобы подключиться';
+
   final connectedSince = DateTime(2026, 7, 14, 9);
 
   setUpAll(() {
-    registerFallbackValue(config);
+    registerFallbackValue(selectedConfig);
   });
 
   setUp(() {
@@ -60,7 +62,6 @@ void main() {
         connectVpn: connectVpn,
         disconnectVpn: disconnectVpn,
         syncStatus: syncStatus,
-        config: config,
       );
 
   void stubStarted({
@@ -240,16 +241,22 @@ void main() {
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
-    'ConnectRequested вне переходного статуса зовёт connectVpn с config',
-    setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
+    'гейт: без активного сервера ConnectRequested не зовёт connectVpn и '
+    'эмитит подсказку выбрать сервер',
     build: buildBloc,
     act: (bloc) => bloc.add(const ConnectRequested()),
-    verify: (_) => verify(() => connectVpn(config)).called(1),
+    expect: () => [
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.error)
+          .having((s) => s.errorMessage, 'errorMessage', noServerHint)
+          .having((s) => s.connectedSince, 'connectedSince', isNull),
+    ],
+    verify: (_) => verifyNever(() => connectVpn(any())),
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
     'ConfigSelected делает конфиг активным: ConnectRequested зовёт connectVpn '
-    'с выбранным, не с демо',
+    'ровно раз с выбранным конфигом',
     setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
     build: buildBloc,
     act: (bloc) => bloc
@@ -257,19 +264,39 @@ void main() {
       ..add(const ConnectRequested()),
     verify: (_) {
       verify(() => connectVpn(selectedConfig)).called(1);
-      verifyNever(() => connectVpn(config));
+      verifyNever(() => connectVpn(otherConfig));
     },
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
-    'без ConfigSelected ConnectRequested остаётся на демо-конфиге',
+    'смена активного: последний ConfigSelected побеждает при Connect',
     setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
     build: buildBloc,
-    act: (bloc) => bloc.add(const ConnectRequested()),
+    act: (bloc) => bloc
+      ..add(const ConfigSelected(otherConfig))
+      ..add(const ConfigSelected(selectedConfig))
+      ..add(const ConnectRequested()),
     verify: (_) {
-      verify(() => connectVpn(config)).called(1);
-      verifyNever(() => connectVpn(selectedConfig));
+      verify(() => connectVpn(selectedConfig)).called(1);
+      verifyNever(() => connectVpn(otherConfig));
     },
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'ConfigCleared сбрасывает активный: следующий ConnectRequested снова '
+    'гейтится и не зовёт connectVpn',
+    setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const ConfigSelected(selectedConfig))
+      ..add(const ConfigCleared())
+      ..add(const ConnectRequested()),
+    expect: () => [
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.error)
+          .having((s) => s.errorMessage, 'errorMessage', noServerHint),
+    ],
+    verify: (_) => verifyNever(() => connectVpn(any())),
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
@@ -279,6 +306,17 @@ void main() {
     act: (bloc) => bloc.add(const ConfigSelected(selectedConfig)),
     expect: () => const <VpnConnectionState>[],
     verify: (bloc) => expect(bloc.config, selectedConfig),
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'ConfigCleared в isBusy не роняет Bloc и сбрасывает активный конфиг',
+    seed: () => const VpnConnectionState(status: VpnStatus.disconnecting),
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const ConfigSelected(selectedConfig))
+      ..add(const ConfigCleared()),
+    expect: () => const <VpnConnectionState>[],
+    verify: (bloc) => expect(bloc.config, isNull),
   );
 
   test(
