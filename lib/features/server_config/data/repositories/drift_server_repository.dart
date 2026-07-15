@@ -30,6 +30,9 @@ class DriftServerRepository implements ServerRepository {
     final inserted = await db
         .into(db.serverProfiles)
         .insertReturning(profileToCompanion(config, rawUrl));
+    if (await getActive() == null) {
+      await setActive(inserted.id);
+    }
     return ServerSaved(rowToProfile(inserted));
   }
 
