@@ -1,139 +1,209 @@
-import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
+import 'dart:async';
 
-enum ServerTileAction { rename, delete }
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/latency_pill.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/protocol_badge.dart';
 
 class ServerListTile extends StatelessWidget {
   const ServerListTile({
-    required this.profile,
-    required this.isActive,
-    required this.onTap,
+    required this.dismissKey,
+    required this.name,
+    required this.host,
+    required this.port,
+    required this.protocol,
+    required this.active,
+    required this.onSelect,
     required this.onRename,
     required this.onDelete,
+    this.latency,
     super.key,
   });
 
-  final ServerProfile profile;
-  final bool isActive;
-  final VoidCallback onTap;
+  final Key dismissKey;
+  final String name;
+  final String host;
+  final int port;
+  final String protocol;
+  final LatencyResult? latency;
+  final bool active;
+  final VoidCallback onSelect;
   final VoidCallback onRename;
   final VoidCallback onDelete;
 
-  String get _protocol => switch (profile.config) {
-    VlessConfig() => 'VLESS',
-    VmessConfig() => 'VMess',
-    TrojanConfig() => 'Trojan',
-    ShadowsocksConfig() => 'Shadowsocks',
-    Hysteria2Config() => 'Hysteria2',
-  };
+  String get _address => host.contains(':') ? '[$host]:$port' : '$host:$port';
 
-  String get _address {
-    final host = profile.config.host;
-    final wrapped = host.contains(':') ? '[$host]' : host;
-    return '$wrapped:${profile.config.port}';
+  Future<bool> _confirm(DismissDirection direction) async {
+    unawaited(HapticFeedback.mediumImpact());
+    if (direction == DismissDirection.endToStart) {
+      onDelete();
+    } else {
+      onRename();
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
-    final accent = isActive ? tones.accentConnected : tones.textSecondary;
-    return Material(
-      color: tones.surfaceCard,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Icon(
-                isActive
-                    ? Icons.check_circle_rounded
-                    : Icons.radio_button_unchecked_rounded,
-                color: accent,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      profile.label,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: tones.textPrimary,
-                        fontWeight: FontWeight.w600,
+    return Dismissible(
+      key: dismissKey,
+      confirmDismiss: _confirm,
+      background: const _SwipeAction(
+        icon: Icons.edit_rounded,
+        alignment: Alignment.centerLeft,
+        tone: _SwipeTone.rename,
+      ),
+      secondaryBackground: const _SwipeAction(
+        icon: Icons.delete_rounded,
+        alignment: Alignment.centerRight,
+        tone: _SwipeTone.delete,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: tones.surfaceCard,
+          borderRadius: BorderRadius.circular(20),
+          border: active
+              ? Border.all(color: tones.accentConnected, width: 1.5)
+              : null,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: MergeSemantics(
+                child: Semantics(
+                  selected: active,
+                  button: true,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        unawaited(HapticFeedback.mediumImpact());
+                        onSelect();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Icon(Icons.dns_rounded, color: tones.textSecondary),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: tones.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _address,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: tones.textSecondary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      ProtocolBadge(protocol: protocol),
+                                      const SizedBox(width: 8),
+                                      LatencyPill(latency: latency),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (active) ...[
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.check_circle_rounded,
+                                color: tones.accentConnected,
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        _ProtocolBadge(label: _protocol),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            _address,
-                            overflow: TextOverflow.ellipsis,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: tones.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              PopupMenuButton<ServerTileAction>(
-                icon: Icon(Icons.more_vert_rounded, color: tones.textSecondary),
-                onSelected: (action) => switch (action) {
-                  ServerTileAction.rename => onRename(),
-                  ServerTileAction.delete => onDelete(),
-                },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: ServerTileAction.rename,
-                    child: Text('Переименовать'),
-                  ),
-                  PopupMenuItem(
-                    value: ServerTileAction.delete,
-                    child: Text('Удалить'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+            _TileMenu(onRename: onRename, onDelete: onDelete),
+          ],
         ),
       ),
     );
   }
 }
 
-class _ProtocolBadge extends StatelessWidget {
-  const _ProtocolBadge({required this.label});
+enum _SwipeTone { rename, delete }
 
-  final String label;
+class _SwipeAction extends StatelessWidget {
+  const _SwipeAction({
+    required this.icon,
+    required this.alignment,
+    required this.tone,
+  });
+
+  final IconData icon;
+  final AlignmentGeometry alignment;
+  final _SwipeTone tone;
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
-    final textTheme = Theme.of(context).textTheme;
+    final color = switch (tone) {
+      _SwipeTone.rename => tones.accentTransitional,
+      _SwipeTone.delete => tones.accentError,
+    };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: tones.surfaceElevated,
-        borderRadius: BorderRadius.circular(6),
+        color: color.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        label,
-        style: textTheme.labelSmall?.copyWith(
-          color: tones.textSecondary,
-          fontWeight: FontWeight.w600,
+      child: Icon(icon, color: color),
+    );
+  }
+}
+
+enum _TileMenuAction { rename, delete }
+
+class _TileMenu extends StatelessWidget {
+  const _TileMenu({required this.onRename, required this.onDelete});
+
+  final VoidCallback onRename;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final tones = context.okoTones;
+    return PopupMenuButton<_TileMenuAction>(
+      icon: Icon(Icons.more_vert_rounded, color: tones.textSecondary),
+      onSelected: (action) => switch (action) {
+        _TileMenuAction.rename => onRename(),
+        _TileMenuAction.delete => onDelete(),
+      },
+      itemBuilder: (context) => const [
+        PopupMenuItem(
+          value: _TileMenuAction.rename,
+          child: Text('Переименовать'),
         ),
-      ),
+        PopupMenuItem(
+          value: _TileMenuAction.delete,
+          child: Text('Удалить'),
+        ),
+      ],
     );
   }
 }
