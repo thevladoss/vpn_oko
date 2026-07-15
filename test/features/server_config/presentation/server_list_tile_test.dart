@@ -32,6 +32,21 @@ void main() {
     return false;
   }
 
+  bool hasAccentForegroundBorder(WidgetTester tester, Color accent) {
+    for (final container in tester.widgetList<Container>(
+      find.byType(Container),
+    )) {
+      final decoration = container.foregroundDecoration;
+      if (decoration is BoxDecoration && decoration.border is Border) {
+        final border = decoration.border! as Border;
+        if (border.top.color == accent && border.top.width == 1.5) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   ServerListTile buildTile({
     required bool active,
     VoidCallback? onSelect,
@@ -80,7 +95,11 @@ void main() {
       await tester.pumpWidget(host(buildTile(active: true), dark: true));
       await tester.pumpAndSettle();
 
-      expect(hasAccentBorder(tester, OkoTones.dark.accentConnected), isTrue);
+      expect(
+        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        isTrue,
+      );
+      expect(hasAccentBorder(tester, OkoTones.dark.accentConnected), isFalse);
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
       expect(
         tester.getSemantics(find.text('Tokyo')),
@@ -93,6 +112,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(hasAccentBorder(tester, OkoTones.dark.accentConnected), isFalse);
+      expect(
+        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        isFalse,
+      );
       expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
       expect(
         tester.getSemantics(find.text('Tokyo')),
@@ -181,10 +204,18 @@ void main() {
       await tester.pumpWidget(host(buildTile(active: true), dark: true));
       await tester.pumpAndSettle();
       expect(find.byType(ServerListTile), findsOneWidget);
+      expect(
+        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        isTrue,
+      );
 
       await tester.pumpWidget(host(buildTile(active: true), dark: false));
       await tester.pumpAndSettle();
       expect(find.byType(ServerListTile), findsOneWidget);
+      expect(
+        hasAccentForegroundBorder(tester, OkoTones.light.accentConnected),
+        isTrue,
+      );
     });
   });
 }
