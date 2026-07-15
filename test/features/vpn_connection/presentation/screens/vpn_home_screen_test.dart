@@ -5,10 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/paste_config_button.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_oko/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
@@ -31,10 +32,30 @@ import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_console.dart';
 
 import '../../../../helpers/fake_clipboard_source.dart';
-import '../../../../helpers/fake_latency_probe.dart';
 import '../../../../helpers/mock_vpn_usecases.dart';
 
 class MockWatchLogs extends Mock implements WatchLogs {}
+
+class MockServerRepository extends Mock implements ServerRepository {}
+
+const _tokyoConfig = VlessConfig(
+  uuid: 'deadbeef-1111-2222-3333-444455556666',
+  host: 'tokyo.example',
+  port: 443,
+  transport: 'tcp',
+  security: 'reality',
+  sni: 'www.microsoft.com',
+  name: 'Tokyo',
+);
+
+final _tokyo = ServerProfile(
+  id: 1,
+  label: 'Tokyo',
+  config: _tokyoConfig,
+  rawUrl: 'vless://deadbeef-1111-2222-3333-444455556666@tokyo.example:443'
+      '?type=tcp&security=reality&sni=www.microsoft.com#Tokyo',
+  createdAt: DateTime(2026, 7, 14),
+);
 
 void main() {
   late MockWatchVpnState watchVpnState;
@@ -44,24 +65,24 @@ void main() {
   late MockDisconnectVpn disconnectVpn;
   late MockSyncStatus syncStatus;
   late MockWatchLogs watchLogs;
-  late FakeClipboardSource clipboardSource;
-  late FakeLatencyProbe latencyProbe;
+  late MockServerRepository repository;
+  late FakeClipboardSource clipboard;
 
   late StreamController<VpnState> stateController;
   late StreamController<TrafficStats> trafficController;
   late StreamController<LogEntry> logController;
   late StreamController<DemoExpiry> demoController;
 
-  const config = VpnConfig(
-    host: 'echo.oko.vpn',
-    port: 443,
-    userId: 'user-1',
-    serverName: 'Echo Server',
-    singboxConfigJson: '',
-  );
-
   setUpAll(() {
-    registerFallbackValue(config);
+    registerFallbackValue(
+      const VpnConfig(
+        host: 'fallback',
+        port: 1,
+        userId: '',
+        serverName: 'fallback',
+        singboxConfigJson: '',
+      ),
+    );
   });
 
   setUp(() {
@@ -72,10 +93,8 @@ void main() {
     disconnectVpn = MockDisconnectVpn();
     syncStatus = MockSyncStatus();
     watchLogs = MockWatchLogs();
-    clipboardSource = FakeClipboardSource();
-    latencyProbe = FakeLatencyProbe(
-      resultToReturn: const LatencyMeasured(Duration(milliseconds: 42)),
-    );
+    repository = MockServerRepository();
+    clipboard = FakeClipboardSource();
 
     stateController = StreamController<VpnState>.broadcast();
     trafficController = StreamController<TrafficStats>.broadcast();
@@ -105,20 +124,31 @@ void main() {
     connectVpn: connectVpn,
     disconnectVpn: disconnectVpn,
     syncStatus: syncStatus,
-    config: config,
   );
 
-  Future<void> pumpScreen(WidgetTester tester) async {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    List<ServerProfile> servers = const [],
+    ServerProfile? active,
+  }) async {
+    final serversController = StreamController<List<ServerProfile>>();
+    final activeController = StreamController<ServerProfile?>();
+    addTearDown(() async {
+      await serversController.close();
+      await activeController.close();
+    });
+    when(repository.watchAll).thenAnswer((_) => serversController.stream);
+    when(repository.watchActive).thenAnswer((_) => activeController.stream);
     final bloc = buildBloc()..add(const VpnStarted());
-    final cubit = LogsCubit(watchLogs: watchLogs);
-    final serverConfigCubit = ServerConfigCubit(
-      clipboard: clipboardSource,
-      probe: latencyProbe,
+    final logs = LogsCubit(watchLogs: watchLogs);
+    final serverList = ServerListCubit(
+      repository: repository,
+      clipboard: clipboard,
     );
     addTearDown(() async {
       await bloc.close();
-      await cubit.close();
-      await serverConfigCubit.close();
+      await logs.close();
+      await serverList.close();
     });
     await tester.pumpWidget(
       MaterialApp(
@@ -126,25 +156,30 @@ void main() {
         home: MultiBlocProvider(
           providers: [
             BlocProvider<VpnConnectionBloc>.value(value: bloc),
-            BlocProvider<LogsCubit>.value(value: cubit),
-            BlocProvider<ServerConfigCubit>.value(value: serverConfigCubit),
+            BlocProvider<LogsCubit>.value(value: logs),
+            BlocProvider<ServerListCubit>.value(value: serverList),
           ],
           child: const VpnHomeScreen(),
         ),
       ),
     );
+    await tester.pump();
+    serversController.add(servers);
+    activeController.add(active);
     await tester.pumpAndSettle();
   }
 
-  testWidgets('рендерит все зоны экрана поверх реальных Bloc/Cubit', (
-    tester,
-  ) async {
+  void useLargeSurface(WidgetTester tester) {
     tester.view.physicalSize = const Size(1000, 2000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+  }
 
-    await pumpScreen(tester);
+  testWidgets('рендерит все зоны экрана с активным сервером', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
     expect(find.byType(OkoWordmark), findsOneWidget);
     expect(find.byType(StatusBadge), findsOneWidget);
@@ -153,61 +188,65 @@ void main() {
     expect(find.byType(TrafficPanel), findsOneWidget);
     expect(find.byType(ConnectButton), findsOneWidget);
     expect(find.byType(LogConsole), findsOneWidget);
-    expect(find.text('Echo Server'), findsOneWidget);
-  });
-
-  testWidgets('тап Connect в disconnected шлёт ConnectRequested в Bloc', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1000, 2000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await pumpScreen(tester);
-
-    await tester.tap(find.byType(ConnectButton));
-    await tester.pump();
-
-    verify(() => connectVpn(config)).called(1);
+    expect(find.text('Tokyo'), findsOneWidget);
+    expect(find.text('Управление серверами'), findsOneWidget);
   });
 
   testWidgets(
-    'вставка валидной vless-ссылки реактивно показывает VlessConfigCard '
-    'без полного uuid',
+    'активный сервер driveт Connect: тап шлёт connectVpn с конфигом сервера',
     (tester) async {
-      tester.view.physicalSize = const Size(1000, 2000);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      useLargeSurface(tester);
 
-      clipboardSource.textToReturn =
-          'vless://b831381d-6324-4d53-ad4f-8cda48b30811@example.com:443'
-          '?type=tcp&security=reality&sni=www.microsoft.com#Tokyo';
+      await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
-      await pumpScreen(tester);
+      final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
+      expect(button.onConnect, isNotNull);
 
-      expect(find.byType(PasteConfigButton), findsOneWidget);
-      expect(find.byType(VlessConfigCard), findsNothing);
-      expect(find.byType(ServerCard), findsOneWidget);
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pump();
 
-      await tester.tap(find.byType(PasteConfigButton));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(VlessConfigCard), findsOneWidget);
-      expect(find.byType(ServerCard), findsNothing);
-      expect(find.textContaining('b831381d-6324-4d53'), findsNothing);
-      expect(find.textContaining('ad4f-8cda48b30811'), findsNothing);
+      verify(
+        () => connectVpn(proxyConfigToVpnConfig(_tokyoConfig)),
+      ).called(1);
     },
   );
 
-  testWidgets('connected: показывает обратный отсчёт сессии', (tester) async {
-    tester.view.physicalSize = const Size(1000, 2000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets(
+    'нет активного сервера: Connect недоступен, подсказка и вход в управление',
+    (tester) async {
+      useLargeSurface(tester);
+
+      await pumpScreen(tester);
+
+      final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
+      expect(button.onConnect, isNull);
+      expect(find.text('Сервер не выбран'), findsOneWidget);
+      expect(find.text('Управление серверами'), findsOneWidget);
+      expect(find.byType(ServerCard), findsNothing);
+
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pump();
+
+      verifyNever(() => connectVpn(any()));
+    },
+  );
+
+  testWidgets('кнопка «Управление серверами» открывает шит', (tester) async {
+    useLargeSurface(tester);
 
     await pumpScreen(tester);
+
+    await tester.tap(find.text('Управление серверами'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Серверы'), findsOneWidget);
+    expect(find.text('Вставить из буфера'), findsOneWidget);
+  });
+
+  testWidgets('connected: показывает обратный отсчёт сессии', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
     stateController.add(VpnConnected(connectedSince: DateTime.now()));
     await tester.pump();
@@ -220,12 +259,9 @@ void main() {
   });
 
   testWidgets('demoExpired: показывает оверлей истечения демо', (tester) async {
-    tester.view.physicalSize = const Size(1000, 2000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+    useLargeSurface(tester);
 
-    await pumpScreen(tester);
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
     demoController.add(
       DemoExpiry(
@@ -247,12 +283,9 @@ void main() {
   testWidgets('cooldown без истечения: уведомление и блок Connect', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(1000, 2000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+    useLargeSurface(tester);
 
-    await pumpScreen(tester);
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
     demoController.add(
       DemoExpiry(

@@ -42,6 +42,10 @@ class ConfigSelected extends VpnConnectionEvent {
   List<Object?> get props => [config];
 }
 
+class ConfigCleared extends VpnConnectionEvent {
+  const ConfigCleared();
+}
+
 class VpnDemoLimitReceived extends VpnConnectionEvent {
   const VpnDemoLimitReceived(this.demo);
 

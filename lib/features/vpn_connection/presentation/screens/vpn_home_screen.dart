@@ -1,16 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/core/theme/oko_motion.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_state.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/paste_config_button.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/vless_error_text.dart';
+import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_oko/features/server_config/presentation/screens/server_management_sheet.dart';
 import 'package:vpn_oko/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
@@ -25,6 +23,19 @@ import 'package:vpn_oko/features/vpn_connection/presentation/widgets/server_card
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/status_badge.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/traffic_panel.dart';
 import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_console.dart';
+
+ServerProfile? activeServerProfile(ServerListState state) {
+  final id = state.activeId;
+  if (id == null) {
+    return null;
+  }
+  for (final profile in state.servers) {
+    if (profile.id == id) {
+      return profile;
+    }
+  }
+  return null;
+}
 
 class VpnHomeScreen extends StatefulWidget {
   const VpnHomeScreen({super.key});
@@ -74,28 +85,46 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     return Interval(begin, end, curve: OkoMotion.enterScreenCurve);
   }
 
-  void _pasteConfig(BuildContext context) {
-    unawaited(HapticFeedback.mediumImpact());
-    unawaited(context.read<ServerConfigCubit>().pasteFromClipboard());
+  void _openServerSheet(BuildContext context) {
+    final cubit = context.read<ServerListCubit>();
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => BlocProvider.value(
+          value: cubit,
+          child: const ServerManagementSheet(),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final tones = context.okoTones;
     final textTheme = Theme.of(context).textTheme;
-    final config = context.read<VpnConnectionBloc>().config;
-    return BlocListener<ServerConfigCubit, ServerConfigState>(
-      listener: (context, cfgState) {
-        if (cfgState is ServerConfigLoaded) {
-          context.read<VpnConnectionBloc>().add(
-            ConfigSelected(proxyConfigToVpnConfig(cfgState.config)),
-          );
+    return BlocListener<ServerListCubit, ServerListState>(
+      listenWhen: (previous, current) {
+        final before = activeServerProfile(previous);
+        final after = activeServerProfile(current);
+        return before?.id != after?.id || before?.config != after?.config;
+      },
+      listener: (context, serverState) {
+        final active = activeServerProfile(serverState);
+        final bloc = context.read<VpnConnectionBloc>();
+        if (active == null) {
+          bloc.add(const ConfigCleared());
+        } else {
+          bloc.add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
         }
       },
       child: Scaffold(
         body: BlocBuilder<VpnConnectionBloc, VpnConnectionState>(
           builder: (context, state) {
             final accent = tones.accentFor(state.status);
+            final activeProfile = activeServerProfile(
+              context.watch<ServerListCubit>().state,
+            );
             return Stack(
               children: [
                 _GlowLayer(accent: accent, status: state.status),
@@ -155,45 +184,22 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           interval: _interval(OkoMotion.staggerServerCard),
                           child: Column(
                             children: [
-                              BlocBuilder<ServerConfigCubit, ServerConfigState>(
-                                builder: (context, cfgState) =>
-                                    switch (cfgState) {
-                                      ServerConfigLoaded(
-                                        :final config,
-                                        :final latency,
-                                      ) =>
-                                        VlessConfigCard(
-                                          config: config,
-                                          latency: latency,
-                                        ),
-                                      ServerConfigError(:final error) => Column(
-                                        children: [
-                                          ServerCard(
-                                            serverName: config.serverName,
-                                            host: config.host,
-                                            port: config.port,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            describeVlessError(error),
-                                            textAlign: TextAlign.center,
-                                            style: textTheme.bodySmall
-                                                ?.copyWith(
-                                                  color: tones.accentError,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      ServerConfigInitial() => ServerCard(
-                                        serverName: config.serverName,
-                                        host: config.host,
-                                        port: config.port,
-                                      ),
-                                    },
-                              ),
+                              if (activeProfile != null)
+                                ServerCard(
+                                  serverName: activeProfile.label,
+                                  host: activeProfile.config.host,
+                                  port: activeProfile.config.port,
+                                )
+                              else
+                                _NoServerCard(
+                                  tones: tones,
+                                  textTheme: textTheme,
+                                ),
                               const SizedBox(height: 12),
-                              PasteConfigButton(
-                                onPressed: () => _pasteConfig(context),
+                              OutlinedButton.icon(
+                                onPressed: () => _openServerSheet(context),
+                                icon: const Icon(Icons.dns_rounded),
+                                label: const Text('Управление серверами'),
                               ),
                             ],
                           ),
@@ -223,7 +229,8 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           interval: _interval(OkoMotion.staggerConnectButton),
                           child: ConnectButton(
                             status: state.status,
-                            onConnect: state.cooldownActive
+                            onConnect: state.cooldownActive ||
+                                    activeProfile == null
                                 ? null
                                 : () => context
                                       .read<VpnConnectionBloc>()
@@ -250,6 +257,51 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _NoServerCard extends StatelessWidget {
+  const _NoServerCard({required this.tones, required this.textTheme});
+
+  final OkoTones tones;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: tones.surfaceCard,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.dns_rounded, color: tones.textSecondary),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Сервер не выбран',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: tones.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Выберите сервер, чтобы подключиться',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: tones.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

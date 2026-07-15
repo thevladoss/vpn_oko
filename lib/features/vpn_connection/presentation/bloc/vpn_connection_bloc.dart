@@ -24,18 +24,19 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     required this.connectVpn,
     required this.disconnectVpn,
     required this.syncStatus,
-    required VpnConfig config,
-  }) : _activeConfig = config,
-       super(const VpnConnectionState(status: VpnStatus.disconnected)) {
+  }) : super(const VpnConnectionState(status: VpnStatus.disconnected)) {
     on<VpnStarted>(_onStarted);
     on<VpnStateReceived>(_onStateReceived);
     on<VpnTrafficReceived>(_onTrafficReceived);
     on<VpnDemoLimitReceived>(_onDemoLimitReceived);
     on<VpnCooldownElapsed>(_onCooldownElapsed);
     on<ConfigSelected>(_onConfigSelected);
+    on<ConfigCleared>(_onConfigCleared);
     on<ConnectRequested>(_onConnectRequested);
     on<DisconnectRequested>(_onDisconnectRequested);
   }
+
+  static const String _noServerHint = 'Выберите сервер, чтобы подключиться';
 
   final WatchVpnState watchVpnState;
   final WatchTraffic watchTraffic;
@@ -44,9 +45,9 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
   final DisconnectVpn disconnectVpn;
   final SyncStatus syncStatus;
 
-  VpnConfig _activeConfig;
+  VpnConfig? _active;
 
-  VpnConfig get config => _activeConfig;
+  VpnConfig? get config => _active;
 
   StreamSubscription<VpnState>? _stateSub;
   StreamSubscription<TrafficStats>? _trafficSub;
@@ -134,7 +135,14 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     ConfigSelected event,
     Emitter<VpnConnectionState> emit,
   ) {
-    _activeConfig = event.config;
+    _active = event.config;
+  }
+
+  void _onConfigCleared(
+    ConfigCleared event,
+    Emitter<VpnConnectionState> emit,
+  ) {
+    _active = null;
   }
 
   void _onConnectRequested(
@@ -143,7 +151,18 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
   ) {
     if (state.cooldownActive) return;
     if (state.isBusy) return;
-    unawaited(connectVpn(_activeConfig));
+    final active = _active;
+    if (active == null) {
+      emit(
+        state.copyWith(
+          status: VpnStatus.error,
+          errorMessage: _noServerHint,
+          clearConnectedSince: true,
+        ),
+      );
+      return;
+    }
+    unawaited(connectVpn(active));
   }
 
   void _onDisconnectRequested(

@@ -1,12 +1,17 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
 import 'package:vpn_oko/core/bridge/vpn_bridge.dart';
 import 'package:vpn_oko/features/server_config/data/datasources/clipboard_source_impl.dart';
+import 'package:vpn_oko/features/server_config/data/local/app_database.dart';
+import 'package:vpn_oko/features/server_config/data/local/encrypted_database.dart';
+import 'package:vpn_oko/features/server_config/data/local/secret_key_store.dart';
 import 'package:vpn_oko/features/server_config/data/probes/socket_latency_probe.dart';
+import 'package:vpn_oko/features/server_config/data/repositories/drift_server_repository.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
+import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
 import 'package:vpn_oko/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
 import 'package:vpn_oko/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/repositories/vpn_repository.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/connect_vpn.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
@@ -33,11 +38,18 @@ class AppDependencies {
     disconnectVpn = DisconnectVpn(vpnRepository);
     syncStatus = SyncStatus(vpnRepository);
     watchLogs = WatchLogs(logRepository);
+    const keyStore = SecretKeyStore(
+      FlutterSecretStore(FlutterSecureStorage()),
+    );
+    _database = openEncryptedDatabase(keyStore);
+    serverRepository = DriftServerRepository(_database);
   }
 
   final VpnBridge _bridge;
+  late final AppDatabase _database;
 
   late final VpnRepository vpnRepository;
+  late final ServerRepository serverRepository;
   late final LogRepository logRepository;
   late final WatchVpnState watchVpnState;
   late final WatchTraffic watchTraffic;
@@ -47,14 +59,6 @@ class AppDependencies {
   late final SyncStatus syncStatus;
   late final WatchLogs watchLogs;
 
-  final VpnConfig demoConfig = const VpnConfig(
-    host: 'echo.oko.vpn',
-    port: 443,
-    userId: '00000000-0000-0000-0000-000000000000',
-    serverName: 'Echo Server',
-    singboxConfigJson: '',
-  );
-
   final ClipboardSource clipboardSource = const SystemClipboardSource();
   final LatencyProbe latencyProbe = const SocketLatencyProbe();
 
@@ -62,5 +66,6 @@ class AppDependencies {
     await vpnRepository.dispose();
     await logRepository.dispose();
     await _bridge.dispose();
+    await _database.close();
   }
 }

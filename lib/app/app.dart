@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/app/di.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
+import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
@@ -35,16 +35,15 @@ class OkoApp extends StatelessWidget {
               connectVpn: dependencies.connectVpn,
               disconnectVpn: dependencies.disconnectVpn,
               syncStatus: dependencies.syncStatus,
-              config: dependencies.demoConfig,
             )..add(const VpnStarted()),
           ),
           BlocProvider(
             create: (_) => LogsCubit(watchLogs: dependencies.watchLogs),
           ),
           BlocProvider(
-            create: (_) => ServerConfigCubit(
+            create: (_) => ServerListCubit(
+              repository: dependencies.serverRepository,
               clipboard: dependencies.clipboardSource,
-              probe: dependencies.latencyProbe,
             ),
           ),
         ],

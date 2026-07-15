@@ -51,7 +51,6 @@ void main() {
         connectVpn: connectVpn,
         disconnectVpn: disconnectVpn,
         syncStatus: syncStatus,
-        config: config,
       );
 
   void stubStarted({
@@ -211,7 +210,7 @@ void main() {
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
     'reconnect после кулдауна: VpnCooldownElapsed чистит кулдаун, следующий '
-    'ConnectRequested зовёт connectVpn',
+    'ConnectRequested зовёт connectVpn на активном сервере',
     setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
     seed: () => VpnConnectionState(
       status: VpnStatus.disconnected,
@@ -220,6 +219,7 @@ void main() {
     ),
     build: buildBloc,
     act: (bloc) => bloc
+      ..add(const ConfigSelected(config))
       ..add(const VpnCooldownElapsed())
       ..add(const ConnectRequested()),
     expect: () => [
