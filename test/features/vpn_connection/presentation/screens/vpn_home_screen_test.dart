@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
+import 'package:vpn_oko/core/theme/vpn_status.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
@@ -126,7 +127,7 @@ void main() {
     syncStatus: syncStatus,
   );
 
-  Future<void> pumpScreen(
+  Future<VpnConnectionBloc> pumpScreen(
     WidgetTester tester, {
     List<ServerProfile> servers = const [],
     ServerProfile? active,
@@ -167,6 +168,7 @@ void main() {
     serversController.add(servers);
     activeController.add(active);
     await tester.pumpAndSettle();
+    return bloc;
   }
 
   void useLargeSurface(WidgetTester tester) {
@@ -211,14 +213,14 @@ void main() {
   );
 
   testWidgets(
-    'нет активного сервера: Connect недоступен, подсказка и вход в управление',
+    'нет сервера: тап Connect не поднимает туннель, bloc → error',
     (tester) async {
       useLargeSurface(tester);
 
-      await pumpScreen(tester);
+      final bloc = await pumpScreen(tester);
 
       final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
-      expect(button.onConnect, isNull);
+      expect(button.onConnect, isNotNull);
       expect(find.text('Сервер не выбран'), findsOneWidget);
       expect(find.byType(ServerCard), findsNothing);
 
@@ -226,11 +228,37 @@ void main() {
       await tester.pump();
 
       verifyNever(() => connectVpn(any()));
+      expect(bloc.state.status, VpnStatus.error);
+      expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
+    },
+  );
 
-      await tester.tap(find.text('Сервер не выбран'));
-      await tester.pumpAndSettle();
+  testWidgets('карточка «Сервер не выбран» открывает управление серверами', (
+    tester,
+  ) async {
+    useLargeSurface(tester);
 
-      expect(find.text('Серверы'), findsOneWidget);
+    await pumpScreen(tester);
+
+    await tester.tap(find.text('Сервер не выбран'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Серверы'), findsOneWidget);
+  });
+
+  testWidgets(
+    'ирис без сервера не поднимает туннель, bloc → error(noServerHint)',
+    (tester) async {
+      useLargeSurface(tester);
+
+      final bloc = await pumpScreen(tester);
+
+      await tester.tap(find.byType(IrisIndicator));
+      await tester.pump();
+
+      verifyNever(() => connectVpn(any()));
+      expect(bloc.state.status, VpnStatus.error);
+      expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
     },
   );
 

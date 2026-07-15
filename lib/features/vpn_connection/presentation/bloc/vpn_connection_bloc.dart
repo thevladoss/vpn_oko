@@ -36,7 +36,7 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     on<DisconnectRequested>(_onDisconnectRequested);
   }
 
-  static const String _noServerHint = 'Выберите сервер, чтобы подключиться';
+  static const String noServerHint = 'Выберите сервер, чтобы подключиться';
 
   final WatchVpnState watchVpnState;
   final WatchTraffic watchTraffic;
@@ -156,7 +156,7 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
       emit(
         state.copyWith(
           status: VpnStatus.error,
-          errorMessage: _noServerHint,
+          errorMessage: noServerHint,
           clearConnectedSince: true,
         ),
       );

@@ -99,13 +99,10 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
     );
   }
 
-  VoidCallback? _irisToggle(
-    VpnConnectionState state,
-    ServerProfile? activeProfile,
-  ) {
+  VoidCallback? _irisToggle(VpnConnectionState state) {
     return switch (state.status) {
       VpnStatus.disconnected || VpnStatus.error =>
-        state.cooldownActive || activeProfile == null
+        state.cooldownActive
             ? null
             : () => context
                   .read<VpnConnectionBloc>()
@@ -170,7 +167,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               child: IrisIndicator(
                                 status: state.status,
                                 connectedSince: state.connectedSince,
-                                onTap: _irisToggle(state, activeProfile),
+                                onTap: _irisToggle(state),
                               ),
                             ),
                           ),
@@ -236,8 +233,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           interval: _interval(OkoMotion.staggerConnectButton),
                           child: ConnectButton(
                             status: state.status,
-                            onConnect: state.cooldownActive ||
-                                    activeProfile == null
+                            onConnect: state.cooldownActive
                                 ? null
                                 : () => context
                                       .read<VpnConnectionBloc>()
