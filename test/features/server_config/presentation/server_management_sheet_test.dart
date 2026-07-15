@@ -306,5 +306,33 @@ void main() {
       final fieldWidth = tester.getSize(find.byType(TextField)).width;
       expect(fieldWidth, greaterThan(200));
     });
+
+    testWidgets('диалог переименования открывается с полным именем и курсором '
+        'в конце', (tester) async {
+      const longName =
+          'Токийский сервер с очень длинным именем для проверки курсора';
+      final longProfile = ServerProfile(
+        id: 8,
+        label: longName,
+        config: _tokyoConfig,
+        rawUrl: _tokyoLink,
+        createdAt: DateTime(2026, 7, 15),
+      );
+      when(() => repository.rename(any(), any())).thenAnswer((_) async {});
+      cubit = makeCubit(servers: [longProfile]);
+      await pumpSheet(tester);
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ServerListTile), const Offset(-260, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Переименовать'));
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      final controller = field.controller!;
+      expect(controller.text, longName);
+      expect(controller.selection.isCollapsed, isTrue);
+      expect(controller.selection.baseOffset, longName.length);
+    });
   });
 }
