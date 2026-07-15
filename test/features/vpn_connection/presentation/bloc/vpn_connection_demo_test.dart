@@ -160,8 +160,8 @@ void main() {
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
-    'порядко-независимость: DemoExpiry затем VpnDisconnected сохраняет '
-    'cooldownUntil и demoExpired',
+    'порядко-независимость: DemoExpiry затем VpnDisconnected — итог сохраняет '
+    'cooldownUntil и demoExpired (Disconnected их не чистит)',
     seed: () => VpnConnectionState(
       status: VpnStatus.connected,
       connectedSince: connectedSince,
@@ -179,6 +179,29 @@ void main() {
           .having((s) => s.status, 'status', VpnStatus.disconnected)
           .having((s) => s.demoExpired, 'demoExpired', true)
           .having((s) => s.cooldownUntil, 'cooldownUntil', cooldownUntil),
+    ],
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'порядко-независимость: VpnDisconnected затем DemoExpiry — демо-поля '
+    'ложатся поверх disconnected',
+    seed: () => VpnConnectionState(
+      status: VpnStatus.connected,
+      connectedSince: connectedSince,
+    ),
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const VpnStateReceived(VpnDisconnected()))
+      ..add(
+        VpnDemoLimitReceived(
+          DemoExpiry(cooldownUntil: cooldownUntil, justExpired: true),
+        ),
+      ),
+    expect: () => [
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.demoExpired, 'demoExpired', false)
+          .having((s) => s.cooldownUntil, 'cooldownUntil', isNull),
       isA<VpnConnectionState>()
           .having((s) => s.status, 'status', VpnStatus.disconnected)
           .having((s) => s.demoExpired, 'demoExpired', true)

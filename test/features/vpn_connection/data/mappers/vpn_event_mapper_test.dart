@@ -93,7 +93,7 @@ void main() {
   });
 
   group('snapshotToDemo', () {
-    test('cooldownUntilEpochMs present yields DemoExpiry justExpired false', () {
+    test('cooldownUntilEpochMs present yields justExpired false', () {
       final result = snapshotToDemo(
         VpnStatusSnapshotMessage(
           status: VpnStatusMessage.disconnected,

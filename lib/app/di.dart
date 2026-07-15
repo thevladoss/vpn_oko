@@ -11,6 +11,7 @@ import 'package:vpn_oko/features/vpn_connection/domain/repositories/vpn_reposito
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/connect_vpn.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/sync_status.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_demo_limit.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_traffic.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_vpn_state.dart';
 import 'package:vpn_oko/features/vpn_logs/data/datasources/log_native_datasource.dart';
@@ -27,6 +28,7 @@ class AppDependencies {
     logRepository = LogRepositoryImpl(logDatasource);
     watchVpnState = WatchVpnState(vpnRepository);
     watchTraffic = WatchTraffic(vpnRepository);
+    watchDemoLimit = WatchDemoLimit(vpnRepository);
     connectVpn = ConnectVpn(vpnRepository);
     disconnectVpn = DisconnectVpn(vpnRepository);
     syncStatus = SyncStatus(vpnRepository);
@@ -39,6 +41,7 @@ class AppDependencies {
   late final LogRepository logRepository;
   late final WatchVpnState watchVpnState;
   late final WatchTraffic watchTraffic;
+  late final WatchDemoLimit watchDemoLimit;
   late final ConnectVpn connectVpn;
   late final DisconnectVpn disconnectVpn;
   late final SyncStatus syncStatus;

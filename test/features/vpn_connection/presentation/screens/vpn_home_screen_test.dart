@@ -9,6 +9,7 @@ import 'package:vpn_oko/features/server_config/domain/entities/latency_result.da
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/paste_config_button.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/vless_config_card.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
@@ -35,6 +36,7 @@ class MockWatchLogs extends Mock implements WatchLogs {}
 void main() {
   late MockWatchVpnState watchVpnState;
   late MockWatchTraffic watchTraffic;
+  late MockWatchDemoLimit watchDemoLimit;
   late MockConnectVpn connectVpn;
   late MockDisconnectVpn disconnectVpn;
   late MockSyncStatus syncStatus;
@@ -61,6 +63,7 @@ void main() {
   setUp(() {
     watchVpnState = MockWatchVpnState();
     watchTraffic = MockWatchTraffic();
+    watchDemoLimit = MockWatchDemoLimit();
     connectVpn = MockConnectVpn();
     disconnectVpn = MockDisconnectVpn();
     syncStatus = MockSyncStatus();
@@ -77,6 +80,8 @@ void main() {
     when(() => syncStatus()).thenAnswer((_) async {});
     when(() => watchVpnState()).thenAnswer((_) => stateController.stream);
     when(() => watchTraffic()).thenAnswer((_) => trafficController.stream);
+    when(() => watchDemoLimit())
+        .thenAnswer((_) => const Stream<DemoExpiry>.empty());
     when(() => watchLogs()).thenAnswer((_) => logController.stream);
     when(() => connectVpn(any())).thenAnswer((_) async {});
     when(() => disconnectVpn()).thenAnswer((_) async {});
@@ -91,6 +96,7 @@ void main() {
   VpnConnectionBloc buildBloc() => VpnConnectionBloc(
     watchVpnState: watchVpnState,
     watchTraffic: watchTraffic,
+    watchDemoLimit: watchDemoLimit,
     connectVpn: connectVpn,
     disconnectVpn: disconnectVpn,
     syncStatus: syncStatus,

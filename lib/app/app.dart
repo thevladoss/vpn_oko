@@ -31,6 +31,7 @@ class OkoApp extends StatelessWidget {
             create: (_) => VpnConnectionBloc(
               watchVpnState: dependencies.watchVpnState,
               watchTraffic: dependencies.watchTraffic,
+              watchDemoLimit: dependencies.watchDemoLimit,
               connectVpn: dependencies.connectVpn,
               disconnectVpn: dependencies.disconnectVpn,
               syncStatus: dependencies.syncStatus,

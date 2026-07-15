@@ -4,6 +4,7 @@ import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
 import 'package:vpn_oko/core/error/failures.dart';
 import 'package:vpn_oko/core/error/vpn_exception.dart';
 import 'package:vpn_oko/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
@@ -61,9 +62,13 @@ void main() {
       await repository.syncStatus();
       final first = await repository.watchState().first;
 
+      final connectedSince = DateTime.fromMillisecondsSinceEpoch(1000);
       expect(
         first,
-        VpnConnected(connectedSince: DateTime.fromMillisecondsSinceEpoch(1000)),
+        VpnConnected(
+          connectedSince: connectedSince,
+          sessionEndsAt: connectedSince.add(kDemoSessionDuration),
+        ),
       );
     });
 
@@ -177,6 +182,59 @@ void main() {
         repository.syncStatus(),
         throwsA(isA<Failure>()),
       );
+    });
+  });
+
+  group('watchDemoLimit', () {
+    test('proxies datasource demo stream', () async {
+      final received = <DemoExpiry>[];
+      final subscription = repository.watchDemoLimit().listen(received.add);
+      await pumpEventQueue();
+
+      final demo = DemoExpiry(
+        cooldownUntil: DateTime.fromMillisecondsSinceEpoch(9000),
+        justExpired: true,
+      );
+      fake.emitDemo(demo);
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      expect(received, <DemoExpiry>[demo]);
+    });
+
+    test('syncStatus with cooldown snapshot restores cooldown', () async {
+      fake.snapshot = VpnStatusSnapshotMessage(
+        status: VpnStatusMessage.disconnected,
+        rxBytes: 0,
+        txBytes: 0,
+        cooldownUntilEpochMs: 12000,
+      );
+      final received = <DemoExpiry>[];
+      final subscription = repository.watchDemoLimit().listen(received.add);
+      await pumpEventQueue();
+
+      await repository.syncStatus();
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      expect(received, <DemoExpiry>[
+        DemoExpiry(
+          cooldownUntil: DateTime.fromMillisecondsSinceEpoch(12000),
+          justExpired: false,
+        ),
+      ]);
+    });
+
+    test('syncStatus without cooldown emits no demo event', () async {
+      final received = <DemoExpiry>[];
+      final subscription = repository.watchDemoLimit().listen(received.add);
+      await pumpEventQueue();
+
+      await repository.syncStatus();
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      expect(received, isEmpty);
     });
   });
 

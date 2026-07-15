@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
 import 'package:vpn_oko/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
+import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
 
@@ -11,6 +12,8 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
       StreamController<VpnState>.broadcast();
   final StreamController<TrafficStats> _traffic =
       StreamController<TrafficStats>.broadcast();
+  final StreamController<DemoExpiry> _demo =
+      StreamController<DemoExpiry>.broadcast();
 
   final List<VpnConfigMessage> startedWith = <VpnConfigMessage>[];
   int stopCount = 0;
@@ -29,11 +32,16 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
 
   void emitTraffic(TrafficStats stats) => _traffic.add(stats);
 
+  void emitDemo(DemoExpiry demo) => _demo.add(demo);
+
   @override
   Stream<VpnState> get states => _states.stream;
 
   @override
   Stream<TrafficStats> get traffic => _traffic.stream;
+
+  @override
+  Stream<DemoExpiry> get demoLimit => _demo.stream;
 
   @override
   Future<VpnStatusSnapshotMessage> currentStatus() async {
@@ -65,5 +73,6 @@ class FakeVpnNativeDatasource implements VpnNativeDatasource {
   Future<void> dispose() async {
     await _states.close();
     await _traffic.close();
+    await _demo.close();
   }
 }
