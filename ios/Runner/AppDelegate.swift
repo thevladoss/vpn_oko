@@ -13,6 +13,7 @@ import os.log
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    ensureLibboxSetup()
     if #available(iOS 14.0, *) {
       Logger(subsystem: "com.example.vpnOko", category: "core")
         .log("libbox core \(LibboxVersion(), privacy: .public)")
@@ -21,5 +22,23 @@ import os.log
     let messenger = engineBridge.applicationRegistrar.messenger()
     VpnHostApiSetup.setUp(binaryMessenger: messenger, api: VpnHostApiImpl())
     VpnEventsStreamHandler.register(with: messenger, streamHandler: VpnEventListener.shared)
+  }
+
+  private static var didSetupLibbox = false
+
+  private func ensureLibboxSetup() {
+    guard !AppDelegate.didSetupLibbox else { return }
+    let options = LibboxSetupOptions()
+    options.basePath = AppGroup.basePath
+    options.workingPath = AppGroup.workingPath
+    options.tempPath = AppGroup.cachePath
+    options.logMaxLines = 3000
+    var setupError: NSError?
+    if LibboxSetup(options, &setupError) {
+      AppDelegate.didSetupLibbox = true
+    } else if #available(iOS 14.0, *) {
+      Logger(subsystem: "com.example.vpnOko", category: "core")
+        .error("libbox setup failed: \(setupError?.localizedDescription ?? "unknown", privacy: .public)")
+    }
   }
 }

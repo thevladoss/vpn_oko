@@ -50,7 +50,6 @@ final class VpnHostApiImpl: VpnHostApi {
       let proto = NETunnelProviderProtocol()
       proto.providerBundleIdentifier = "com.example.vpnOko.PacketTunnel"
       proto.serverAddress = config.host
-      proto.providerConfiguration = ["host": config.host, "port": config.port]
       manager.protocolConfiguration = proto
       manager.localizedDescription = "Oko VPN"
       manager.isEnabled = true
@@ -71,7 +70,10 @@ final class VpnHostApiImpl: VpnHostApi {
 
           do {
             self.observer.attach(manager.connection)
-            try manager.connection.startVPNTunnel()
+            try manager.connection.startVPNTunnel(options: [
+              "configContent": NSString(string: config.singboxConfigJson),
+              "serverName": NSString(string: config.serverName),
+            ])
             completion(.success(()))
           } catch {
             self.fail(code: "ne_error", message: error.localizedDescription)
