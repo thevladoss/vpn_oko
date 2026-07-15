@@ -11,29 +11,52 @@ import com.example.vpn_oko.bridge.LogMessage
 import com.example.vpn_oko.bridge.StatusChangedMessage
 import com.example.vpn_oko.bridge.TrafficChangedMessage
 import com.example.vpn_oko.bridge.VpnEventBus
-import java.io.FileInputStream
-import java.io.IOException
+import io.nekohasekai.libbox.CommandClient
+import io.nekohasekai.libbox.CommandClientHandler
+import io.nekohasekai.libbox.CommandClientOptions
+import io.nekohasekai.libbox.CommandServer
+import io.nekohasekai.libbox.CommandServerHandler
+import io.nekohasekai.libbox.ConnectionEvents
+import io.nekohasekai.libbox.Libbox
+import io.nekohasekai.libbox.LogIterator
+import io.nekohasekai.libbox.OutboundGroupIterator
+import io.nekohasekai.libbox.OverrideOptions
+import io.nekohasekai.libbox.SetupOptions
+import io.nekohasekai.libbox.StatusMessage
+import io.nekohasekai.libbox.StringIterator
+import io.nekohasekai.libbox.SystemProxyStatus
+import java.io.File
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicLong
 
-class OkoVpnService : VpnService() {
+class OkoVpnService : VpnService(), CommandServerHandler {
 
     private var state: VpnConnectionState = VpnConnectionState.Disconnected
-    private var tunnel: ParcelFileDescriptor? = null
     private val notificationFactory by lazy { VpnNotificationFactory(this) }
+    private val worker = Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "oko-vpn-core").also { it.isDaemon = true }
+    }
 
-    private val rx = AtomicLong(0)
-    private val running = AtomicBoolean(false)
-    private var readThread: Thread? = null
-    private var trafficTicker: ScheduledExecutorService? = null
+    @Volatile
+    private var tunnel: ParcelFileDescriptor? = null
+
+    @Volatile
+    private var commandServer: CommandServer? = null
+
+    @Volatile
+    private var trafficClient: CommandClient? = null
+
+    @Volatile
+    private var platform: OkoPlatformInterface? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        ensureLibboxSetup()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_DISCONNECT) {
             teardown("stopped by user")
-            stopSelf()
             return START_NOT_STICKY
         }
         if (intent == null) {
@@ -56,26 +79,77 @@ class OkoVpnService : VpnService() {
             return START_NOT_STICKY
         }
 
-        val host = intent.getStringExtra(EXTRA_HOST).orEmpty()
-        val port = intent.getLongExtra(EXTRA_PORT, 0L)
-        val serverName = intent.getStringExtra(EXTRA_SERVER_NAME).orEmpty()
-        if (host.isBlank() || port !in 1L..65535L) {
-            failStart("invalid_config", "invalid host or port")
+        val configJson = intent.getStringExtra(EXTRA_CONFIG_JSON).orEmpty()
+        if (configJson.isBlank()) {
+            failStart("invalid_config", "empty singbox config")
             return START_NOT_STICKY
         }
 
-        val descriptor = buildTunnel(serverName)
-        if (descriptor == null) {
-            failStart("establish_failed", "establish returned null")
-            return START_NOT_STICKY
+        worker.execute { startCore(configJson) }
+        return START_NOT_STICKY
+    }
+
+    private fun startCore(configJson: String) {
+        try {
+            Libbox.checkConfig(configJson)
+        } catch (error: Exception) {
+            failStart("invalid_config", error.message ?: "config rejected by core")
+            return
         }
 
-        tunnel = descriptor
-        startReadLoop(descriptor)
-        startTrafficTicker()
+        try {
+            val platformInterface = OkoPlatformInterface(this) { Builder() }
+            platform = platformInterface
+            val server = Libbox.newCommandServer(this, platformInterface)
+            server.start()
+            commandServer = server
+            server.startOrReloadService(configJson, OverrideOptions())
+        } catch (error: Exception) {
+            failStart("core_start_failed", error.message ?: "core failed to start")
+            return
+        }
+
+        startTrafficClient()
         transition(VpnConnectionState.Connected(System.currentTimeMillis()))
         updateNotification("Connected")
-        return START_NOT_STICKY
+    }
+
+    private fun startTrafficClient() {
+        runCatching {
+            val options = CommandClientOptions().apply {
+                addCommand(Libbox.CommandStatus)
+                statusInterval = STATUS_INTERVAL_NANOS
+            }
+            val client = CommandClient(TrafficHandler(), options)
+            client.connect()
+            trafficClient = client
+        }.onFailure {
+            VpnEventBus.emit(
+                LogMessage("traffic stats unavailable: ${it.message}", System.currentTimeMillis(), "warning"),
+            )
+        }
+    }
+
+    private fun ensureLibboxSetup() {
+        if (libboxSetup.getAndSet(true)) return
+        runCatching {
+            val working = File(filesDir, "singbox").also { it.mkdirs() }
+            Libbox.setup(
+                SetupOptions().apply {
+                    basePath = filesDir.absolutePath
+                    workingPath = working.absolutePath
+                    tempPath = cacheDir.absolutePath
+                    fixAndroidStack = true
+                    logMaxLines = LOG_MAX_LINES
+                    debug = false
+                },
+            )
+        }.onFailure {
+            libboxSetup.set(false)
+            VpnEventBus.emit(
+                LogMessage("libbox setup failed: ${it.message}", System.currentTimeMillis(), "error"),
+            )
+        }
     }
 
     private fun updateNotification(text: String) {
@@ -83,52 +157,36 @@ class OkoVpnService : VpnService() {
             .notify(VpnNotificationFactory.NOTIFICATION_ID, notificationFactory.building(text))
     }
 
-    private fun startReadLoop(pfd: ParcelFileDescriptor) {
-        rx.set(0)
-        running.set(true)
-        readThread = Thread {
-            val buffer = ByteArray(32767)
-            try {
-                FileInputStream(pfd.fileDescriptor).use { input ->
-                    while (running.get()) {
-                        val read = input.read(buffer)
-                        if (read <= 0) break
-                        rx.addAndGet(read.toLong())
-                    }
-                }
-            } catch (_: IOException) {
-            }
-        }.also {
-            it.isDaemon = true
-            it.start()
-        }
+    internal fun attachTunnel(descriptor: ParcelFileDescriptor) {
+        tunnel = descriptor
     }
 
-    private fun startTrafficTicker() {
-        val ticker = Executors.newSingleThreadScheduledExecutor { runnable ->
-            Thread(runnable, "oko-vpn-traffic-ticker").also { it.isDaemon = true }
-        }
-        ticker.scheduleAtFixedRate(
-            { VpnEventBus.emit(TrafficChangedMessage(rx.get(), 0L)) },
-            1L,
-            1L,
-            TimeUnit.SECONDS,
-        )
-        trafficTicker = ticker
+    override fun serviceStop() {
+        teardown("core requested stop")
     }
 
-    private fun buildTunnel(serverName: String): ParcelFileDescriptor? =
-        Builder()
-            .setSession(if (serverName.isBlank()) "Oko VPN" else serverName)
-            .addAddress("10.0.0.2", 32)
-            .addRoute("10.111.222.0", 24)
-            .addDnsServer("1.1.1.1")
-            .setMtu(1500)
-            .establish()
+    override fun serviceReload() {
+    }
+
+    override fun getSystemProxyStatus(): SystemProxyStatus =
+        SystemProxyStatus().apply {
+            available = false
+            enabled = false
+        }
+
+    override fun setSystemProxyEnabled(isEnabled: Boolean) {
+    }
+
+    override fun writeDebugMessage(message: String?) {
+        if (!message.isNullOrBlank()) {
+            VpnEventBus.emit(LogMessage(message, System.currentTimeMillis(), "info"))
+        }
+    }
 
     private fun failStart(code: String, reason: String) {
         VpnEventBus.emit(LogMessage(reason, System.currentTimeMillis(), "error"))
         VpnEventBus.emit(ErrorMessage(code, reason))
+        releaseCore()
         transition(VpnConnectionState.Error(code))
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -153,20 +211,29 @@ class OkoVpnService : VpnService() {
 
     @Synchronized
     private fun teardown(reason: String) {
-        if (state is VpnConnectionState.Disconnected) return
+        if (state !is VpnConnectionState.Connecting && state !is VpnConnectionState.Connected) return
         transition(VpnConnectionState.Disconnecting)
-        running.set(false)
-        tunnel?.close()
-        tunnel = null
-        readThread?.join(500)
-        readThread = null
-        trafficTicker?.shutdownNow()
-        trafficTicker = null
-        rx.set(0)
+        releaseCore()
         VpnEventBus.emit(LogMessage(reason, System.currentTimeMillis(), "info"))
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         transition(VpnConnectionState.Disconnected)
         stopSelf()
+    }
+
+    private fun releaseCore() {
+        val client = trafficClient
+        val server = commandServer
+        val descriptor = tunnel
+        trafficClient = null
+        commandServer = null
+        tunnel = null
+        platform = null
+        worker.execute {
+            runCatching { client?.disconnect() }
+            runCatching { server?.closeService() }
+            runCatching { server?.close() }
+            runCatching { descriptor?.close() }
+        }
     }
 
     override fun onRevoke() {
@@ -175,7 +242,41 @@ class OkoVpnService : VpnService() {
 
     override fun onDestroy() {
         teardown("service destroyed")
+        worker.shutdown()
         super.onDestroy()
+    }
+
+    private inner class TrafficHandler : CommandClientHandler {
+        override fun connected() {
+        }
+
+        override fun disconnected(message: String?) {
+        }
+
+        override fun clearLogs() {
+        }
+
+        override fun writeLogs(messageList: LogIterator?) {
+        }
+
+        override fun writeStatus(message: StatusMessage) {
+            VpnEventBus.emit(TrafficChangedMessage(message.downlinkTotal, message.uplinkTotal))
+        }
+
+        override fun writeGroups(message: OutboundGroupIterator?) {
+        }
+
+        override fun initializeClashMode(modeList: StringIterator?, currentMode: String?) {
+        }
+
+        override fun updateClashMode(newMode: String?) {
+        }
+
+        override fun setDefaultLogLevel(level: Int) {
+        }
+
+        override fun writeConnectionEvents(message: ConnectionEvents?) {
+        }
     }
 
     companion object {
@@ -185,5 +286,10 @@ class OkoVpnService : VpnService() {
         const val EXTRA_PORT = "com.example.vpn_oko.extra.PORT"
         const val EXTRA_USER_ID = "com.example.vpn_oko.extra.USER_ID"
         const val EXTRA_SERVER_NAME = "com.example.vpn_oko.extra.SERVER_NAME"
+        const val EXTRA_CONFIG_JSON = "com.example.vpn_oko.extra.CONFIG_JSON"
+
+        private const val STATUS_INTERVAL_NANOS = 1_000_000_000L
+        private const val LOG_MAX_LINES = 3000L
+        private val libboxSetup = AtomicBoolean(false)
     }
 }
