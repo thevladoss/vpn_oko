@@ -90,6 +90,7 @@ class MainActivity : FlutterFragmentActivity(), VpnConsentGateway {
             .putExtra(OkoVpnService.EXTRA_PORT, config.port)
             .putExtra(OkoVpnService.EXTRA_USER_ID, config.userId)
             .putExtra(OkoVpnService.EXTRA_SERVER_NAME, config.serverName)
+            .putExtra(OkoVpnService.EXTRA_CONFIG_JSON, config.singboxConfigJson)
         startForegroundService(intent)
     }
 }
