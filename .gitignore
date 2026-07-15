@@ -61,3 +61,6 @@ android/build/
 
 # libbox core — собирается scripts/build_libbox.sh, не хранится в git (88MB)
 android/app/libs/*.aar
+
+# libbox core iOS — Libbox.xcframework, showcase-модель, не в git (270MB)
+ios/Frameworks/
