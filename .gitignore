@@ -58,3 +58,6 @@ CLAUDE.md
 
 # Android build artifacts
 android/build/
+
+# libbox core — собирается scripts/build_libbox.sh, не хранится в git (88MB)
+android/app/libs/*.aar
