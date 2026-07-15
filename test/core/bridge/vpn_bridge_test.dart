@@ -56,6 +56,26 @@ void main() {
       expect(errors, [error]);
     });
 
+    test('routes DemoExpiredMessage to demoEvents only', () async {
+      final demos = <DemoExpiredMessage>[];
+      final statuses = <StatusChangedMessage>[];
+      final errors = <ErrorMessage>[];
+
+      bridge.demoEvents.listen(demos.add);
+      bridge.statusEvents.listen(statuses.add);
+      bridge.errorEvents.listen(errors.add);
+
+      final demo = DemoExpiredMessage(cooldownUntilEpochMs: 1720000000000);
+
+      source.add(demo);
+      await pumpEventQueue();
+
+      expect(demos, [demo]);
+      expect(demos.single.cooldownUntilEpochMs, 1720000000000);
+      expect(statuses, isEmpty);
+      expect(errors, isEmpty);
+    });
+
     test('preserves order within a single stream', () async {
       final statuses = <StatusChangedMessage>[];
       bridge.statusEvents.listen(statuses.add);

@@ -20,11 +20,14 @@ class VpnBridge {
       StreamController<TrafficChangedMessage>.broadcast();
   final StreamController<ErrorMessage> _errors =
       StreamController<ErrorMessage>.broadcast();
+  final StreamController<DemoExpiredMessage> _demo =
+      StreamController<DemoExpiredMessage>.broadcast();
 
   Stream<StatusChangedMessage> get statusEvents => _status.stream;
   Stream<LogMessage> get logEvents => _logs.stream;
   Stream<TrafficChangedMessage> get trafficEvents => _traffic.stream;
   Stream<ErrorMessage> get errorEvents => _errors.stream;
+  Stream<DemoExpiredMessage> get demoEvents => _demo.stream;
 
   Future<void> startVpn(VpnConfigMessage config) => _hostApi.startVpn(config);
 
@@ -42,6 +45,8 @@ class VpnBridge {
         _traffic.add(event);
       case ErrorMessage():
         _errors.add(event);
+      case DemoExpiredMessage():
+        _demo.add(event);
     }
   }
 
@@ -51,5 +56,6 @@ class VpnBridge {
     await _logs.close();
     await _traffic.close();
     await _errors.close();
+    await _demo.close();
   }
 }
