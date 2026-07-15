@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Process
+import android.system.Os
 import android.system.OsConstants
 import com.example.vpn_oko.bridge.LogMessage
 import com.example.vpn_oko.bridge.VpnEventBus
@@ -23,8 +24,9 @@ import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.TunOptions
 import io.nekohasekai.libbox.WIFIState
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
-import java.net.NetworkInterface as JavaNetworkInterface
 
 class OkoPlatformInterface(
     private val service: OkoVpnService,
@@ -34,6 +36,8 @@ class OkoPlatformInterface(
     private var monitorCallback: ConnectivityManager.NetworkCallback? = null
     private val monitorThread = HandlerThread("oko-net-monitor").apply { start() }
     private val monitorHandler = Handler(monitorThread.looper)
+    private val syntheticIndexes = ConcurrentHashMap<String, Int>()
+    private val syntheticIndexCounter = AtomicInteger(1000)
 
     override fun openTun(options: TunOptions): Int {
         val builder = builderFactory()
@@ -138,19 +142,17 @@ class OkoPlatformInterface(
 
     override fun getInterfaces(): NetworkInterfaceIterator {
         val manager = connectivity() ?: return NetworkInterfaceList(emptyList())
-        val javaInterfaces = runCatching {
-            JavaNetworkInterface.getNetworkInterfaces()?.toList().orEmpty()
-        }.getOrDefault(emptyList())
         val interfaces = mutableListOf<LibboxNetworkInterface>()
         val networks = runCatching { manager.allNetworks }.getOrDefault(emptyArray())
         for (network in networks) {
             val linkProperties = manager.getLinkProperties(network) ?: continue
             val capabilities = manager.getNetworkCapabilities(network) ?: continue
             val name = linkProperties.interfaceName ?: continue
-            val javaInterface = javaInterfaces.find { it.name == name } ?: continue
+            val index = interfaceIndex(name)
+            if (index == 0) continue
             val boxInterface = LibboxNetworkInterface()
             boxInterface.name = name
-            boxInterface.index = javaInterface.index
+            boxInterface.index = index
             boxInterface.type = when {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libbox.InterfaceTypeWIFI
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> Libbox.InterfaceTypeCellular
@@ -160,19 +162,16 @@ class OkoPlatformInterface(
             boxInterface.dnsServer = StringList(linkProperties.dnsServers.mapNotNull { it.hostAddress })
             boxInterface.setAddresses(
                 StringList(
-                    javaInterface.interfaceAddresses.mapNotNull { entry ->
-                        entry.address.hostAddress?.substringBefore('%')?.let { "$it/${entry.networkPrefixLength}" }
+                    linkProperties.linkAddresses.mapNotNull { entry ->
+                        entry.address.hostAddress?.substringBefore('%')?.let { "$it/${entry.prefixLength}" }
                     },
                 ),
             )
-            runCatching { boxInterface.mtu = javaInterface.mtu }
-            var flags = 0
+            runCatching { boxInterface.mtu = linkProperties.mtu }
+            var flags = OsConstants.IFF_MULTICAST
             if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                flags = OsConstants.IFF_UP or OsConstants.IFF_RUNNING
+                flags = flags or OsConstants.IFF_UP or OsConstants.IFF_RUNNING
             }
-            if (javaInterface.isLoopback) flags = flags or OsConstants.IFF_LOOPBACK
-            if (javaInterface.isPointToPoint) flags = flags or OsConstants.IFF_POINTOPOINT
-            if (javaInterface.supportsMulticast()) flags = flags or OsConstants.IFF_MULTICAST
             boxInterface.flags = flags
             boxInterface.metered =
                 !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
@@ -245,8 +244,8 @@ class OkoPlatformInterface(
                 Thread.sleep(100)
                 continue
             }
-            val index = runCatching { JavaNetworkInterface.getByName(name).index }.getOrNull()
-            if (index == null) {
+            val index = interfaceIndex(name)
+            if (index == 0) {
                 Thread.sleep(100)
                 continue
             }
@@ -256,6 +255,12 @@ class OkoPlatformInterface(
             listener.updateDefaultInterface(name, index, expensive, false)
             return
         }
+    }
+
+    private fun interfaceIndex(name: String): Int {
+        val real = runCatching { Os.if_nametoindex(name) }.getOrDefault(0)
+        if (real != 0) return real
+        return syntheticIndexes.getOrPut(name) { syntheticIndexCounter.getAndIncrement() }
     }
 
     private fun connectivity(): ConnectivityManager? =
