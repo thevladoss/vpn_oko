@@ -138,6 +138,36 @@ void main() {
       );
     });
 
+    test('add в пустую базу делает сервер активным', () async {
+      final saved =
+          (await repository.add(_vlessConfig, _vlessUrl) as ServerSaved)
+              .profile;
+
+      final active = await repository.watchActive().first;
+      expect(active?.id, saved.id);
+      final snapshot = await repository.getActive();
+      expect(snapshot?.id, saved.id);
+    });
+
+    test('add второго при активном первом не меняет активного', () async {
+      final a = (await repository.add(_vlessConfig, _vlessUrl) as ServerSaved)
+          .profile;
+      await repository.add(_trojanConfig, _trojanUrl);
+
+      final active = await repository.getActive();
+      expect(active?.id, a.id);
+    });
+
+    test('дубликат не меняет активного', () async {
+      final a = (await repository.add(_vlessConfig, _vlessUrl) as ServerSaved)
+          .profile;
+      final duplicate = await repository.add(_vlessConfig, _vlessUrl);
+
+      expect(duplicate, isA<ServerDuplicate>());
+      final active = await repository.getActive();
+      expect(active?.id, a.id);
+    });
+
     test('setActive отражается в watchActive и getActive', () async {
       final saved =
           (await repository.add(_vlessConfig, _vlessUrl) as ServerSaved)
