@@ -30,6 +30,7 @@
 		AE4EA8CCBEF6951852E5F57A /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
 		B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */; };
 		EC544E8BF826C8DBCBF97A6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2ECB3FB0CB3600551034B2B /* Foundation.framework */; };
+		FA162D67DD95C91561641A36 /* TrafficLogClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43103482E03093D412DD62FA /* TrafficLogClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		43103482E03093D412DD62FA /* TrafficLogClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TrafficLogClient.swift; sourceTree = "<group>"; };
 		555482DCF2B991679CCD1756 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C1179F7D4311B8D8BA03EE3 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		71472FBE806C4ED6F6BDF453 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -256,6 +258,7 @@
 				A00000000000000000000102 /* VpnHostApiImpl.swift */,
 				A00000000000000000000103 /* VpnEventListener.swift */,
 				A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */,
+				43103482E03093D412DD62FA /* TrafficLogClient.swift */,
 			);
 			path = Bridge;
 			sourceTree = "<group>";
@@ -527,6 +530,7 @@
 				A00000000000000000000203 /* VpnEventListener.swift in Sources */,
 				50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */,
 				931173EC9349A7A6B2141E3E /* AppGroup.swift in Sources */,
+				FA162D67DD95C91561641A36 /* TrafficLogClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

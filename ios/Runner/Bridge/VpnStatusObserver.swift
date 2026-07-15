@@ -3,6 +3,7 @@ import NetworkExtension
 final class VpnStatusObserver {
   private let listener: VpnEventListener
   private var token: NSObjectProtocol?
+  var onStatus: ((NEVPNStatus) -> Void)?
 
   init(listener: VpnEventListener = .shared) {
     self.listener = listener
@@ -25,6 +26,7 @@ final class VpnStatusObserver {
   }
 
   private func report(_ connection: NEVPNConnection) {
+    onStatus?(connection.status)
     switch connection.status {
     case .connected:
       let since = connection.connectedDate.map { Int64($0.timeIntervalSince1970 * 1000) }

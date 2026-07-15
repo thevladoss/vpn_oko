@@ -4,11 +4,22 @@ import NetworkExtension
 final class VpnHostApiImpl: VpnHostApi {
   private let listener: VpnEventListener
   private let observer = VpnStatusObserver()
+  private let trafficClient = TrafficLogClient()
   private var manager: NETunnelProviderManager?
 
   init(listener: VpnEventListener = .shared) {
     self.listener = listener
     restoreExistingTunnel()
+    observer.onStatus = { [weak self] status in
+      switch status {
+      case .connected:
+        self?.trafficClient.start()
+      case .disconnected, .invalid:
+        self?.trafficClient.stop()
+      default:
+        break
+      }
+    }
   }
 
   private func restoreExistingTunnel() {
