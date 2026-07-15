@@ -1,17 +1,49 @@
-# Oko VPN — прототип нативного VPN на Flutter
+# Oko VPN: рабочий нативный VPN на Flutter
 
 [![CI](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml/badge.svg)](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml)
 
-Прототип по тестовому заданию. Flutter-приложение управляет реальным Android
-`VpnService` через типобезопасный мост Pigeon и показывает живой поток статусов,
-логов и трафика из native-слоя. iOS работает через настоящий Network Extension
-(`PacketTunnelProvider`): реальный туннель поднят и проверен на физическом
-устройстве (iPhone, iOS 26) с dev-подписью — extension стартует, применяет
-сетевые настройки и доводит статус Connected до Flutter.
+Flutter-приложение поднимает реальный VPN на Android: весь трафик (`0.0.0.0/0` и
+`::/0`) уходит через VLESS+Reality-сервер по вставленной подписке. Туннель гонит
+встроенное ядро **sing-box** (`libbox`, собранное из v1.13.14), подключённое
+напрямую в наш `VpnService` через типобезопасный мост Pigeon. Проверено на
+устройстве: приложение открывает заблокированные ресурсы.
 
-Реального VPN-core в прототипе нет: трафик не проксируется, а путь его интеграции
-описан разделом [«План интеграции VPN-core»](#план-интеграции-vpn-core). Раздел
-[«Ограничения»](#ограничения) перечисляет границы прототипа прямо, без приукрашивания.
+Мультипротокол работает из коробки: VLESS (Reality / XTLS / ws / grpc), VMess,
+Trojan, Shadowsocks, Hysteria2. Парсер ссылок и генератор sing-box JSON написаны
+на Dart и покрыты тестами.
+
+iOS пока skeleton: extension применяет сетевые настройки, но настоящий туннель
+(sing-box внутри Network Extension) отложен. Раздел [«Ограничения»](#ограничения)
+называет границы прямо.
+
+## Showcase-модель репозитория
+
+Публичный репозиторий показывает **код и архитектуру рабочего VPN**, но
+намеренно не включает само ядро.
+
+- **Ядра в репозитории нет.** `libbox.aar` (собранный из sing-box v1.13.14) в git
+  не хранится, рецепт сборки ядра не публикуется. Поэтому склонированный
+  репозиторий Android-приложение без ядра **не соберёт**. Это осознанное
+  решение, а не пропущенный шаг.
+- **Рабочая сборка распространяется отдельно.** Демо-APK (с 5-минутным лимитом
+  сессии) выдаётся по отдельной ссылке.
+- **CI остаётся зелёным без ядра.** GitHub Actions гоняет `flutter analyze` и
+  `flutter test`. Это чистый Dart, ядро им не нужно. Весь Dart-слой
+  (парсер, генератор конфига, мапперы, Bloc/Cubit, виджеты) собирается и тестируется
+  публично.
+
+Так репозиторий доказывает архитектуру и качество кода, не раздавая готовый
+обходной инструмент.
+
+## Что делает приложение
+
+| Возможность | Как реализовано |
+|-------------|-----------------|
+| Реальный туннель на Android | `libbox` берёт TUN-fd от `establish()` и проксирует весь трафик через outbound; rx/tx приходят из статистики ядра |
+| Мультипротокол | Один парсер на `vless://` / `vmess://` / `trojan://` / `ss://` / `hysteria2://`; VLESS покрывает Reality, XTLS-flow, ws и grpc |
+| Генерация конфига ядра | Чистая Dart-функция `ProxyConfig → sing-box JSON`, отдельные тесты на каждый протокол и транспорт |
+| Управление серверами | Добавление вставкой `vless://`, зашифрованное хранилище, список, переключение активного, удаление |
+| Демо-лимит | Нативный таймер режет сессию на 5:00 и включает кулдаун 2 минуты между сессиями |
 
 ## Запуск
 
@@ -20,104 +52,136 @@
 - Flutter 3.44.5 stable (Dart 3.12.2)
 - JDK 17
 - Android SDK: minSdk 26 (Android 8.0), targetSdk 36 (по умолчанию Flutter 3.44)
-- Xcode 16+ — только для сборки iOS
+- Xcode 16+ (только для сборки iOS)
 
-### Команды
+### Dart-слой: анализ и тесты (без ядра)
+
+Публичная часть проверяется без `libbox`:
 
 ```bash
-# Зависимости из pubspec.lock
 flutter pub get
-
-# Pigeon-код уже закоммичен (lib/core/bridge/vpn_api.g.dart).
-# Регенерация нужна только при правке контракта pigeons/vpn_api.dart:
-dart run pigeon --input pigeons/vpn_api.dart
-
-# Android — устройство или эмулятор API 26+:
-flutter run
-
-# iOS — открыть ios/Runner.xcworkspace в Xcode, выбрать свою команду
-# в Signing & Capabilities и запустить на устройстве (нужен платный
-# Apple Developer-аккаунт; симулятор packet-tunnel NE не исполняет):
-open ios/Runner.xcworkspace
-
-# Анализ и тесты:
 flutter analyze
 flutter test
 ```
 
-Живой путь Connect → трафик → Disconnect работает на Android из коробки. Для iOS
-откройте `ios/Runner.xcworkspace` в Xcode, выберите свою команду и запустите на
-устройстве — причина в разделе
-[«iOS: Network Extension»](#ios-network-extension).
+Тот же набор гоняет CI. Регенерация Pigeon нужна только при правке контракта
+`pigeons/vpn_api.dart`:
+
+```bash
+dart run pigeon --input pigeons/vpn_api.dart
+```
+
+Схема Drift пересобирается при правке таблиц:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### Android: рабочая сборка
+
+Gradle подключает ядро как `implementation(files("libs/libbox.aar"))`. Репозиторий
+этот файл не содержит (см. [Showcase-модель](#showcase-модель-репозитория)), поэтому
+без ядра сборка приложения падает на этапе линковки. С предоставленным
+`android/app/libs/libbox.aar`:
+
+```bash
+flutter run
+```
+
+VPN-диалог согласия и живой Connect → трафик → Disconnect работают на устройстве
+или эмуляторе API 26+.
+
+### iOS: skeleton
+
+Открывается в Xcode, выберите свою команду в Signing & Capabilities и запускайте
+на устройстве:
+
+```bash
+open ios/Runner.xcworkspace
+```
+
+Extension поднимается и применяет `setTunnelNetworkSettings`, но настоящий core в
+него ещё не встроен (см. [«Ограничения»](#ограничения)).
 
 ## Структура проекта
 
 ```
 lib/
-├── app/                      # composition root (di.dart), MaterialApp (app.dart)
+├── app/                      composition root (di.dart), MaterialApp (app.dart)
 ├── core/
-│   ├── bridge/               # Pigeon vpn_api.g.dart + VpnBridge (демультиплексор)
-│   ├── error/                # Failure-типы
-│   └── theme/                # темы, токены, типографика, VpnStatus
+│   ├── bridge/               Pigeon vpn_api.g.dart + VpnBridge (демультиплексор)
+│   ├── error/                Failure-типы
+│   └── theme/                темы, токены, типографика, VpnStatus
 └── features/
-    ├── vpn_connection/       # domain / data / presentation (мост, экран, ирис)
-    ├── vpn_logs/             # живой блок логов
-    └── server_config/        # VLESS-парсер, карточка сервера, tcping
-pigeons/vpn_api.dart          # контракт моста (источник кодогена)
-android/app/src/main/kotlin/  # VpnService, foreground-сервис, event bus, host api
-ios/Runner/ + ios/PacketTunnel/  # Swift-мост + NE-таргет
-test/                         # 154 автотеста: парсер, мапперы, Bloc, виджеты
-.github/workflows/ci.yml      # CI: flutter analyze + flutter test
+    ├── vpn_connection/       мост, экран, ирис, демо-таймер (domain/data/presentation)
+    ├── vpn_logs/             живой блок логов
+    └── server_config/        парсер, генератор конфига, хранилище, карточка сервера
+pigeons/vpn_api.dart          контракт моста (источник кодогена)
+android/app/src/main/kotlin/  VpnService, libbox-интеграция, event bus, host api
+android/app/libs/libbox.aar   ядро sing-box (не в git, showcase-модель)
+ios/Runner/ + ios/PacketTunnel/  Swift-мост + NE-таргет (skeleton)
+test/                         321 автотест: парсер, генератор, мапперы, Bloc, виджеты
+.github/workflows/ci.yml      CI: flutter analyze + flutter test
 ```
 
 ## Использовано open-source
 
-Все версии зафиксированы в `pubspec.yaml`. Фаза подачи новых пакетов не добавляет.
+Ядро VPN и весь Flutter-стек взяты готовыми, версии зафиксированы.
 
-| Пакет | Версия | Роль |
-|-------|--------|------|
+| Компонент | Версия | Роль |
+|-----------|--------|------|
+| **sing-box** | v1.13.14 (`libbox` через `gomobile bind`) | Ядро VPN: outbound-протоколы, tun-inbound, роутинг; встроено в наш native-слой |
 | `pigeon` | `^27.1.1` | Кодоген типобезопасного моста Flutter ↔ Kotlin/Swift |
 | `flutter_bloc` | `^9.1.1` | State management, event-driven машина состояний |
+| `drift` + `sqlite3_flutter_libs` | `^2.34.2` | Реактивное SQL-хранилище серверов (SQLite3MultipleCiphers) |
+| `flutter_secure_storage` | `^10.3.1` | Ключ шифрования БД в Keychain / EncryptedSharedPreferences |
 | `equatable` | `^2.1.0` | Value equality доменных моделей (sealed + immutable) |
 | `google_fonts` | `^8.1.0` | Шрифты Inter / JetBrainsMono / SpaceGrotesk (офлайн-бандл) |
 | `very_good_analysis` | `^10.3.0` | Строгий линтинг, `flutter analyze` на CI (dev) |
-| `mocktail` | `^1.0.5` | Моки без кодогена (dev) |
-| `bloc_test` | `^10.0.0` | Тесты Bloc/Cubit-переходов (dev) |
+| `mocktail` + `bloc_test` | `^1.0.5` / `^10.0.0` | Моки и тесты Bloc-переходов без кодогена (dev) |
+| `drift_dev` + `build_runner` | `2.34.0` | Кодоген схемы БД (dev) |
 
 ## Написано самостоятельно
 
 | Область | Что написано |
 |---------|--------------|
-| Мост и домен | Контракт `pigeons/vpn_api.dart`, `VpnBridge` (единственный подписчик event-канала, демультиплексор по sealed-событиям), мапперы DTO → entity, модели `VpnState` / `VpnConfig` / `TrafficStats` / `VlessConfig` |
-| Android | `OkoVpnService` (Builder, `establish()`, read-loop с подсчётом rx, FGS `systemExempted`, `onRevoke`, единый teardown), `VpnConsentGateway` (флоу `prepare()`), `VpnEventBus` (потокобезопасная шина, replay статуса), `VpnConnectionState` (машина переходов), `VpnHostApiImpl`, `VpnNotificationFactory` |
-| iOS | `VpnHostApiImpl` (реальный `NETunnelProviderManager`), `VpnStatusObserver` (`NEVPNStatus` → Flutter), `PacketTunnelProvider` (skeleton туннеля с узким маршрутом), entitlements, `scripts/add_packet_tunnel_target.rb` (добавление NE-таргета через гем xcodeproj) |
-| VLESS | Парсер `vless://` (чистая функция поверх `Uri.parse` с валидацией порта и UUID), `SocketLatencyProbe` (tcping), маскировка UUID |
-| UI | `iris_painter.dart` (CustomPainter ирис-индикатора), `VpnConnectionBloc`, `LogsCubit`, `ServerConfigCubit`, виджеты (кнопка с прогрессом, таймер, панели трафика и логов, карточка сервера), дизайн-система `core/theme/` (токены, обе темы, типографика, motion) |
-| Тесты | 154 автотеста в `test/`: парсер (11+ edge-кейсов), мапперы, переходы Bloc/Cubit (включая error и `onRevoke`), виджеты |
+| Мост и домен | Контракт `pigeons/vpn_api.dart`, `VpnBridge` (единственный подписчик event-канала, демультиплексор по sealed-событиям), мапперы DTO → entity, sealed-модели `VpnState` / `ProxyConfig` / `TrafficStats` |
+| Парсер ссылок | `parseProxyUrl`: `vless://` (Reality / XTLS-flow / ws / grpc), `vmess://` (base64-json), `trojan://`, `ss://` (плейн и base64), `hysteria2://`. Каждая схема с TDD и edge-кейсами |
+| Генератор конфига | `buildSingboxConfig` / `toSingboxJson`: чистая функция `ProxyConfig → sing-box JSON` (tun-inbound `gvisor`, DNS через proxy, outbound по протоколу); тест на каждый протокол и транспорт |
+| Android-интеграция ядра | `OkoVpnService` (`Libbox.newCommandServer`, `startOrReloadService`, `CommandClient` для живых rx/tx, единый teardown, FGS `systemExempted`, `onRevoke`), `OkoPlatformInterface` (`openTun` → `establish`, `protect`, монитор интерфейса, `getInterfaces`, connection owner) |
+| Хранилище серверов | Схема Drift, шифрование через SQLite3MultipleCiphers, ключ в `flutter_secure_storage`, CRUD и выбор активного сервера, реактивный список |
+| Демо-лимит | Нативный таймер сессии `DemoLimit` + `DemoCooldownStore` (кулдаун переживает перезапуск), событие `DemoExpiredMessage`, восстановление через `getStatus()` |
+| UI | `iris_painter.dart` (CustomPainter ирис-индикатора), `VpnConnectionBloc`, `LogsCubit`, `ServerConfigCubit`, `ServerListCubit`, виджеты (кнопка с прогрессом, таймер, панели трафика и логов, карточка сервера, protocol-badge, latency-pill), дизайн-система `core/theme/` |
+| iOS-мост | `VpnHostApiImpl` (`NETunnelProviderManager`), `VpnStatusObserver` (`NEVPNStatus` → Flutter), `PacketTunnelProvider` (skeleton), entitlements, `scripts/*.rb` (добавление NE-таргета через `xcodeproj`) |
+| Тесты | 321 автотест в `test/`: парсер (все протоколы), генератор JSON, мапперы, переходы Bloc/Cubit (включая error, `onRevoke`, демо-истечение и кулдаун), виджеты |
 
 ## Архитектура
 
 Feature-first clean architecture. Presentation зависит только от domain, data
-реализует доменные интерфейсы, а весь обмен с native идёт через один Pigeon-мост.
-Диаграмма прослеживает сценарий Connect слева направо и вниз: тап пользователя →
-Bloc → usecase → repository → `VpnBridge` → Pigeon → Android `OkoVpnService` или
-iOS `PacketTunnelProvider`. Пунктирные стрелки — обратный поток событий
-(`StatusChanged`, `LogMessage`, `TrafficChanged`, `Error`).
+реализует доменные интерфейсы, весь обмен с native идёт через один Pigeon-мост.
+Ключевой поток: ссылка `vless://` парсится в `ProxyConfig`, `toSingboxJson`
+собирает конфиг ядра на Dart, строка уходит через `startVpn` в `OkoVpnService`,
+`libbox` берёт TUN-fd от `establish()` и проксирует трафик. Пунктирные стрелки
+показывают обратный поток событий (`StatusChanged`, `LogMessage`,
+`TrafficChanged`, `DemoExpired`, `Error`).
 
 ```mermaid
 flowchart TD
-  UI["Presentation: VpnHomeScreen + widgets<br/>(iris indicator, logs, server card)"] -->|user intent| BLOC["Bloc/Cubit: VpnConnectionBloc,<br/>LogsCubit, ServerConfigCubit"]
-  BLOC -->|calls| UC["Usecases: ConnectVpn, DisconnectVpn,<br/>WatchVpnState, WatchTraffic, WatchLogs"]
-  UC -->|domain interfaces| REPO["Repositories: VpnRepository, LogRepository"]
-  REPO -->|impl| DS["Datasources: VpnNativeDatasource,<br/>LogNativeDatasource"]
-  DS --> BR["VpnBridge<br/>(single owner of Pigeon stream)"]
-  BR -->|VpnHostApi startVpn stopVpn getStatus| PG["Pigeon generated<br/>Dart Kotlin Swift"]
+  UI["Presentation: VpnHomeScreen + widgets<br/>(iris indicator, logs, server card)"] -->|user intent| BLOC["Bloc/Cubit: VpnConnectionBloc,<br/>ServerListCubit, LogsCubit"]
+  BLOC -->|calls| UC["Usecases: ConnectVpn, DisconnectVpn,<br/>WatchVpnState, WatchTraffic"]
+  UC -->|domain interfaces| REPO["Repositories: VpnRepository,<br/>ServerRepository, LogRepository"]
+  REPO -->|active server| GEN["Dart: parseProxyUrl -> ProxyConfig<br/>-> toSingboxJson (singbox config)"]
+  GEN --> BR["VpnBridge<br/>(single owner of Pigeon stream)"]
+  REPO -->|encrypted CRUD| DB["Drift + SQLite3MultipleCiphers<br/>(key in secure storage)"]
+  BR -->|VpnHostApi startVpn(singboxConfigJson)| PG["Pigeon generated<br/>Dart Kotlin Swift"]
   PG -.->|EventChannelApi vpnEvents| BR
   PG --> ANDROID["Android: VpnHostApiImpl<br/>-> OkoVpnService"]
   PG --> IOS["iOS: VpnHostApiImpl<br/>-> NETunnelProviderManager"]
-  ANDROID --> TUN["VpnService.Builder.establish()<br/>-> TUN fd -> read-loop (counts rx, drops packets)"]
-  IOS --> NE["PacketTunnelProvider (NE extension)<br/>setTunnelNetworkSettings"]
-  TUN -.->|StatusChanged / LogMessage / TrafficChanged / Error| PG
+  ANDROID --> CORE["libbox core (sing-box)<br/>newCommandServer -> startOrReloadService"]
+  CORE --> TUN["OkoPlatformInterface.openTun<br/>-> Builder.establish() -> TUN fd -> proxy 0.0.0.0/0"]
+  IOS --> NE["PacketTunnelProvider (skeleton)<br/>setTunnelNetworkSettings"]
+  CORE -.->|CommandClient status: rx/tx| PG
+  ANDROID -.->|StatusChanged / LogMessage / DemoExpired / Error| PG
   NE -.->|NEVPNStatus observer| IOS
   IOS -.->|events| PG
 ```
@@ -127,207 +191,52 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   participant U as User
-  participant W as VpnHomeScreen
   participant B as VpnConnectionBloc
   participant R as VpnRepository
+  participant G as toSingboxJson (Dart)
   participant P as Pigeon (VpnHostApi)
   participant S as OkoVpnService
-  U->>W: tap Connect
-  W->>B: ConnectRequested
-  B->>R: connect(config)
-  R->>P: startVpn(config)
-  P->>S: onStartCommand (prepare + establish)
-  S-->>P: StatusChanged(connecting) / LogMessage
-  S-->>P: StatusChanged(connected) / TrafficChanged
+  participant C as libbox core
+  U->>B: tap Connect (active server)
+  B->>R: connect(activeServer)
+  R->>G: ProxyConfig -> singbox JSON
+  G-->>R: singboxConfigJson
+  R->>P: startVpn(config, singboxConfigJson)
+  P->>S: onStartCommand (foreground + checkConfig)
+  S->>C: newCommandServer + startOrReloadService
+  C->>S: openTun -> establish() -> TUN fd
+  S-->>P: StatusChanged(connected)
+  C-->>P: CommandClient status (rx/tx)
   P-->>R: vpnEvents stream
-  R-->>B: VpnState(connected)
-  B-->>W: rebuild (iris + timer + traffic)
+  R-->>B: VpnState(connected) + traffic
 ```
 
 Маппинг слоёв на файлы:
 
 | Слой | Файлы | Роль |
 |------|-------|------|
-| presentation | `lib/features/*/presentation/` | Виджеты + Bloc/Cubit; ирис-индикатор `iris_painter.dart` (CustomPainter), панель логов, карточка сервера |
-| domain | `lib/features/*/domain/` | sealed/immutable entity, usecases, интерфейсы репозиториев |
-| data | `lib/features/*/data/` | Реализации репозиториев, мапперы DTO → entity, датасорсы поверх `VpnBridge` |
-| core/bridge | `lib/core/bridge/` | `vpn_api.g.dart` (Pigeon) + `VpnBridge` — единственный подписчик event-канала |
-| Android native | `android/.../vpn/`, `android/.../bridge/` | `OkoVpnService`, `VpnConsentGateway`, `VpnEventBus`, `VpnConnectionState`, `VpnHostApiImpl` |
-| iOS native | `ios/Runner/Bridge/`, `ios/PacketTunnel/` | `VpnHostApiImpl`, `VpnStatusObserver`, `PacketTunnelProvider` |
-
-## iOS: Network Extension
-
-iOS-туннель живёт в отдельном extension-процессе. Контейнерное приложение
-`Runner.app` держит `NETunnelProviderManager` и стартует туннель, а
-`PacketTunnel.appex` исполняет `PacketTunnelProvider`. Приложение и расширение
-несут общую App Group `group.com.example.vpnOko` (в прототипе канал обмена не
-задействован — задел под VPN-core).
-
-```
-Runner.app (контейнер)                     PacketTunnel.appex (extension)
-  Bridge/VpnHostApiImpl.swift                PacketTunnelProvider : NEPacketTunnelProvider
-    NETunnelProviderManager                    startTunnel -> setTunnelNetworkSettings
-    load -> save -> loadFromPreferences ->       (NEPacketTunnelNetworkSettings +
-    connection.startVPNTunnel/stopVPNTunnel       узкий маршрут 10.111.222.0/24)
-  Bridge/VpnStatusObserver.swift               stopTunnel
-    NEVPNStatusDidChange -> VpnStatusMessage
-       | App Group: group.com.example.vpnOko (задел под core)
-```
-
-### Bundle identifiers
-
-- Контейнер: `com.example.vpnOko`
-- Extension: `com.example.vpnOko.PacketTunnel`
-- App Group: `group.com.example.vpnOko`
-
-### Capabilities и entitlements
-
-Оба таргета несут одинаковые entitlements (`ios/Runner/Runner.entitlements`,
-`ios/PacketTunnel/PacketTunnel.entitlements`):
-
-- `com.apple.developer.networking.networkextension` → `packet-tunnel-provider`
-- `com.apple.security.application-groups` → `group.com.example.vpnOko`
-
-Info.plist расширения (`ios/PacketTunnel/Info.plist`):
-
-- `NSExtensionPointIdentifier` = `com.apple.networkextension.packet-tunnel` (без `-provider`)
-- `NSExtensionPrincipalClass` = `$(PRODUCT_MODULE_NAME).PacketTunnelProvider`
-
-### Ограничение симулятора
-
-iOS Simulator не хостит packet-tunnel Network Extension: `simctl install`
-приложения со встроенным NE-appex падает с `Invalid placeholder attributes`. Это
-ограничение платформы Apple, не проекта. Поэтому:
-
-- **Автоматически проверено:** обе цели (`Runner` и `PacketTunnel.appex`)
-  компилируются под device и simulator; строки bundle id, entitlements и App Group
-  корректны; Dart-маппинг NE-статусов и ошибок покрыт unit-тестами.
-- **На симуляторе** Swift-мост исполняет честный путь ошибки: `connecting → error`
-  плюс лог «Network Extension недоступен в симуляторе». Это доказывает реальный
-  вызов `NETunnelProviderManager.loadAllFromPreferences`, а не заглушку.
-- **На устройстве** проверено вживую: `neagent` запускает extension-процесс,
-  `PacketTunnelProvider.startTunnel` применяет `NEPacketTunnelNetworkSettings`, а
-  `NEVPNStatus` доходит до Connected и до Flutter-экрана (подтверждено системными
-  логами устройства).
-
-### Запуск на устройстве
-
-1. Откройте `ios/Runner.xcworkspace` в Xcode.
-2. В Signing & Capabilities выберите свою команду — Xcode с автоподписью сам
-   регистрирует App ID обоих таргетов, App Group и provisioning-профили.
-3. Выберите физическое устройство и нажмите Run.
-4. На устройстве дайте VPN-разрешение и нажмите Connect.
-
-Нужен платный Apple Developer-аккаунт и реальное устройство: симулятор
-packet-tunnel Network Extension не исполняет. TestFlight/App Store Connect не
-требуются — сборка ставится напрямую dev-подписью.
-
-## План интеграции VPN-core
-
-Прототип поднимает туннель, но не проксирует трафик: реального VPN-core в нём нет.
-Шов для core уже подготовлен, и ниже названы точные точки подключения в коде.
-
-### Точки подключения
-
-**Android — `OkoVpnService.startReadLoop()`**
-(`android/app/src/main/kotlin/com/example/vpn_oko/vpn/OkoVpnService.kt`). Сейчас
-поток читает пакеты из `pfd.fileDescriptor` в буфер и дропает их, суммируя только
-прочитанные байты (`rx.addAndGet(read)`); tx не измеряется, тикер шлёт
-`TrafficChangedMessage(rx.get(), 0L)`. Сюда встаёт core:
-
-- `Builder.establish()` уже отдаёт TUN `ParcelFileDescriptor`.
-- Вместо read-loop дескриптор уходит в core: `libbox` / sing-box принимает fd
-  туннеля и берёт на себя чтение, запись и проксирование.
-- Колбэк `VpnService.protect(socket)` защищает исходящий сокет core от зацикливания
-  обратно в туннель.
-
-**iOS — `PacketTunnelProvider.startTunnel`**
-(`ios/PacketTunnel/PacketTunnelProvider.swift`). Сейчас метод только вызывает
-`setTunnelNetworkSettings`, а `self.packetFlow` не читает. Реальный core:
-
-- Тот же sing-box, собранный под iOS, запускается внутри extension-процесса.
-- Цикл `packetFlow.readPackets` ↔ core ↔ `packetFlow.writePackets` (либо core сам
-  держит tun через адаптер `Libbox`).
-
-### Предлагаемый интерфейс VpnCore
-
-В коде такого интерфейса пока нет — это план. Реальный `VpnCore` без реализации не
-вводится, чтобы не плодить мёртвый код (его ловит `very_good_analysis`). Эскиз
-сигнатур для обеих платформ:
-
-```kotlin
-// Android: android/.../vpn/VpnCore.kt (план, файла нет)
-interface VpnCore {
-  fun start(tunFd: ParcelFileDescriptor, config: VlessConfig, protect: (Int) -> Boolean)
-  fun stop()
-  fun stats(): TrafficStats   // rx + tx из core, а не из read-loop
-}
-// LibboxVpnCore оборачивает gomobile-биндинг libbox;
-// OkoVpnService.startReadLoop заменяется на vpnCore.start(descriptor, config, ::protect)
-```
-
-```swift
-// iOS: ios/PacketTunnel/VpnCore.swift (план, файла нет)
-protocol VpnCore {
-  func start(packetFlow: NEPacketTunnelFlow, config: VlessConfig) throws
-  func stop()
-}
-// LibboxVpnCore внутри PacketTunnelProvider.startTunnel вместо голого setTunnelNetworkSettings
-```
-
-Pigeon-контракт при этом не меняется: `startVpn(VpnConfigMessage)` плюс поток
-событий уже покрывают интеграцию. Фасад заложен под core, менять его не придётся.
-
-### Механика gomobile / JNI
-
-| Платформа | Артефакт | Инструмент | Механика |
-|-----------|----------|-----------|----------|
-| Android | `libbox.aar` (или `libXray.aar`) | `gomobile bind -target=android` | AAR несёт `.so` под ABI + JNI-обёртку; core вызывается in-process из `OkoVpnService`, без gRPC/localhost |
-| iOS | `Libbox.xcframework` | `gomobile bind -target=ios` | XCFramework линкуется в extension-таргет; Swift зовёт Obj-C-биндинг core |
-| Flutter ↔ native | — | Pigeon (уже есть) | Dart FFI **не место интеграции**: core живёт в native VPN-процессе, а Flutter остаётся UI-слоем поверх Pigeon-моста |
-
-Частая ошибка — тянуть core в Dart через FFI. Core запускается в нативном
-VPN-процессе (Android Service, iOS NE extension), а Flutter общается с native
-только через Pigeon.
-
-### Варианты core
-
-| Core | Артефакт | Рекомендация |
-|------|----------|--------------|
-| **sing-box / libbox** | `.aar` + `.xcframework` из `gomobile bind` | Первичный: единый core на обе платформы, VLESS-outbound из коробки |
-| **Xray-core / libXray** | gomobile-обёртка Xray → `.aar` / `.xcframework` | Альтернатива, если нужен именно Xray/XTLS |
-| **libv2ray** | легаси gomobile-биндинг v2ray | Исторический вариант эпохи v2ray, не рекомендуется |
-
-`VlessConfig` (распарсен на Dart в фазе 4) передаётся через `startVpn` → на native
-собирается sing-box JSON с `vless`-outbound → отдаётся в core (ориентировочно
-`Libbox.newService(config)`; конкретные имена символов API не проверены и даны как
-план, не как рабочий вызов).
+| presentation | `lib/features/*/presentation/` | Виджеты + Bloc/Cubit; ирис-индикатор `iris_painter.dart`, панель логов, экран управления серверами |
+| domain | `lib/features/*/domain/` | sealed/immutable entity, usecases, интерфейсы репозиториев, парсер и генератор конфига |
+| data | `lib/features/*/data/` | Реализации репозиториев, мапперы DTO → entity, Drift-хранилище, датасорсы поверх `VpnBridge` |
+| core/bridge | `lib/core/bridge/` | `vpn_api.g.dart` (Pigeon) + `VpnBridge`, единственный подписчик event-канала |
+| Android native | `android/.../vpn/`, `android/.../bridge/` | `OkoVpnService`, `OkoPlatformInterface`, `DemoLimit`, `DemoCooldownStore`, `VpnEventBus`, `VpnHostApiImpl` |
+| iOS native | `ios/Runner/Bridge/`, `ios/PacketTunnel/` | `VpnHostApiImpl`, `VpnStatusObserver`, `PacketTunnelProvider` (skeleton) |
 
 ## Ограничения
 
-Прототип честно очерчен. Границы названы прямо, без «полноценного VPN»:
+Границы названы прямо:
 
-- **Реального core нет — трафик не проксируется.** Туннель поднимается, но пакеты не
-  шифруются и не уходят на сервер. Путь интеграции описан разделом выше.
-- **tx всегда 0.** Read-loop считает только прочитанные байты (rx); отправку никто
-  не измеряет, тикер шлёт `TrafficChangedMessage(rx, 0L)`.
-- **Маршрут узкий — `10.111.222.0/24`, не `0.0.0.0/0`.** Интернет устройства
-  продолжает работать в статусе Connected; счётчик rx растёт от `ping` в подсеть
-  туннеля. Это осознанное решение демо, не забытая настройка.
-- **iOS-туннель проверяется на реальном устройстве.** Симулятор
-  packet-tunnel Network Extension не исполняет — это ограничение платформы Apple.
-- **Вставленный `vless://`-конфиг — display-only.** Карточка показывает разобранные
-  поля и задержку, но в реальный Connect ссылка не проводится:
-  `VpnConnectionBloc.config` остаётся демо-конфигом (`host echo.oko.vpn`, UUID
-  `00000000-0000-0000-0000-000000000000`).
-
-## Что дальше
-
-Направления по тестовому заданию и требованиям v2, если продолжать прототип:
-
-- **Реальный VPN-core** через `VpnCore` из плана выше: sing-box/libbox как `.aar` и
-  `.xcframework`, подключённый в `startReadLoop` и `startTunnel`.
-- **Чтение трафика на iOS**: цикл `packetFlow.readPackets` / `writePackets`, чтобы
-  extension считал реальные rx/tx, а не только поднимал туннель.
-- **Kill switch и split tunneling**: блокировка трафика при разрыве и маршрутизация
-  по приложениям поверх настоящего core.
+- **iOS ещё skeleton.** Extension поднимается и вызывает `setTunnelNetworkSettings`,
+  но `Libbox.xcframework` в него не встроен: трафик на iOS пока не проксируется.
+  Рабочая платформа сейчас только Android. Ядро отложено из-за лимита памяти
+  Network Extension (около 50 МБ): интеграция требует отдельного memory-safe
+  цикла packet flow.
+- **Демо-лимит 5 минут.** Нативный таймер режет сессию на 5:00 и включает кулдаун
+  2 минуты. Это рычаг демо-версии, а не техническое ограничение туннеля.
+- **Клиентский лимит обходим декомпиляцией.** Он держит демо-модель, а не защищает
+  от снятия. Для демо-цели этого достаточно.
+- **Репозиторий не собирает Android без ядра.** `libbox.aar` и рецепт его сборки в
+  git не входят (см. [Showcase-модель](#showcase-модель-репозитория)); рабочая
+  сборка идёт по отдельной ссылке на APK.
+- **Проверка «трафик идёт» требует живого сервера.** Нужен рабочий VLESS+Reality
+  (или иной поддержанный протокол); секреты держатся вне репозитория.
