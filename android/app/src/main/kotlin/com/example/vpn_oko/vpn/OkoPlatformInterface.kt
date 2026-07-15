@@ -3,8 +3,11 @@ package com.example.vpn_oko.vpn
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.VpnService
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.Process
 import android.system.OsConstants
 import com.example.vpn_oko.bridge.LogMessage
@@ -29,6 +32,8 @@ class OkoPlatformInterface(
 ) : PlatformInterface {
 
     private var monitorCallback: ConnectivityManager.NetworkCallback? = null
+    private val monitorThread = HandlerThread("oko-net-monitor").apply { start() }
+    private val monitorHandler = Handler(monitorThread.looper)
 
     override fun openTun(options: TunOptions): Int {
         val builder = builderFactory()
@@ -178,6 +183,10 @@ class OkoPlatformInterface(
 
     override fun startDefaultInterfaceMonitor(listener: InterfaceUpdateListener) {
         val manager = connectivity() ?: return
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+            .build()
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) = emitDefaultInterface(manager, network, listener)
 
@@ -188,8 +197,16 @@ class OkoPlatformInterface(
                 listener.updateDefaultInterface("", -1, false, false)
             }
         }
-        runCatching { manager.registerDefaultNetworkCallback(callback) }
-            .onSuccess { monitorCallback = callback }
+        runCatching {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+                    manager.registerBestMatchingNetworkCallback(request, callback, monitorHandler)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ->
+                    manager.requestNetwork(request, callback, monitorHandler)
+                else ->
+                    manager.registerDefaultNetworkCallback(callback, monitorHandler)
+            }
+        }.onSuccess { monitorCallback = callback }
     }
 
     override fun closeDefaultInterfaceMonitor(listener: InterfaceUpdateListener) {
@@ -222,12 +239,23 @@ class OkoPlatformInterface(
         network: Network,
         listener: InterfaceUpdateListener,
     ) {
-        val name = manager.getLinkProperties(network)?.interfaceName ?: return
-        val capabilities = manager.getNetworkCapabilities(network)
-        val index = runCatching { JavaNetworkInterface.getByName(name)?.index ?: -1 }.getOrDefault(-1)
-        val expensive = capabilities != null &&
-            !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
-        listener.updateDefaultInterface(name, index, expensive, false)
+        for (attempt in 0 until 10) {
+            val name = manager.getLinkProperties(network)?.interfaceName
+            if (name == null) {
+                Thread.sleep(100)
+                continue
+            }
+            val index = runCatching { JavaNetworkInterface.getByName(name).index }.getOrNull()
+            if (index == null) {
+                Thread.sleep(100)
+                continue
+            }
+            val capabilities = manager.getNetworkCapabilities(network)
+            val expensive = capabilities != null &&
+                !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+            listener.updateDefaultInterface(name, index, expensive, false)
+            return
+        }
     }
 
     private fun connectivity(): ConnectivityManager? =
