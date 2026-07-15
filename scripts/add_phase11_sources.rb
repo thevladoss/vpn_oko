@@ -5,6 +5,7 @@ project = Xcodeproj::Project.open(project_path)
 
 sources = {
   'Shared/AppGroup.swift' => %w[Runner PacketTunnel],
+  'Shared/DemoCooldownStore.swift' => %w[Runner PacketTunnel],
   'PacketTunnel/RunBlocking.swift' => %w[PacketTunnel],
   'PacketTunnel/OkoPlatformInterface.swift' => %w[PacketTunnel],
   'Bridge/TrafficLogClient.swift' => %w[Runner]

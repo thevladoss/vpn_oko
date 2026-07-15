@@ -14,6 +14,7 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		500F6A28F843EC0715394AC8 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C1179F7D4311B8D8BA03EE3 /* Pods_Runner.framework */; };
 		50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */; };
+		588388F37B362B509E18EE3C /* DemoCooldownStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F2B9446B7D8003EA00CF54 /* DemoCooldownStore.swift */; };
 		639CBDF821367FDC399A07E8 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA3E17C517EE615B0B065E /* AppGroup.swift */; };
 		67C7F9BC1B3B0F1C7EEA41C1 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71472FBE806C4ED6F6BDF453 /* Pods_RunnerTests.framework */; };
 		6D8D4CB447B14827F079865B /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
@@ -29,6 +30,7 @@
 		A00000000000000000000203 /* VpnEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* VpnEventListener.swift */; };
 		AE4EA8CCBEF6951852E5F57A /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
 		B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */; };
+		E1D25A71D03776259AAE3A5D /* DemoCooldownStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F2B9446B7D8003EA00CF54 /* DemoCooldownStore.swift */; };
 		EC544E8BF826C8DBCBF97A6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2ECB3FB0CB3600551034B2B /* Foundation.framework */; };
 		FA162D67DD95C91561641A36 /* TrafficLogClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43103482E03093D412DD62FA /* TrafficLogClient.swift */; };
 /* End PBXBuildFile section */
@@ -103,6 +105,7 @@
 		A00000000000000000000101 /* Messages.g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.g.swift; sourceTree = "<group>"; };
 		A00000000000000000000102 /* VpnHostApiImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VpnHostApiImpl.swift; sourceTree = "<group>"; };
 		A00000000000000000000103 /* VpnEventListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VpnEventListener.swift; sourceTree = "<group>"; };
+		A0F2B9446B7D8003EA00CF54 /* DemoCooldownStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DemoCooldownStore.swift; sourceTree = "<group>"; };
 		A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VpnStatusObserver.swift; sourceTree = "<group>"; };
 		A2CF2941E667E304CBF4C002 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OkoPlatformInterface.swift; sourceTree = "<group>"; };
@@ -267,6 +270,7 @@
 			isa = PBXGroup;
 			children = (
 				E4CA3E17C517EE615B0B065E /* AppGroup.swift */,
+				A0F2B9446B7D8003EA00CF54 /* DemoCooldownStore.swift */,
 			);
 			name = Shared;
 			path = Shared;
@@ -515,6 +519,7 @@
 				639CBDF821367FDC399A07E8 /* AppGroup.swift in Sources */,
 				31F31C5D1EA3AC26A44A706C /* RunBlocking.swift in Sources */,
 				B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */,
+				588388F37B362B509E18EE3C /* DemoCooldownStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -531,6 +536,7 @@
 				50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */,
 				931173EC9349A7A6B2141E3E /* AppGroup.swift in Sources */,
 				FA162D67DD95C91561641A36 /* TrafficLogClient.swift in Sources */,
+				E1D25A71D03776259AAE3A5D /* DemoCooldownStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
