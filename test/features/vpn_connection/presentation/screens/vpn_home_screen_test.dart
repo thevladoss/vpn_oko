@@ -17,6 +17,9 @@ import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connect_button.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_countdown.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/iris_indicator.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/oko_wordmark.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/server_card.dart';
@@ -47,6 +50,7 @@ void main() {
   late StreamController<VpnState> stateController;
   late StreamController<TrafficStats> trafficController;
   late StreamController<LogEntry> logController;
+  late StreamController<DemoExpiry> demoController;
 
   const config = VpnConfig(
     host: 'echo.oko.vpn',
@@ -76,12 +80,12 @@ void main() {
     stateController = StreamController<VpnState>.broadcast();
     trafficController = StreamController<TrafficStats>.broadcast();
     logController = StreamController<LogEntry>.broadcast();
+    demoController = StreamController<DemoExpiry>.broadcast();
 
     when(() => syncStatus()).thenAnswer((_) async {});
     when(() => watchVpnState()).thenAnswer((_) => stateController.stream);
     when(() => watchTraffic()).thenAnswer((_) => trafficController.stream);
-    when(() => watchDemoLimit())
-        .thenAnswer((_) => const Stream<DemoExpiry>.empty());
+    when(() => watchDemoLimit()).thenAnswer((_) => demoController.stream);
     when(() => watchLogs()).thenAnswer((_) => logController.stream);
     when(() => connectVpn(any())).thenAnswer((_) async {});
     when(() => disconnectVpn()).thenAnswer((_) async {});
@@ -91,6 +95,7 @@ void main() {
     await stateController.close();
     await trafficController.close();
     await logController.close();
+    await demoController.close();
   });
 
   VpnConnectionBloc buildBloc() => VpnConnectionBloc(
@@ -195,4 +200,77 @@ void main() {
       expect(find.textContaining('ad4f-8cda48b30811'), findsNothing);
     },
   );
+
+  testWidgets('connected: показывает обратный отсчёт сессии', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpScreen(tester);
+
+    stateController.add(VpnConnected(connectedSince: DateTime.now()));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(DemoCountdown), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('demoExpired: показывает оверлей истечения демо', (tester) async {
+    tester.view.physicalSize = const Size(1000, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpScreen(tester);
+
+    demoController.add(
+      DemoExpiry(
+        cooldownUntil: DateTime.now().add(const Duration(milliseconds: 400)),
+        justExpired: true,
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(DemoExpiredOverlay), findsOneWidget);
+    expect(find.text('Вы исчерпали 5 минут демо подключения'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('cooldown без истечения: уведомление и блок Connect', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpScreen(tester);
+
+    demoController.add(
+      DemoExpiry(
+        cooldownUntil: DateTime.now().add(const Duration(milliseconds: 400)),
+        justExpired: false,
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(CooldownNotice), findsOneWidget);
+    expect(find.byType(DemoExpiredOverlay), findsNothing);
+
+    final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
+    expect(button.onConnect, isNull);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
 }

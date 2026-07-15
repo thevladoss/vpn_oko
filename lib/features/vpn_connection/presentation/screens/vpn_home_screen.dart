@@ -16,6 +16,9 @@ import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connect_button.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_countdown.dart';
+import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/iris_indicator.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/oko_wordmark.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/server_card.dart';
@@ -124,6 +127,17 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                             ),
                           ),
                         ),
+                        if (state.status == VpnStatus.connected &&
+                            state.sessionEndsAt != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: DemoCountdown(
+                              deadline: state.sessionEndsAt!,
+                              style: textTheme.labelLarge?.copyWith(
+                                color: tones.textSecondary,
+                              ),
+                            ),
+                          ),
                         if (state.status == VpnStatus.error &&
                             state.errorMessage != null)
                           Padding(
@@ -195,14 +209,25 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           ),
                         ),
                         const SizedBox(height: 24),
+                        if (state.cooldownActive &&
+                            !state.demoExpired &&
+                            state.cooldownUntil != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: CooldownNotice(
+                              cooldownUntil: state.cooldownUntil!,
+                            ),
+                          ),
                         _Staggered(
                           animation: _entrance,
                           interval: _interval(OkoMotion.staggerConnectButton),
                           child: ConnectButton(
                             status: state.status,
-                            onConnect: () => context
-                                .read<VpnConnectionBloc>()
-                                .add(const ConnectRequested()),
+                            onConnect: state.cooldownActive
+                                ? null
+                                : () => context
+                                      .read<VpnConnectionBloc>()
+                                      .add(const ConnectRequested()),
                             onDisconnect: () => context
                                 .read<VpnConnectionBloc>()
                                 .add(const DisconnectRequested()),
@@ -219,6 +244,8 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                   interval: _interval(OkoMotion.staggerLogConsole),
                   child: const LogConsole(),
                 ),
+                if (state.demoExpired && state.cooldownUntil != null)
+                  DemoExpiredOverlay(cooldownUntil: state.cooldownUntil!),
               ],
             );
           },
