@@ -8,6 +8,7 @@ sources = {
   'Shared/DemoCooldownStore.swift' => %w[Runner PacketTunnel],
   'PacketTunnel/RunBlocking.swift' => %w[PacketTunnel],
   'PacketTunnel/OkoPlatformInterface.swift' => %w[PacketTunnel],
+  'PacketTunnel/DemoLimitTimer.swift' => %w[PacketTunnel],
   'Bridge/TrafficLogClient.swift' => %w[Runner]
 }
 

@@ -21,6 +21,7 @@
 		6FBB9F0ABA49D6B92D5296BA /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799B037CD820DEE4342AED0 /* PacketTunnelProvider.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		9142188481542350C8FCEAE2 /* DemoLimitTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91D66FCCBC0FE637DD54880 /* DemoLimitTimer.swift */; };
 		931173EC9349A7A6B2141E3E /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA3E17C517EE615B0B065E /* AppGroup.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -114,6 +115,7 @@
 		CAF530FE538020C5A9B7A141 /* PacketTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1B0A6C7AA0D75CF43A1E4 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		E4CA3E17C517EE615B0B065E /* AppGroup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		E91D66FCCBC0FE637DD54880 /* DemoLimitTimer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DemoLimitTimer.swift; sourceTree = "<group>"; };
 		EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = Libbox.xcframework; path = Frameworks/Libbox.xcframework; sourceTree = SOURCE_ROOT; };
 		FEE9360B2C49CED36AB45730 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -156,6 +158,7 @@
 				0C2B212238846A6AA985885C /* PacketTunnel.entitlements */,
 				CA63A8D84FD63706D202B964 /* RunBlocking.swift */,
 				C20FBE419D3742EF29936C60 /* OkoPlatformInterface.swift */,
+				E91D66FCCBC0FE637DD54880 /* DemoLimitTimer.swift */,
 			);
 			name = PacketTunnel;
 			path = PacketTunnel;
@@ -520,6 +523,7 @@
 				31F31C5D1EA3AC26A44A706C /* RunBlocking.swift in Sources */,
 				B260C9A16DB32F28F2FD822B /* OkoPlatformInterface.swift in Sources */,
 				588388F37B362B509E18EE3C /* DemoCooldownStore.swift in Sources */,
+				9142188481542350C8FCEAE2 /* DemoLimitTimer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
