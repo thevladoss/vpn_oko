@@ -8,9 +8,8 @@ import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/add_server_sheet.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/proxy_error_text.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_empty_state.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 
 String _protocolOf(ProxyConfig config) => switch (config) {
@@ -137,9 +136,12 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
                             ? _Staggered(
                                 animation: _entrance,
                                 interval: _interval(OkoMotion.staggerIris),
-                                child: Center(
-                                  child: ServerListEmptyState(
-                                    onAdd: () => AddServerSheet.show(context),
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: EmptyServerPasteField(
+                                    onPaste: () => context
+                                        .read<ServerListCubit>()
+                                        .addFromClipboard(),
                                   ),
                                 ),
                               )

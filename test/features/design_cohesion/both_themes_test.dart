@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/latency_pill.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/protocol_badge.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_empty_state.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_countdown.dart';
@@ -92,9 +92,9 @@ void main() {
       () => find.text('Paris'),
     ),
     _Case(
-      'ServerListEmptyState',
-      () => ServerListEmptyState(onAdd: () {}),
-      () => find.text('Добавьте первый сервер'),
+      'EmptyServerPasteField',
+      () => EmptyServerPasteField(onPaste: () {}),
+      () => find.text('Добавьте свой первый сервер'),
     ),
     _Case(
       'DemoCountdown выше минуты',

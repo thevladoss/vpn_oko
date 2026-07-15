@@ -9,7 +9,7 @@ import 'package:vpn_oko/features/server_config/domain/entities/server_profile.da
 import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_oko/features/server_config/presentation/screens/server_management_sheet.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/add_server_sheet.dart';
+import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
@@ -119,21 +119,25 @@ void main() {
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      expect(find.text('Добавьте первый сервер'), findsOneWidget);
+      expect(find.byType(EmptyServerPasteField), findsOneWidget);
+      expect(find.text('Добавьте свой первый сервер'), findsOneWidget);
       expect(find.byType(ServerListTile), findsNothing);
     });
 
-    testWidgets('пустое состояние ведёт к шиту добавления с превью', (
-      tester,
-    ) async {
+    testWidgets('тап по пунктирному полю вставляет из буфера', (tester) async {
+      clipboard.textToReturn = _tokyoLink;
+      when(
+        () => repository.add(any(), any()),
+      ).thenAnswer((_) async => ServerSaved(_tokyo));
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      await tester.tap(find.text('Добавить сервер'));
-      await tester.pumpAndSettle();
+      await tester.tap(find.byType(EmptyServerPasteField));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
-      expect(find.byType(AddServerSheet), findsOneWidget);
-      expect(find.byType(TextField), findsOneWidget);
+      verify(() => repository.add(any(), any())).called(1);
+      expect(find.byType(TextField), findsNothing);
     });
 
     testWidgets('маскирует секреты: uuid не попадает в дерево', (tester) async {

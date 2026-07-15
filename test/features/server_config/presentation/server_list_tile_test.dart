@@ -5,7 +5,6 @@ import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/latency_pill.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/protocol_badge.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_empty_state.dart';
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 
 void main() {
@@ -186,28 +185,6 @@ void main() {
       await tester.pumpWidget(host(buildTile(active: true), dark: false));
       await tester.pumpAndSettle();
       expect(find.byType(ServerListTile), findsOneWidget);
-    });
-  });
-
-  group('ServerListEmptyState', () {
-    testWidgets('рендерит заголовок, подсказку и иконку', (tester) async {
-      await tester.pumpWidget(
-        host(const ServerListEmptyState(), dark: true),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Добавьте первый сервер'), findsOneWidget);
-      expect(find.textContaining('vless://'), findsOneWidget);
-      expect(find.byIcon(Icons.dns_rounded), findsOneWidget);
-    });
-
-    testWidgets('рендерится в light-теме', (tester) async {
-      await tester.pumpWidget(
-        host(const ServerListEmptyState(), dark: false),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ServerListEmptyState), findsOneWidget);
     });
   });
 }
