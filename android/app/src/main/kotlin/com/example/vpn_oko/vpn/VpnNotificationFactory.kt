@@ -20,6 +20,15 @@ class VpnNotificationFactory(private val context: Context) {
             .setOngoing(true)
             .build()
 
+    fun expired(text: String): Notification =
+        Notification.Builder(context, CHANNEL_ID)
+            .setContentTitle("Oko VPN")
+            .setContentText(text)
+            .setSmallIcon(android.R.drawable.ic_lock_lock)
+            .setOngoing(false)
+            .setAutoCancel(true)
+            .build()
+
     companion object {
         const val CHANNEL_ID = "oko_vpn"
         const val NOTIFICATION_ID = 1001
