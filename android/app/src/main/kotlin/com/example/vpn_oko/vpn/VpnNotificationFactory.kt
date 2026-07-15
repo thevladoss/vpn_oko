@@ -3,7 +3,10 @@ package com.example.vpn_oko.vpn
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import com.example.vpn_oko.MainActivity
 
 class VpnNotificationFactory(private val context: Context) {
 
@@ -12,12 +15,20 @@ class VpnNotificationFactory(private val context: Context) {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
-    fun building(text: String): Notification =
+    fun building(text: String, connectedSinceMs: Long? = null): Notification =
         Notification.Builder(context, CHANNEL_ID)
             .setContentTitle("Oko VPN")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(true)
+            .setContentIntent(openAppIntent())
+            .apply {
+                if (connectedSinceMs != null) {
+                    setWhen(connectedSinceMs)
+                    setShowWhen(true)
+                    setUsesChronometer(true)
+                }
+            }
             .build()
 
     fun expired(text: String): Notification =
@@ -27,7 +38,20 @@ class VpnNotificationFactory(private val context: Context) {
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(false)
             .setAutoCancel(true)
+            .setContentIntent(openAppIntent())
             .build()
+
+    private fun openAppIntent(): PendingIntent {
+        val launch = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        return PendingIntent.getActivity(
+            context,
+            0,
+            launch,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+    }
 
     companion object {
         const val CHANNEL_ID = "oko_vpn"

@@ -126,7 +126,7 @@ class OkoVpnService : VpnService(), CommandServerHandler {
         startTrafficClient()
         val connectedSince = System.currentTimeMillis()
         transition(VpnConnectionState.Connected(connectedSince))
-        updateNotification("Connected")
+        updateNotification("Connected", connectedSince)
         scheduleExpiry()
     }
 
@@ -194,9 +194,9 @@ class OkoVpnService : VpnService(), CommandServerHandler {
         }
     }
 
-    private fun updateNotification(text: String) {
+    private fun updateNotification(text: String, connectedSinceMs: Long? = null) {
         getSystemService(NotificationManager::class.java)
-            .notify(VpnNotificationFactory.NOTIFICATION_ID, notificationFactory.building(text))
+            .notify(VpnNotificationFactory.NOTIFICATION_ID, notificationFactory.building(text, connectedSinceMs))
     }
 
     internal fun attachTunnel(descriptor: ParcelFileDescriptor) {
