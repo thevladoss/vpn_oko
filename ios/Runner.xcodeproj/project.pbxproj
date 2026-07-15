@@ -14,6 +14,7 @@
 		500F6A28F843EC0715394AC8 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C1179F7D4311B8D8BA03EE3 /* Pods_Runner.framework */; };
 		50D1AF2C591514C2D5C417AF /* VpnStatusObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E59E07EC22A95781766E2B /* VpnStatusObserver.swift */; };
 		67C7F9BC1B3B0F1C7EEA41C1 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71472FBE806C4ED6F6BDF453 /* Pods_RunnerTests.framework */; };
+		6D8D4CB447B14827F079865B /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
 		6FBB9F0ABA49D6B92D5296BA /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2799B037CD820DEE4342AED0 /* PacketTunnelProvider.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
@@ -23,6 +24,7 @@
 		A00000000000000000000201 /* Messages.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* Messages.g.swift */; };
 		A00000000000000000000202 /* VpnHostApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* VpnHostApiImpl.swift */; };
 		A00000000000000000000203 /* VpnEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* VpnEventListener.swift */; };
+		AE4EA8CCBEF6951852E5F57A /* Libbox.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */; };
 		EC544E8BF826C8DBCBF97A6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2ECB3FB0CB3600551034B2B /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -100,6 +102,7 @@
 		C2ECB3FB0CB3600551034B2B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		CAF530FE538020C5A9B7A141 /* PacketTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacketTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC1B0A6C7AA0D75CF43A1E4 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = Libbox.xcframework; path = Frameworks/Libbox.xcframework; sourceTree = SOURCE_ROOT; };
 		FEE9360B2C49CED36AB45730 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,6 +120,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC544E8BF826C8DBCBF97A6E /* Foundation.framework in Frameworks */,
+				6D8D4CB447B14827F079865B /* Libbox.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				500F6A28F843EC0715394AC8 /* Pods_Runner.framework in Frameworks */,
+				AE4EA8CCBEF6951852E5F57A /* Libbox.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +175,7 @@
 				9439EDE5E6A74393457B9314 /* iOS */,
 				6C1179F7D4311B8D8BA03EE3 /* Pods_Runner.framework */,
 				71472FBE806C4ED6F6BDF453 /* Pods_RunnerTests.framework */,
+				EFFB29395CC3EBCAAAC85E59 /* Libbox.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -278,6 +284,7 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				D229ED0025D50709113C236B /* Embed App Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				B05CCB0B67FB4CDF7688ABBC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -450,6 +457,23 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
 		};
+		B05CCB0B67FB4CDF7688ABBC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -581,10 +605,26 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -603,10 +643,26 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko.PacketTunnel;
 				PRODUCT_NAME = PacketTunnel;
 				SDKROOT = iphoneos;
@@ -674,10 +730,26 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko.PacketTunnel;
 				PRODUCT_NAME = PacketTunnel;
 				SDKROOT = iphoneos;
@@ -695,10 +767,26 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 0.1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko.PacketTunnel;
 				PRODUCT_NAME = PacketTunnel;
 				SDKROOT = iphoneos;
@@ -828,10 +916,26 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -852,10 +956,26 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = Z2GDTXHVZZ;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Frameworks",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					UIKit,
+					"-framework",
+					Security,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Network,
+					"-lresolv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.vpnOko;
 				PRODUCT_NAME = "$(TARGET_NAME)";

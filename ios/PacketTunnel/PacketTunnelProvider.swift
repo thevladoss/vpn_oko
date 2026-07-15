@@ -1,8 +1,14 @@
 import NetworkExtension
+import Libbox
+import os.log
 
 final class PacketTunnelProvider: NEPacketTunnelProvider {
   override func startTunnel(options: [String: NSObject]?,
                             completionHandler: @escaping (Error?) -> Void) {
+    if #available(iOS 14.0, *) {
+      Logger(subsystem: "com.example.vpnOko.PacketTunnel", category: "core")
+        .log("libbox core \(LibboxVersion(), privacy: .public)")
+    }
     let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "10.0.0.1")
     let ipv4 = NEIPv4Settings(addresses: ["10.0.0.2"], subnetMasks: ["255.255.255.255"])
     ipv4.includedRoutes = [NEIPv4Route(destinationAddress: "10.111.222.0",
