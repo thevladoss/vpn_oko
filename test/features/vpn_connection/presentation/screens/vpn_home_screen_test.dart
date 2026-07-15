@@ -253,6 +253,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(DemoCountdown), findsOneWidget);
+    expect(find.text('Демо'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();

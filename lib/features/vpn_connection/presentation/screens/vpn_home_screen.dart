@@ -160,11 +160,8 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                             state.sessionEndsAt != null)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
-                            child: DemoCountdown(
+                            child: _DemoSessionChip(
                               deadline: state.sessionEndsAt!,
-                              style: textTheme.labelLarge?.copyWith(
-                                color: tones.textSecondary,
-                              ),
                             ),
                           ),
                         if (state.status == VpnStatus.error &&
@@ -299,6 +296,49 @@ class _NoServerCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DemoSessionChip extends StatelessWidget {
+  const _DemoSessionChip({required this.deadline});
+
+  final DateTime deadline;
+
+  @override
+  Widget build(BuildContext context) {
+    final tones = context.okoTones;
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: tones.surfaceElevated.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: tones.glow),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.hourglass_bottom_rounded,
+            size: 16,
+            color: tones.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Демо',
+            style: textTheme.labelSmall?.copyWith(color: tones.textSecondary),
+          ),
+          const SizedBox(width: 10),
+          DemoCountdown(
+            deadline: deadline,
+            style: textTheme.titleMedium?.copyWith(color: tones.textSecondary),
+            warnStyle: textTheme.titleMedium?.copyWith(
+              color: tones.accentTransitional,
             ),
           ),
         ],
