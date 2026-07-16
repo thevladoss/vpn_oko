@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
@@ -164,13 +166,28 @@ void main() {
 
   group('sing-box JSON восстанавливается через канонический URL', () {
     test('vless reality из sing-box → URL → тот же config', () {
-      const body =
-          '{"outbounds":[{"type":"vless","tag":"SB Tokyo",'
-          '"server":"sb.example","server_port":443,"uuid":"$_uuid",'
-          '"flow":"xtls-rprx-vision","tls":{"enabled":true,'
-          '"server_name":"sb.example","reality":{"enabled":true,'
-          '"public_key":"PBKvalue","short_id":"ab12"},'
-          '"utls":{"fingerprint":"chrome"}}}]}';
+      final body = jsonEncode({
+        'outbounds': [
+          {
+            'type': 'vless',
+            'tag': 'SB Tokyo',
+            'server': 'sb.example',
+            'server_port': 443,
+            'uuid': _uuid,
+            'flow': 'xtls-rprx-vision',
+            'tls': {
+              'enabled': true,
+              'server_name': 'sb.example',
+              'reality': {
+                'enabled': true,
+                'public_key': 'PBKvalue',
+                'short_id': 'ab12',
+              },
+              'utls': {'fingerprint': 'chrome'},
+            },
+          },
+        ],
+      });
       final import = parseSubscription(body);
       expect(import.servers, hasLength(1));
 
@@ -182,10 +199,18 @@ void main() {
     });
 
     test('shadowsocks из sing-box → URL → тот же config', () {
-      const body =
-          '{"outbounds":[{"type":"shadowsocks","tag":"SB SS",'
-          '"server":"ss.sb","server_port":8388,'
-          '"method":"aes-256-gcm","password":"sbpass"}]}';
+      final body = jsonEncode({
+        'outbounds': [
+          {
+            'type': 'shadowsocks',
+            'tag': 'SB SS',
+            'server': 'ss.sb',
+            'server_port': 8388,
+            'method': 'aes-256-gcm',
+            'password': 'sbpass',
+          },
+        ],
+      });
       final import = parseSubscription(body);
       expect(import.servers, hasLength(1));
 
