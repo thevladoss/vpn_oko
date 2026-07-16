@@ -169,13 +169,7 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     if (state.isBusy) return;
     final active = _active;
     if (active == null) {
-      emit(
-        state.copyWith(
-          status: VpnStatus.error,
-          errorMessage: noServerHint,
-          clearConnectedSince: true,
-        ),
-      );
+      emit(state.copyWith(noServerNudge: state.noServerNudge + 1));
       return;
     }
     unawaited(connectVpn(active));

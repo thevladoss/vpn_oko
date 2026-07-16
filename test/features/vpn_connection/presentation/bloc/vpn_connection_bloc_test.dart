@@ -38,8 +38,6 @@ void main() {
     singboxConfigJson: '{"outbounds":[{"type":"trojan"}]}',
   );
 
-  const noServerHint = 'Выберите сервер, чтобы подключиться';
-
   final connectedSince = DateTime(2026, 7, 14, 9);
 
   setUpAll(() {
@@ -241,15 +239,33 @@ void main() {
   );
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
-    'гейт: без активного сервера ConnectRequested не зовёт connectVpn и '
-    'эмитит подсказку выбрать сервер',
+    'гейт: без активного сервера ConnectRequested не зовёт connectVpn, '
+    'статус остаётся disconnected и инкрементит noServerNudge',
     build: buildBloc,
     act: (bloc) => bloc.add(const ConnectRequested()),
     expect: () => [
       isA<VpnConnectionState>()
-          .having((s) => s.status, 'status', VpnStatus.error)
-          .having((s) => s.errorMessage, 'errorMessage', noServerHint)
-          .having((s) => s.connectedSince, 'connectedSince', isNull),
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.errorMessage, 'errorMessage', isNull)
+          .having((s) => s.noServerNudge, 'noServerNudge', 1),
+    ],
+    verify: (_) => verifyNever(() => connectVpn(any())),
+  );
+
+  blocTest<VpnConnectionBloc, VpnConnectionState>(
+    'гейт: два ConnectRequested без сервера подряд дают '
+    'noServerNudge 1 затем 2',
+    build: buildBloc,
+    act: (bloc) => bloc
+      ..add(const ConnectRequested())
+      ..add(const ConnectRequested()),
+    expect: () => [
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.noServerNudge, 'noServerNudge', 1),
+      isA<VpnConnectionState>()
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.noServerNudge, 'noServerNudge', 2),
     ],
     verify: (_) => verifyNever(() => connectVpn(any())),
   );
@@ -284,7 +300,7 @@ void main() {
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
     'ConfigCleared сбрасывает активный: следующий ConnectRequested снова '
-    'гейтится и не зовёт connectVpn',
+    'гейтится, не зовёт connectVpn и инкрементит noServerNudge',
     setUp: () => when(() => connectVpn(any())).thenAnswer((_) async {}),
     build: buildBloc,
     act: (bloc) => bloc
@@ -293,8 +309,9 @@ void main() {
       ..add(const ConnectRequested()),
     expect: () => [
       isA<VpnConnectionState>()
-          .having((s) => s.status, 'status', VpnStatus.error)
-          .having((s) => s.errorMessage, 'errorMessage', noServerHint),
+          .having((s) => s.status, 'status', VpnStatus.disconnected)
+          .having((s) => s.errorMessage, 'errorMessage', isNull)
+          .having((s) => s.noServerNudge, 'noServerNudge', 1),
     ],
     verify: (_) => verifyNever(() => connectVpn(any())),
   );

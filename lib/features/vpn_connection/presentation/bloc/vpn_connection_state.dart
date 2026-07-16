@@ -11,6 +11,7 @@ class VpnConnectionState extends Equatable {
     this.sessionEndsAt,
     this.cooldownUntil,
     this.demoExpired = false,
+    this.noServerNudge = 0,
   });
 
   final VpnStatus status;
@@ -21,6 +22,7 @@ class VpnConnectionState extends Equatable {
   final DateTime? sessionEndsAt;
   final DateTime? cooldownUntil;
   final bool demoExpired;
+  final int noServerNudge;
 
   bool get isBusy =>
       status == VpnStatus.connecting || status == VpnStatus.disconnecting;
@@ -40,6 +42,7 @@ class VpnConnectionState extends Equatable {
     DateTime? cooldownUntil,
     bool clearCooldown = false,
     bool? demoExpired,
+    int? noServerNudge,
   }) {
     return VpnConnectionState(
       status: status ?? this.status,
@@ -53,6 +56,7 @@ class VpnConnectionState extends Equatable {
       cooldownUntil:
           clearCooldown ? null : (cooldownUntil ?? this.cooldownUntil),
       demoExpired: demoExpired ?? this.demoExpired,
+      noServerNudge: noServerNudge ?? this.noServerNudge,
     );
   }
 
@@ -66,5 +70,6 @@ class VpnConnectionState extends Equatable {
         sessionEndsAt,
         cooldownUntil,
         demoExpired,
+        noServerNudge,
       ];
 }
