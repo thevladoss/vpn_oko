@@ -24,7 +24,7 @@ class FlutterSecretStore implements SecretStore {
 class SecretKeyStore {
   const SecretKeyStore(this._store);
 
-  static const String _dbKeyName = 'oko_db_key';
+  static const String _dbKeyName = 'osin_db_key';
 
   final SecretStore _store;
 

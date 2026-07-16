@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:vpn_osin/features/server_config/data/local/app_database.dart';
 import 'package:vpn_osin/features/server_config/data/local/secret_key_store.dart';
 
-const String _databaseFileName = 'oko_servers.db';
+const String _databaseFileName = 'osin_servers.db';
 
 AppDatabase openEncryptedDatabase(SecretKeyStore keyStore) {
   return AppDatabase(_encryptedExecutor(keyStore));

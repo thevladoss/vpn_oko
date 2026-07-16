@@ -54,7 +54,7 @@ class VpnNotificationFactory(private val context: Context) {
     }
 
     companion object {
-        const val CHANNEL_ID = "oko_vpn"
+        const val CHANNEL_ID = "osin_vpn"
         const val NOTIFICATION_ID = 1001
     }
 }

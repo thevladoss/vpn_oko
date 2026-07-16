@@ -31,7 +31,7 @@ class DemoCooldownStore(private val store: LongStore) {
 
 class SharedPreferencesLongStore(context: Context) : LongStore {
 
-    private val prefs = context.getSharedPreferences("oko_demo_limit", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("osin_demo_limit", Context.MODE_PRIVATE)
 
     override fun get(key: String): Long? =
         if (prefs.contains(key)) prefs.getLong(key, 0L) else null
