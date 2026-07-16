@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 
 Widget _host(DateTime until, ThemeData theme) => MaterialApp(
@@ -18,7 +18,7 @@ void main() {
       const Duration(minutes: 1, seconds: 30, milliseconds: 800),
     );
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark));
+    await tester.pumpWidget(_host(until, OsinTheme.dark));
     await tester.pump();
 
     expect(find.textContaining('Доступно через'), findsOneWidget);
@@ -33,11 +33,11 @@ void main() {
   ) async {
     final until = DateTime.now().add(const Duration(minutes: 1));
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark));
+    await tester.pumpWidget(_host(until, OsinTheme.dark));
     await tester.pump();
 
-    expect(_timeColor(tester), OkoTones.dark.accentTransitional);
-    expect(_timeColor(tester), isNot(OkoTones.dark.accentError));
+    expect(_timeColor(tester), OsinTones.dark.accentTransitional);
+    expect(_timeColor(tester), isNot(OsinTones.dark.accentError));
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -46,10 +46,10 @@ void main() {
   testWidgets('тон кулдауна — accentTransitional (light)', (tester) async {
     final until = DateTime.now().add(const Duration(minutes: 1));
 
-    await tester.pumpWidget(_host(until, OkoTheme.light));
+    await tester.pumpWidget(_host(until, OsinTheme.light));
     await tester.pump();
 
-    expect(_timeColor(tester), OkoTones.light.accentTransitional);
+    expect(_timeColor(tester), OsinTones.light.accentTransitional);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();

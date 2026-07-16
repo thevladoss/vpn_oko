@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
@@ -24,7 +24,7 @@ import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_n
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_indicator.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/oko_wordmark.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordmark.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/status_badge.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/traffic_panel.dart';
@@ -165,7 +165,7 @@ void main() {
     );
     await tester.pumpWidget(
       wrapWithTopAlert(
-        theme: theme ?? OkoTheme.dark,
+        theme: theme ?? OsinTheme.dark,
         home: disableAnimations
             ? Builder(
                 builder: (context) => MediaQuery(
@@ -197,7 +197,7 @@ void main() {
 
     await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
 
-    expect(find.byType(OkoWordmark), findsOneWidget);
+    expect(find.byType(OsinWordmark), findsOneWidget);
     expect(find.byType(StatusBadge), findsOneWidget);
     expect(find.byType(IrisIndicator), findsOneWidget);
     expect(find.byType(ServerCard), findsOneWidget);
@@ -453,8 +453,8 @@ void main() {
   });
 
   for (final (name, theme) in <(String, ThemeData)>[
-    ('dark', OkoTheme.dark),
-    ('light', OkoTheme.light),
+    ('dark', OsinTheme.dark),
+    ('light', OsinTheme.light),
   ]) {
     for (final reduceMotion in [false, true]) {
       testWidgets(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 class StatusBadge extends StatelessWidget {
@@ -18,21 +18,21 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final accent = tones.accentFor(status);
     final style = Theme.of(context).textTheme.labelSmall ?? const TextStyle();
     return ExcludeSemantics(
       child: AnimatedContainer(
-        duration: OkoMotion.statusCrossfade,
-        curve: OkoMotion.statusCrossfadeCurve,
+        duration: OsinMotion.statusCrossfade,
+        curve: OsinMotion.statusCrossfadeCurve,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: accent.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(999),
         ),
         child: AnimatedDefaultTextStyle(
-          duration: OkoMotion.statusCrossfade,
-          curve: OkoMotion.statusCrossfadeCurve,
+          duration: OsinMotion.statusCrossfade,
+          curve: OsinMotion.statusCrossfadeCurve,
           style: style.copyWith(color: accent),
           child: Text(_words[status]!),
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 
 Widget _host(
@@ -31,7 +31,7 @@ void main() {
       const Duration(minutes: 4, seconds: 59, milliseconds: 800),
     );
 
-    await tester.pumpWidget(_host(deadline, OkoTheme.dark));
+    await tester.pumpWidget(_host(deadline, OsinTheme.dark));
     await tester.pump();
 
     expect(find.text('04:59'), findsOneWidget);
@@ -48,14 +48,14 @@ void main() {
     await tester.pumpWidget(
       _host(
         deadline,
-        OkoTheme.dark,
-        style: TextStyle(color: OkoTones.dark.textSecondary),
-        warnStyle: TextStyle(color: OkoTones.dark.accentTransitional),
+        OsinTheme.dark,
+        style: TextStyle(color: OsinTones.dark.textSecondary),
+        warnStyle: TextStyle(color: OsinTones.dark.accentTransitional),
       ),
     );
     await tester.pump();
 
-    expect(_timeColor(tester), OkoTones.dark.textSecondary);
+    expect(_timeColor(tester), OsinTones.dark.textSecondary);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -71,15 +71,15 @@ void main() {
     await tester.pumpWidget(
       _host(
         deadline,
-        OkoTheme.dark,
-        style: TextStyle(color: OkoTones.dark.textSecondary),
-        warnStyle: TextStyle(color: OkoTones.dark.accentTransitional),
+        OsinTheme.dark,
+        style: TextStyle(color: OsinTones.dark.textSecondary),
+        warnStyle: TextStyle(color: OsinTones.dark.accentTransitional),
       ),
     );
     await tester.pump();
 
-    expect(_timeColor(tester), OkoTones.dark.accentTransitional);
-    expect(_timeColor(tester), isNot(OkoTones.dark.accentError));
+    expect(_timeColor(tester), OsinTones.dark.accentTransitional);
+    expect(_timeColor(tester), isNot(OsinTones.dark.accentError));
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -88,7 +88,7 @@ void main() {
   testWidgets('дедлайн в прошлом — 00:00 без исключений', (tester) async {
     final past = DateTime.now().subtract(const Duration(seconds: 5));
 
-    await tester.pumpWidget(_host(past, OkoTheme.dark));
+    await tester.pumpWidget(_host(past, OsinTheme.dark));
     await tester.pump();
 
     expect(find.text('00:00'), findsOneWidget);
@@ -109,14 +109,14 @@ void main() {
     await tester.pumpWidget(
       _host(
         deadline,
-        OkoTheme.light,
-        style: TextStyle(color: OkoTones.light.textSecondary),
-        warnStyle: TextStyle(color: OkoTones.light.accentTransitional),
+        OsinTheme.light,
+        style: TextStyle(color: OsinTones.light.textSecondary),
+        warnStyle: TextStyle(color: OsinTones.light.accentTransitional),
       ),
     );
     await tester.pump();
 
-    expect(_timeColor(tester), OkoTones.light.textSecondary);
+    expect(_timeColor(tester), OsinTones.light.textSecondary);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -130,7 +130,7 @@ void main() {
     await tester.pumpWidget(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: _host(deadline, OkoTheme.dark),
+        child: _host(deadline, OsinTheme.dark),
       ),
     );
     await tester.pump();

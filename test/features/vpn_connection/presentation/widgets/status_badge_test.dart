@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/status_badge.dart';
 
 void main() {
   Widget host(Widget child) {
     return MaterialApp(
-      theme: OkoTheme.dark,
+      theme: OsinTheme.dark,
       home: Scaffold(body: Center(child: child)),
     );
   }

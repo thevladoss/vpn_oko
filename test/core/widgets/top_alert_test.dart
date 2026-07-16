@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 
 Widget _host(
@@ -34,7 +34,7 @@ void main() {
       await tester.pumpWidget(
         _host(
           const TopAlert(message: 'Готово', visible: true),
-          OkoTheme.dark,
+          OsinTheme.dark,
         ),
       );
       await tester.pump(const Duration(milliseconds: 400));
@@ -43,7 +43,7 @@ void main() {
       final icon = tester.widget<Icon>(
         find.byIcon(Icons.check_circle_rounded),
       );
-      expect(icon.color, OkoTones.dark.accentConnected);
+      expect(icon.color, OsinTones.dark.accentConnected);
     });
 
     testWidgets('error красит в accentError и рисует error_rounded', (
@@ -56,13 +56,13 @@ void main() {
             kind: TopAlertKind.error,
             visible: true,
           ),
-          OkoTheme.dark,
+          OsinTheme.dark,
         ),
       );
       await tester.pump(const Duration(milliseconds: 400));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_rounded));
-      expect(icon.color, OkoTones.dark.accentError);
+      expect(icon.color, OsinTones.dark.accentError);
     });
 
     testWidgets('warning красит в accentTransitional и рисует info_rounded', (
@@ -75,13 +75,13 @@ void main() {
             kind: TopAlertKind.warning,
             visible: true,
           ),
-          OkoTheme.dark,
+          OsinTheme.dark,
         ),
       );
       await tester.pump(const Duration(milliseconds: 400));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.info_rounded));
-      expect(icon.color, OkoTones.dark.accentTransitional);
+      expect(icon.color, OsinTones.dark.accentTransitional);
     });
 
     testWidgets('message == null → SizedBox.shrink, без иконки и текста', (
@@ -90,7 +90,7 @@ void main() {
       await tester.pumpWidget(
         _host(
           const TopAlert(message: null, visible: true),
-          OkoTheme.dark,
+          OsinTheme.dark,
         ),
       );
       await tester.pump();
@@ -100,7 +100,7 @@ void main() {
     });
 
     testWidgets('рендерится в обеих темах без исключений', (tester) async {
-      for (final theme in [OkoTheme.dark, OkoTheme.light]) {
+      for (final theme in [OsinTheme.dark, OsinTheme.light]) {
         await tester.pumpWidget(
           _host(
             const TopAlert(
@@ -128,7 +128,7 @@ void main() {
       await tester.pumpWidget(
         _host(
           const TopAlert(message: 'Без анимаций', visible: true),
-          OkoTheme.dark,
+          OsinTheme.dark,
           disableAnimations: true,
         ),
       );

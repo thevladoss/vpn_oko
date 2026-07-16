@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
-import 'package:vpn_osin/core/theme/oko_typography.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
+import 'package:vpn_osin/core/theme/osin_typography.dart';
 
-class OkoTheme {
-  const OkoTheme._();
+class OsinTheme {
+  const OsinTheme._();
 
   static ThemeData get dark => _build(
         brightness: Brightness.dark,
-        tones: OkoTones.dark,
+        tones: OsinTones.dark,
         colorScheme: _darkScheme,
       );
 
   static ThemeData get light => _build(
         brightness: Brightness.light,
-        tones: OkoTones.light,
+        tones: OsinTones.light,
         colorScheme: _lightScheme,
       );
 
   static ThemeData _build({
     required Brightness brightness,
-    required OkoTones tones,
+    required OsinTones tones,
     required ColorScheme colorScheme,
   }) {
     return ThemeData(
@@ -27,8 +27,8 @@ class OkoTheme {
       brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      textTheme: OkoTypography.textTheme(brightness),
-      extensions: <OkoTones>[tones],
+      textTheme: OsinTypography.textTheme(brightness),
+      extensions: <OsinTones>[tones],
     );
   }
 
@@ -38,25 +38,25 @@ class OkoTheme {
 
   static final ColorScheme _darkScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: OkoTones.dark.accentConnected,
+    primary: OsinTones.dark.accentConnected,
     onPrimary: _voidBackground,
-    secondary: OkoTones.dark.accentIdle,
-    onSecondary: OkoTones.dark.textPrimary,
-    error: OkoTones.dark.accentError,
+    secondary: OsinTones.dark.accentIdle,
+    onSecondary: OsinTones.dark.textPrimary,
+    error: OsinTones.dark.accentError,
     onError: _voidBackground,
     surface: _voidBackground,
-    onSurface: OkoTones.dark.textPrimary,
+    onSurface: OsinTones.dark.textPrimary,
   );
 
   static final ColorScheme _lightScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: OkoTones.light.accentConnected,
+    primary: OsinTones.light.accentConnected,
     onPrimary: _onLight,
-    secondary: OkoTones.light.accentIdle,
+    secondary: OsinTones.light.accentIdle,
     onSecondary: _onLight,
-    error: OkoTones.light.accentError,
+    error: OsinTones.light.accentError,
     onError: _onLight,
     surface: _lightBackground,
-    onSurface: OkoTones.light.textPrimary,
+    onSurface: OsinTones.light.textPrimary,
   );
 }

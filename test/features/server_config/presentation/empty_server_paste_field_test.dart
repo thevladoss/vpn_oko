@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 
 void main() {
   Widget host(Widget child, {required bool dark}) {
     return MaterialApp(
-      theme: dark ? OkoTheme.dark : OkoTheme.light,
+      theme: dark ? OsinTheme.dark : OsinTheme.light,
       home: Scaffold(
         body: Center(child: SizedBox(width: 360, child: child)),
       ),

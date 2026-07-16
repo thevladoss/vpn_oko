@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
@@ -11,7 +11,7 @@ Widget host(Widget child) {
   return MediaQuery(
     data: const MediaQueryData(disableAnimations: true),
     child: MaterialApp(
-      theme: OkoTheme.dark,
+      theme: OsinTheme.dark,
       home: Scaffold(body: Center(child: child)),
     ),
   );

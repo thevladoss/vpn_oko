@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_state.dart';
 import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_line.dart';
@@ -33,7 +33,7 @@ class _LogConsoleState extends State<LogConsole>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: OkoMotion.autoscroll,
+      duration: OsinMotion.autoscroll,
     );
   }
 
@@ -55,8 +55,8 @@ class _LogConsoleState extends State<LogConsole>
     unawaited(
       _controller.animateTo(
         open ? 1 : 0,
-        duration: OkoMotion.autoscroll,
-        curve: OkoMotion.autoscrollCurve,
+        duration: OsinMotion.autoscroll,
+        curve: OsinMotion.autoscrollCurve,
       ),
     );
   }
@@ -80,7 +80,7 @@ class _LogConsoleState extends State<LogConsole>
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     return Align(
       alignment: Alignment.bottomCenter,
@@ -166,8 +166,8 @@ class _LogConsoleState extends State<LogConsole>
       unawaited(
         _scroll.animateTo(
           position.maxScrollExtent,
-          duration: OkoMotion.autoscroll,
-          curve: OkoMotion.autoscrollCurve,
+          duration: OsinMotion.autoscroll,
+          curve: OsinMotion.autoscrollCurve,
         ),
       );
     });
@@ -200,7 +200,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return Semantics(
       button: true,
@@ -271,7 +271,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),

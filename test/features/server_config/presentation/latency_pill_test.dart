@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
 
 void main() {
   Widget host(Widget child, {required bool dark}) {
     return MaterialApp(
-      theme: dark ? OkoTheme.dark : OkoTheme.light,
+      theme: dark ? OsinTheme.dark : OsinTheme.light,
       home: Scaffold(body: Center(child: child)),
     );
   }
@@ -30,7 +30,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('56 ms'), findsOneWidget);
-      expect(colorOf(tester, '56 ms'), OkoTones.dark.accentConnected);
+      expect(colorOf(tester, '56 ms'), OsinTones.dark.accentConnected);
     });
 
     testWidgets('180 ms → accentTransitional', (tester) async {
@@ -45,7 +45,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('180 ms'), findsOneWidget);
-      expect(colorOf(tester, '180 ms'), OkoTones.dark.accentTransitional);
+      expect(colorOf(tester, '180 ms'), OsinTones.dark.accentTransitional);
     });
 
     testWidgets('420 ms → accentError', (tester) async {
@@ -60,7 +60,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('420 ms'), findsOneWidget);
-      expect(colorOf(tester, '420 ms'), OkoTones.dark.accentError);
+      expect(colorOf(tester, '420 ms'), OsinTones.dark.accentError);
     });
 
     testWidgets('unreachable → «недоступен» accentError', (tester) async {
@@ -70,7 +70,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('недоступен'), findsOneWidget);
-      expect(colorOf(tester, 'недоступен'), OkoTones.dark.accentError);
+      expect(colorOf(tester, 'недоступен'), OsinTones.dark.accentError);
     });
 
     testWidgets('null → «…» textSecondary как скелетон', (tester) async {
@@ -80,7 +80,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('…'), findsOneWidget);
-      expect(colorOf(tester, '…'), OkoTones.dark.textSecondary);
+      expect(colorOf(tester, '…'), OsinTones.dark.textSecondary);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
@@ -96,7 +96,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(LatencyPill), findsOneWidget);
-      expect(colorOf(tester, '56 ms'), OkoTones.light.accentConnected);
+      expect(colorOf(tester, '56 ms'), OsinTones.light.accentConnected);
     });
   });
 }

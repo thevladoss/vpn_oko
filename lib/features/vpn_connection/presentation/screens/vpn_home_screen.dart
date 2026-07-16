@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
@@ -21,7 +21,7 @@ import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_n
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_indicator.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/oko_wordmark.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordmark.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/status_badge.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/traffic_panel.dart';
@@ -91,9 +91,9 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
   Interval _interval(Duration start) {
     final begin = start.inMilliseconds / _total.inMilliseconds;
     final end =
-        (start.inMilliseconds + OkoMotion.enterScreen.inMilliseconds) /
+        (start.inMilliseconds + OsinMotion.enterScreen.inMilliseconds) /
         _total.inMilliseconds;
-    return Interval(begin, end, curve: OkoMotion.enterScreenCurve);
+    return Interval(begin, end, curve: OsinMotion.enterScreenCurve);
   }
 
   void _openServerSheet(BuildContext context) {
@@ -127,7 +127,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return MultiBlocListener(
       listeners: [
@@ -183,7 +183,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           height: 56,
                           child: Row(
                             children: [
-                              OkoWordmark(status: state.status),
+                              OsinWordmark(status: state.status),
                               const Spacer(),
                               StatusBadge(status: state.status),
                             ],
@@ -192,7 +192,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                         Expanded(
                           child: _Staggered(
                             animation: _entrance,
-                            interval: _interval(OkoMotion.staggerIris),
+                            interval: _interval(OsinMotion.staggerIris),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 32),
                               child: IrisIndicator(
@@ -229,7 +229,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           ),
                         _Staggered(
                           animation: _entrance,
-                          interval: _interval(OkoMotion.staggerServerCard),
+                          interval: _interval(OsinMotion.staggerServerCard),
                           child: activeProfile != null
                               ? ServerCard(
                                   serverName: activeProfile.label,
@@ -246,7 +246,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                         const SizedBox(height: 24),
                         _Staggered(
                           animation: _entrance,
-                          interval: _interval(OkoMotion.staggerTrafficPanel),
+                          interval: _interval(OsinMotion.staggerTrafficPanel),
                           child: TrafficPanel(
                             rxBytes: state.rxBytes,
                             txBytes: state.txBytes,
@@ -267,7 +267,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                         ),
                         _Staggered(
                           animation: _entrance,
-                          interval: _interval(OkoMotion.staggerConnectButton),
+                          interval: _interval(OsinMotion.staggerConnectButton),
                           child: ConnectButton(
                             status: state.status,
                             onConnect: state.cooldownActive
@@ -288,7 +288,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                 ),
                 _Staggered(
                   animation: _entrance,
-                  interval: _interval(OkoMotion.staggerLogConsole),
+                  interval: _interval(OsinMotion.staggerLogConsole),
                   child: const LogConsole(),
                 ),
                 if (state.demoExpired && state.cooldownUntil != null)
@@ -309,7 +309,7 @@ class _NoServerCard extends StatelessWidget {
     this.onTap,
   });
 
-  final OkoTones tones;
+  final OsinTones tones;
   final TextTheme textTheme;
   final VoidCallback? onTap;
 
@@ -381,7 +381,7 @@ class _DemoSessionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -428,8 +428,8 @@ class _GlowLayer extends StatelessWidget {
     final intensity = status == VpnStatus.disconnected ? 0.0 : 0.16;
     return Positioned.fill(
       child: AnimatedContainer(
-        duration: OkoMotion.statusCrossfade,
-        curve: OkoMotion.statusCrossfadeCurve,
+        duration: OsinMotion.statusCrossfade,
+        curve: OsinMotion.statusCrossfadeCurve,
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: const Alignment(0, -0.35),

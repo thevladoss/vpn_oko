@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/protocol_badge.dart';
@@ -10,7 +10,7 @@ import 'package:vpn_osin/features/server_config/presentation/widgets/server_list
 void main() {
   Widget host(Widget child, {required bool dark}) {
     return MaterialApp(
-      theme: dark ? OkoTheme.dark : OkoTheme.light,
+      theme: dark ? OsinTheme.dark : OsinTheme.light,
       home: Scaffold(
         body: Center(child: SizedBox(width: 360, child: child)),
       ),
@@ -96,10 +96,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        hasAccentForegroundBorder(tester, OsinTones.dark.accentConnected),
         isTrue,
       );
-      expect(hasAccentBorder(tester, OkoTones.dark.accentConnected), isFalse);
+      expect(hasAccentBorder(tester, OsinTones.dark.accentConnected), isFalse);
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
       expect(
         tester.getSemantics(find.text('Tokyo')),
@@ -111,9 +111,9 @@ void main() {
       await tester.pumpWidget(host(buildTile(active: false), dark: true));
       await tester.pumpAndSettle();
 
-      expect(hasAccentBorder(tester, OkoTones.dark.accentConnected), isFalse);
+      expect(hasAccentBorder(tester, OsinTones.dark.accentConnected), isFalse);
       expect(
-        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        hasAccentForegroundBorder(tester, OsinTones.dark.accentConnected),
         isFalse,
       );
       expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
@@ -205,7 +205,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(ServerListTile), findsOneWidget);
       expect(
-        hasAccentForegroundBorder(tester, OkoTones.dark.accentConnected),
+        hasAccentForegroundBorder(tester, OsinTones.dark.accentConnected),
         isTrue,
       );
 
@@ -213,7 +213,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(ServerListTile), findsOneWidget);
       expect(
-        hasAccentForegroundBorder(tester, OkoTones.light.accentConnected),
+        hasAccentForegroundBorder(tester, OsinTones.light.accentConnected),
         isTrue,
       );
     });

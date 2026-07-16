@@ -8,7 +8,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   LicenseRegistry.addLicense(_fontLicenses);
   final dependencies = AppDependencies();
-  runApp(OkoApp(dependencies: dependencies));
+  runApp(OsinApp(dependencies: dependencies));
 }
 
 Stream<LicenseEntry> _fontLicenses() async* {

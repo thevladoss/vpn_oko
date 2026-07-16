@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
-import 'package:vpn_osin/core/theme/oko_typography.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
+import 'package:vpn_osin/core/theme/osin_typography.dart';
 import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 class LogLine extends StatelessWidget {
@@ -10,8 +10,8 @@ class LogLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
-    final mono = OkoTypography.mono(Theme.of(context).brightness);
+    final tones = context.osinTones;
+    final mono = OsinTypography.mono(Theme.of(context).brightness);
     final levelColor = switch (entry.level) {
       LogLevel.info => tones.textSecondary,
       LogLevel.warning => tones.accentTransitional,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_osin/app/di.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 import 'package:vpn_osin/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
@@ -11,8 +11,8 @@ import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connectio
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
 import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 
-class OkoApp extends StatefulWidget {
-  const OkoApp({
+class OsinApp extends StatefulWidget {
+  const OsinApp({
     required this.dependencies,
     this.themeMode = ThemeMode.system,
     super.key,
@@ -22,10 +22,10 @@ class OkoApp extends StatefulWidget {
   final ThemeMode themeMode;
 
   @override
-  State<OkoApp> createState() => _OkoAppState();
+  State<OsinApp> createState() => _OsinAppState();
 }
 
-class _OkoAppState extends State<OkoApp> {
+class _OsinAppState extends State<OsinApp> {
   final TopAlertController _alerts = TopAlertController();
 
   @override
@@ -39,9 +39,9 @@ class _OkoAppState extends State<OkoApp> {
     return TopAlertScope(
       controller: _alerts,
       child: MaterialApp(
-        title: 'Oko VPN',
-        theme: OkoTheme.light,
-        darkTheme: OkoTheme.dark,
+        title: 'osin',
+        theme: OsinTheme.light,
+        darkTheme: OsinTheme.dark,
         themeMode: widget.themeMode,
         builder: (context, child) => Stack(
           children: [

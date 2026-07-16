@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 
 enum TopAlertKind { success, warning, error }
 
@@ -16,7 +16,7 @@ class TopAlert extends StatelessWidget {
   final TopAlertKind kind;
   final bool visible;
 
-  Color _accent(OkoTones tones) => switch (kind) {
+  Color _accent(OsinTones tones) => switch (kind) {
     TopAlertKind.success => tones.accentConnected,
     TopAlertKind.warning => tones.accentTransitional,
     TopAlertKind.error => tones.accentError,
@@ -30,22 +30,22 @@ class TopAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     final message = this.message;
     final accent = _accent(tones);
     final duration = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
-        : OkoMotion.statusCrossfade;
+        : OsinMotion.statusCrossfade;
     return IgnorePointer(
       child: AnimatedSlide(
         offset: visible ? Offset.zero : const Offset(0, -0.4),
         duration: duration,
-        curve: OkoMotion.statusCrossfadeCurve,
+        curve: OsinMotion.statusCrossfadeCurve,
         child: AnimatedOpacity(
           opacity: visible ? 1 : 0,
           duration: duration,
-          curve: OkoMotion.statusCrossfadeCurve,
+          curve: OsinMotion.statusCrossfadeCurve,
           child: message == null
               ? const SizedBox.shrink()
               : DecoratedBox(

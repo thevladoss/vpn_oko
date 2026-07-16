@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 class ConnectButton extends StatelessWidget {
@@ -32,7 +32,7 @@ class ConnectButton extends StatelessWidget {
         VpnStatus.connecting || VpnStatus.disconnecting => null,
       };
 
-  Color _background(OkoTones tones) => switch (status) {
+  Color _background(OsinTones tones) => switch (status) {
         VpnStatus.disconnected => tones.accentConnected,
         VpnStatus.connecting ||
         VpnStatus.disconnecting =>
@@ -41,10 +41,10 @@ class ConnectButton extends StatelessWidget {
         VpnStatus.error => tones.accentError,
       };
 
-  Color _foreground(OkoTones tones, ColorScheme scheme) =>
+  Color _foreground(OsinTones tones, ColorScheme scheme) =>
       status == VpnStatus.connected ? tones.accentError : scheme.onPrimary;
 
-  BoxBorder? _border(OkoTones tones) => status == VpnStatus.connected
+  BoxBorder? _border(OsinTones tones) => status == VpnStatus.connected
       ? Border.all(color: tones.accentError, width: 1.5)
       : null;
 
@@ -60,7 +60,7 @@ class ConnectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final foreground = _foreground(tones, scheme);
@@ -72,8 +72,8 @@ class ConnectButton extends StatelessWidget {
       label: _label,
       excludeSemantics: true,
       child: AnimatedContainer(
-        duration: OkoMotion.statusCrossfade,
-        curve: OkoMotion.statusCrossfadeCurve,
+        duration: OsinMotion.statusCrossfade,
+        curve: OsinMotion.statusCrossfadeCurve,
         height: 56,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -97,8 +97,8 @@ class ConnectButton extends StatelessWidget {
                   _leading(foreground),
                   const SizedBox(width: 8),
                   AnimatedDefaultTextStyle(
-                    duration: OkoMotion.statusCrossfade,
-                    curve: OkoMotion.statusCrossfadeCurve,
+                    duration: OsinMotion.statusCrossfade,
+                    curve: OsinMotion.statusCrossfadeCurve,
                     style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
                       color: foreground,
                       fontWeight: FontWeight.w600,
@@ -131,7 +131,10 @@ class _RunningSegmentState extends State<_RunningSegment>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: OkoMotion.segment);
+    _controller = AnimationController(
+      vsync: this,
+      duration: OsinMotion.segment,
+    );
   }
 
   @override

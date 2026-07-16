@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 
 class LatencyPill extends StatelessWidget {
@@ -13,7 +13,7 @@ class LatencyPill extends StatelessWidget {
     null => '…',
   };
 
-  Color _color(OkoTones tones) => switch (latency) {
+  Color _color(OsinTones tones) => switch (latency) {
     LatencyMeasured(:final rtt) when rtt.inMilliseconds < 100 =>
       tones.accentConnected,
     LatencyMeasured(:final rtt) when rtt.inMilliseconds < 300 =>
@@ -25,7 +25,7 @@ class LatencyPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final color = _color(tones);
     final style = Theme.of(context).textTheme.labelSmall ?? const TextStyle();
     return ExcludeSemantics(

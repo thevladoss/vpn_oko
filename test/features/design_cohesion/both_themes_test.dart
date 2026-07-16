@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
@@ -18,7 +18,7 @@ Widget host(Widget child, ThemeData theme) {
 }
 
 ThemeData themeOf(String name) =>
-    name == 'dark' ? OkoTheme.dark : OkoTheme.light;
+    name == 'dark' ? OsinTheme.dark : OsinTheme.light;
 
 const _expiredTitle = 'Вы исчерпали 5 минут демо подключения';
 
@@ -127,7 +127,7 @@ void main() {
   ];
 
   for (final c in cases) {
-    testWidgets('${c.name} рендерится в OkoTheme.dark и OkoTheme.light', (
+    testWidgets('${c.name} рендерится в OsinTheme.dark и OsinTheme.light', (
       tester,
     ) async {
       for (final name in ['dark', 'light']) {

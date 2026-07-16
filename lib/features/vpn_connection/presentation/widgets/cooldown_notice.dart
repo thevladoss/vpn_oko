@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 
 class CooldownNotice extends StatelessWidget {
@@ -9,7 +9,7 @@ class CooldownNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final labelStyle = Theme.of(
       context,
     ).textTheme.labelSmall?.copyWith(color: tones.accentTransitional);

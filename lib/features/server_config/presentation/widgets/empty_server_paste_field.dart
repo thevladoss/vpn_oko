@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 
 class EmptyServerPasteField extends StatelessWidget {
   const EmptyServerPasteField({required this.onPaste, super.key});
@@ -11,7 +11,7 @@ class EmptyServerPasteField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return Semantics(
       button: true,

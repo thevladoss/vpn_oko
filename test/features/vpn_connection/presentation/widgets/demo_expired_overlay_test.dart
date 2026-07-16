@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 
@@ -30,7 +30,7 @@ void main() {
   testWidgets('заголовок истечения и пояснение о лимите', (tester) async {
     final until = DateTime.now().add(const Duration(minutes: 2));
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark));
+    await tester.pumpWidget(_host(until, OsinTheme.dark));
     await tester.pump();
 
     expect(find.text(_title), findsOneWidget);
@@ -50,7 +50,7 @@ void main() {
       const Duration(minutes: 1, seconds: 59, milliseconds: 800),
     );
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark));
+    await tester.pumpWidget(_host(until, OsinTheme.dark));
     await tester.pump();
 
     expect(find.byType(CooldownNotice), findsOneWidget);
@@ -66,13 +66,13 @@ void main() {
   ) async {
     final until = DateTime.now().add(const Duration(minutes: 2));
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark));
+    await tester.pumpWidget(_host(until, OsinTheme.dark));
     await tester.pump();
 
     final titleColor = tester.widget<Text>(find.text(_title)).style?.color;
-    expect(titleColor, OkoTones.dark.textPrimary);
-    expect(titleColor, isNot(OkoTones.dark.accentError));
-    expect(_timeColor(tester), OkoTones.dark.accentTransitional);
+    expect(titleColor, OsinTones.dark.textPrimary);
+    expect(titleColor, isNot(OsinTones.dark.accentError));
+    expect(_timeColor(tester), OsinTones.dark.accentTransitional);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -81,11 +81,11 @@ void main() {
   testWidgets('светлая тема — заголовок и кулдаун читаются', (tester) async {
     final until = DateTime.now().add(const Duration(minutes: 2));
 
-    await tester.pumpWidget(_host(until, OkoTheme.light));
+    await tester.pumpWidget(_host(until, OsinTheme.light));
     await tester.pump();
 
     expect(find.text(_title), findsOneWidget);
-    expect(_timeColor(tester), OkoTones.light.accentTransitional);
+    expect(_timeColor(tester), OsinTones.light.accentTransitional);
 
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
@@ -94,7 +94,7 @@ void main() {
   testWidgets('reduce-motion — оверлей виден сразу', (tester) async {
     final until = DateTime.now().add(const Duration(minutes: 2));
 
-    await tester.pumpWidget(_host(until, OkoTheme.dark, reduceMotion: true));
+    await tester.pumpWidget(_host(until, OsinTheme.dark, reduceMotion: true));
     await tester.pump();
 
     expect(find.byType(DemoExpiredOverlay), findsOneWidget);

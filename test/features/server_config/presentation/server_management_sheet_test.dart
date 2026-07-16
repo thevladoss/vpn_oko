@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
@@ -91,7 +91,7 @@ void main() {
   Future<void> pumpSheet(WidgetTester tester) async {
     await tester.pumpWidget(
       wrapWithTopAlert(
-        theme: OkoTheme.dark,
+        theme: OsinTheme.dark,
         home: BlocProvider.value(
           value: cubit,
           child: const Scaffold(body: ServerManagementSheet()),
@@ -176,7 +176,7 @@ void main() {
       final icon = tester.widget<Icon>(
         find.descendant(of: find.byType(TopAlert), matching: find.byType(Icon)),
       );
-      expect(icon.color, OkoTones.dark.accentConnected);
+      expect(icon.color, OsinTones.dark.accentConnected);
 
       await tester.pump(const Duration(seconds: 2));
     });
@@ -203,7 +203,7 @@ void main() {
       final icon = tester.widget<Icon>(
         find.descendant(of: find.byType(TopAlert), matching: find.byType(Icon)),
       );
-      expect(icon.color, OkoTones.dark.accentError);
+      expect(icon.color, OsinTones.dark.accentError);
 
       expect(
         find.descendant(

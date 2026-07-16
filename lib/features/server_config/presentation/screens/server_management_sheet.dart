@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
@@ -71,19 +71,19 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
   Interval _interval(Duration start) {
     final begin = start.inMilliseconds / _total.inMilliseconds;
     final end =
-        (start.inMilliseconds + OkoMotion.enterScreen.inMilliseconds) /
+        (start.inMilliseconds + OsinMotion.enterScreen.inMilliseconds) /
         _total.inMilliseconds;
-    return Interval(begin, end, curve: OkoMotion.enterScreenCurve);
+    return Interval(begin, end, curve: OsinMotion.enterScreenCurve);
   }
 
   Interval _tileInterval(int index) {
     final step = index > _maxStaggerSteps ? _maxStaggerSteps : index;
-    return _interval(OkoMotion.staggerServerCard * step);
+    return _interval(OsinMotion.staggerServerCard * step);
   }
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return BlocConsumer<ServerListCubit, ServerListState>(
       listenWhen: (previous, current) =>
@@ -128,7 +128,7 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
                         child: state.servers.isEmpty
                             ? _Staggered(
                                 animation: _entrance,
-                                interval: _interval(OkoMotion.staggerIris),
+                                interval: _interval(OsinMotion.staggerIris),
                                 child: Align(
                                   alignment: Alignment.topCenter,
                                   child: EmptyServerPasteField(

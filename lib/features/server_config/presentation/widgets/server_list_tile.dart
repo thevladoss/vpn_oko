@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/protocol_badge.dart';
@@ -53,7 +53,7 @@ class _ServerListTileState extends State<ServerListTile>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: OkoMotion.statusCrossfade,
+      duration: OsinMotion.statusCrossfade,
     )..addListener(_onSnapTick);
   }
 
@@ -105,7 +105,7 @@ class _ServerListTileState extends State<ServerListTile>
     _snap = Tween<double>(begin: _offset, end: target).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: OkoMotion.statusCrossfadeCurve,
+        curve: OsinMotion.statusCrossfadeCurve,
       ),
     );
     _controller.reset();
@@ -129,7 +129,7 @@ class _ServerListTileState extends State<ServerListTile>
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
@@ -253,7 +253,7 @@ class _TileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return MergeSemantics(
       child: Semantics(

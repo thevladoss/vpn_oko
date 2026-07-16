@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 @immutable
-class OkoTones extends ThemeExtension<OkoTones> {
-  const OkoTones({
+class OsinTones extends ThemeExtension<OsinTones> {
+  const OsinTones({
     required this.accentConnected,
     required this.accentTransitional,
     required this.accentError,
@@ -33,7 +33,7 @@ class OkoTones extends ThemeExtension<OkoTones> {
       };
 
   @override
-  OkoTones copyWith({
+  OsinTones copyWith({
     Color? accentConnected,
     Color? accentTransitional,
     Color? accentError,
@@ -44,7 +44,7 @@ class OkoTones extends ThemeExtension<OkoTones> {
     Color? textPrimary,
     Color? textSecondary,
   }) {
-    return OkoTones(
+    return OsinTones(
       accentConnected: accentConnected ?? this.accentConnected,
       accentTransitional: accentTransitional ?? this.accentTransitional,
       accentError: accentError ?? this.accentError,
@@ -58,11 +58,11 @@ class OkoTones extends ThemeExtension<OkoTones> {
   }
 
   @override
-  OkoTones lerp(ThemeExtension<OkoTones>? other, double t) {
-    if (other is! OkoTones) {
+  OsinTones lerp(ThemeExtension<OsinTones>? other, double t) {
+    if (other is! OsinTones) {
       return this;
     }
-    return OkoTones(
+    return OsinTones(
       accentConnected: Color.lerp(accentConnected, other.accentConnected, t)!,
       accentTransitional:
           Color.lerp(accentTransitional, other.accentTransitional, t)!,
@@ -76,7 +76,7 @@ class OkoTones extends ThemeExtension<OkoTones> {
     );
   }
 
-  static const OkoTones dark = OkoTones(
+  static const OsinTones dark = OsinTones(
     accentConnected: Color(0xFF2CE5A7),
     accentTransitional: Color(0xFFFFB454),
     accentError: Color(0xFFFF5C5C),
@@ -88,7 +88,7 @@ class OkoTones extends ThemeExtension<OkoTones> {
     textSecondary: Color(0xFF8B95A5),
   );
 
-  static const OkoTones light = OkoTones(
+  static const OsinTones light = OsinTones(
     accentConnected: Color(0xFF0E9E75),
     accentTransitional: Color(0xFFB26A00),
     accentError: Color(0xFFC62828),
@@ -101,10 +101,10 @@ class OkoTones extends ThemeExtension<OkoTones> {
   );
 }
 
-extension OkoTonesContext on BuildContext {
-  OkoTones get okoTones {
-    final tones = Theme.of(this).extension<OkoTones>();
-    assert(tones != null, 'OkoTones is missing; wrap the tree in OkoTheme.');
+extension OsinTonesContext on BuildContext {
+  OsinTones get osinTones {
+    final tones = Theme.of(this).extension<OsinTones>();
+    assert(tones != null, 'OsinTones is missing; wrap the tree in OsinTheme.');
     return tones!;
   }
 }

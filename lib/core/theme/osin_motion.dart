@@ -1,7 +1,7 @@
 import 'package:flutter/animation.dart';
 
-class OkoMotion {
-  const OkoMotion._();
+class OsinMotion {
+  const OsinMotion._();
 
   static const Duration enterScreen = Duration(milliseconds: 350);
   static const Curve enterScreenCurve = Curves.easeOutCubic;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/formatters/byte_format.dart';
 
 enum TrafficDirection { down, up }
@@ -18,7 +18,7 @@ class TrafficTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     final accent = active ? tones.accentConnected : tones.textSecondary;
     final isDown = direction == TrafficDirection.down;

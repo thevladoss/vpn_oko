@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 
 class DemoExpiredOverlay extends StatefulWidget {
@@ -27,11 +27,11 @@ class _DemoExpiredOverlayState extends State<DemoExpiredOverlay>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: OkoMotion.enterScreen,
+      duration: OsinMotion.enterScreen,
     );
     _fade = CurvedAnimation(
       parent: _controller,
-      curve: OkoMotion.enterScreenCurve,
+      curve: OsinMotion.enterScreenCurve,
     );
     _scale = Tween<double>(begin: 0.94, end: 1).animate(_fade);
   }
@@ -59,7 +59,7 @@ class _DemoExpiredOverlayState extends State<DemoExpiredOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     return Positioned.fill(
       child: FadeTransition(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 void main() {
-  group('OkoTones.accentFor', () {
-    const dark = OkoTones.dark;
+  group('OsinTones.accentFor', () {
+    const dark = OsinTones.dark;
 
     test('maps connected to accentConnected', () {
       expect(dark.accentFor(VpnStatus.connected), dark.accentConnected);
@@ -26,9 +26,9 @@ void main() {
     });
   });
 
-  group('OkoTones.lerp', () {
-    const dark = OkoTones.dark;
-    const light = OkoTones.light;
+  group('OsinTones.lerp', () {
+    const dark = OsinTones.dark;
+    const light = OsinTones.light;
 
     test('returns dark fields at t = 0.0', () {
       final lerped = dark.lerp(light, 0);
@@ -56,28 +56,28 @@ void main() {
       expect(lerped.textSecondary, light.textSecondary);
     });
 
-    test('returns this when other is not OkoTones', () {
+    test('returns this when other is not OsinTones', () {
       expect(dark.lerp(null, 0.5), same(dark));
     });
   });
 
-  group('BuildContext.okoTones', () {
-    testWidgets('returns the OkoTones extension from the active theme',
+  group('BuildContext.osinTones', () {
+    testWidgets('returns the OsinTones extension from the active theme',
         (tester) async {
-      OkoTones? captured;
+      OsinTones? captured;
       await tester.pumpWidget(
         MaterialApp(
-          theme: OkoTheme.dark,
+          theme: OsinTheme.dark,
           home: Builder(
             builder: (context) {
-              captured = context.okoTones;
+              captured = context.osinTones;
               return const SizedBox.shrink();
             },
           ),
         ),
       );
 
-      expect(captured, same(OkoTones.dark));
+      expect(captured, same(OsinTones.dark));
     });
   });
 }

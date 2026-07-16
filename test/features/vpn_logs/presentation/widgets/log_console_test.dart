@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_osin/core/theme/oko_theme.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_theme.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 import 'package:vpn_osin/features/vpn_logs/domain/usecases/watch_logs.dart';
 import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
@@ -51,7 +51,7 @@ void main() {
   Widget consoleHost() => BlocProvider<LogsCubit>.value(
         value: cubit,
         child: MaterialApp(
-          theme: OkoTheme.dark,
+          theme: OsinTheme.dark,
           home: const Scaffold(body: LogConsole()),
         ),
       );
@@ -249,7 +249,7 @@ void main() {
     Future<void> pumpLine(WidgetTester tester, LogLevel level) async {
       await tester.pumpWidget(
         MaterialApp(
-          theme: OkoTheme.dark,
+          theme: OsinTheme.dark,
           home: Scaffold(body: LogLine(entry: _entry('payload', level: level))),
         ),
       );
@@ -259,19 +259,19 @@ void main() {
     testWidgets('paints info in textSecondary', (tester) async {
       await pumpLine(tester, LogLevel.info);
       final text = tester.widget<Text>(find.byType(Text));
-      expect(text.textSpan!.style!.color, OkoTones.dark.textSecondary);
+      expect(text.textSpan!.style!.color, OsinTones.dark.textSecondary);
     });
 
     testWidgets('paints warning in accentTransitional', (tester) async {
       await pumpLine(tester, LogLevel.warning);
       final text = tester.widget<Text>(find.byType(Text));
-      expect(text.textSpan!.style!.color, OkoTones.dark.accentTransitional);
+      expect(text.textSpan!.style!.color, OsinTones.dark.accentTransitional);
     });
 
     testWidgets('paints error in accentError', (tester) async {
       await pumpLine(tester, LogLevel.error);
       final text = tester.widget<Text>(find.byType(Text));
-      expect(text.textSpan!.style!.color, OkoTones.dark.accentError);
+      expect(text.textSpan!.style!.color, OsinTones.dark.accentError);
     });
   });
 }

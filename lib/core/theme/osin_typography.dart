@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class OkoTypography {
-  const OkoTypography._();
+class OsinTypography {
+  const OsinTypography._();
 
   static TextTheme textTheme(Brightness brightness) {
     final base = brightness == Brightness.dark

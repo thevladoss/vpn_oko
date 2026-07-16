@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_osin/core/theme/oko_motion.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_motion.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 import 'package:vpn_osin/core/theme/vpn_status.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connection_timer.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_painter.dart';
@@ -40,13 +40,13 @@ class _IrisIndicatorState extends State<IrisIndicator>
   @override
   void initState() {
     super.initState();
-    _segment = AnimationController(vsync: this, duration: OkoMotion.segment);
-    _breath = AnimationController(vsync: this, duration: OkoMotion.ringBreath);
-    _pupil = AnimationController(vsync: this, duration: OkoMotion.pupilOpen);
-    _shake = AnimationController(vsync: this, duration: OkoMotion.shake);
+    _segment = AnimationController(vsync: this, duration: OsinMotion.segment);
+    _breath = AnimationController(vsync: this, duration: OsinMotion.ringBreath);
+    _pupil = AnimationController(vsync: this, duration: OsinMotion.pupilOpen);
+    _shake = AnimationController(vsync: this, duration: OsinMotion.shake);
     _pupilCurve = CurvedAnimation(
       parent: _pupil,
-      curve: OkoMotion.pupilOpenCurve,
+      curve: OsinMotion.pupilOpenCurve,
     );
   }
 
@@ -142,7 +142,7 @@ class _IrisIndicatorState extends State<IrisIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final since =
         widget.status == VpnStatus.connected ? widget.connectedSince : null;
     final stack = Stack(

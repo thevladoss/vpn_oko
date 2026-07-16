@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/osin_tones.dart';
 
 class ServerCard extends StatelessWidget {
   const ServerCard({
@@ -17,7 +17,7 @@ class ServerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tones = context.okoTones;
+    final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
     final content = Padding(
       padding: const EdgeInsets.all(24),
