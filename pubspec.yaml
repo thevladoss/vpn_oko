@@ -23,6 +23,7 @@ dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.15.1
   drift_dev: 2.34.0
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
@@ -39,3 +40,12 @@ flutter:
   uses-material-design: true
   assets:
     - google_fonts/
+
+flutter_launcher_icons:
+  image_path: "assets/icon/osin_icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  min_sdk_android: 26
+  adaptive_icon_background: "assets/icon/osin_bg.png"
+  adaptive_icon_foreground: "assets/icon/osin_fg.png"
