@@ -3,11 +3,11 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(
   PigeonOptions(
     dartOut: 'lib/core/bridge/vpn_api.g.dart',
-    kotlinOut: 'android/app/src/main/kotlin/com/example/vpn_oko/bridge/Messages.g.kt',
-    kotlinOptions: KotlinOptions(package: 'com.example.vpn_oko.bridge'),
+    kotlinOut: 'android/app/src/main/kotlin/com/example/vpn_osin/bridge/Messages.g.kt',
+    kotlinOptions: KotlinOptions(package: 'com.example.vpn_osin.bridge'),
     swiftOut: 'ios/Runner/Bridge/Messages.g.swift',
     swiftOptions: SwiftOptions(),
-    dartPackageName: 'vpn_oko',
+    dartPackageName: 'vpn_osin',
   ),
 )
 enum VpnStatusMessage { disconnected, connecting, connected, disconnecting, error }
