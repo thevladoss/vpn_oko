@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:vpn_oko/core/theme/oko_theme.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/widgets/top_alert.dart';
+import 'package:vpn_oko/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
@@ -15,6 +16,7 @@ import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server
 import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
+import '../../../helpers/top_alert_harness.dart';
 
 class MockServerRepository extends Mock implements ServerRepository {}
 
@@ -88,7 +90,7 @@ void main() {
 
   Future<void> pumpSheet(WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      wrapWithTopAlert(
         theme: OkoTheme.dark,
         home: BlocProvider.value(
           value: cubit,
@@ -140,6 +142,8 @@ void main() {
 
       verify(() => repository.add(any(), any())).called(1);
       expect(find.byType(TextField), findsNothing);
+
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('маскирует секреты: uuid не попадает в дерево', (tester) async {
@@ -173,6 +177,8 @@ void main() {
         find.descendant(of: find.byType(TopAlert), matching: find.byType(Icon)),
       );
       expect(icon.color, OkoTones.dark.accentConnected);
+
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('дубликат показывает красный алерт сверху без SnackBar', (
@@ -199,15 +205,27 @@ void main() {
       );
       expect(icon.color, OkoTones.dark.accentError);
 
-      final sheetTop = tester
-          .getTopLeft(find.byKey(const ValueKey('sheet-bounds')))
-          .dy;
+      expect(
+        find.descendant(
+          of: find.byType(TopAlertOverlay),
+          matching: find.byType(TopAlert),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('sheet-bounds')),
+          matching: find.byType(TopAlert),
+        ),
+        findsNothing,
+      );
+      final alertTop = tester.getTopLeft(find.byType(TopAlert)).dy;
       final sheetCenter = tester
           .getCenter(find.byKey(const ValueKey('sheet-bounds')))
           .dy;
-      final alertCenter = tester.getCenter(find.byType(TopAlert)).dy;
-      expect(alertCenter, greaterThanOrEqualTo(sheetTop));
-      expect(alertCenter, lessThan(sheetCenter));
+      expect(alertTop, lessThan(sheetCenter));
+
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('кривая ссылка из буфера показывает ошибку', (tester) async {
@@ -221,6 +239,8 @@ void main() {
 
       verifyNever(() => repository.add(any(), any()));
       expect(find.text('Неподдерживаемая ссылка'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('свайп по тайлу и «Удалить» запрашивают подтверждение', (

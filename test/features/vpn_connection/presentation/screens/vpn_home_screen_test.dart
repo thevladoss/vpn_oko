@@ -35,6 +35,7 @@ import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_console.dart'
 
 import '../../../../helpers/fake_clipboard_source.dart';
 import '../../../../helpers/mock_vpn_usecases.dart';
+import '../../../../helpers/top_alert_harness.dart';
 
 class MockWatchLogs extends Mock implements WatchLogs {}
 
@@ -153,7 +154,7 @@ void main() {
       await serverList.close();
     });
     await tester.pumpWidget(
-      MaterialApp(
+      wrapWithTopAlert(
         theme: OkoTheme.dark,
         home: MultiBlocProvider(
           providers: [
@@ -231,6 +232,8 @@ void main() {
       verifyNever(() => connectVpn(any()));
       expect(bloc.state.status, VpnStatus.error);
       expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
+
+      await tester.pump(const Duration(seconds: 2));
     },
   );
 
@@ -260,6 +263,8 @@ void main() {
       verifyNever(() => connectVpn(any()));
       expect(bloc.state.status, VpnStatus.error);
       expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
+
+      await tester.pump(const Duration(seconds: 2));
     },
   );
 
@@ -282,8 +287,8 @@ void main() {
 
       expect(find.text(VpnConnectionBloc.noServerHint), findsNWidgets(2));
 
-      await tester.pumpWidget(const SizedBox());
-      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
     },
   );
 

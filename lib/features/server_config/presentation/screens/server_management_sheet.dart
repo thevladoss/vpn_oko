@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_oko/core/theme/oko_motion.dart';
 import 'package:vpn_oko/core/theme/oko_tones.dart';
 import 'package:vpn_oko/core/widgets/top_alert.dart';
+import 'package:vpn_oko/core/widgets/top_alert_scope.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
@@ -37,11 +38,6 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
   late final AnimationController _entrance;
   bool _started = false;
 
-  Timer? _alertTimer;
-  String? _alertText;
-  TopAlertKind _alertKind = TopAlertKind.success;
-  bool _alertVisible = false;
-
   @override
   void initState() {
     super.initState();
@@ -62,25 +58,8 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
 
   @override
   void dispose() {
-    _alertTimer?.cancel();
     _entrance.dispose();
     super.dispose();
-  }
-
-  void _showAlert(String text, TopAlertKind kind) {
-    _alertTimer?.cancel();
-    unawaited(
-      HapticFeedback.mediumImpact(),
-    );
-    setState(() {
-      _alertText = text;
-      _alertKind = kind;
-      _alertVisible = true;
-    });
-    _alertTimer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _alertVisible = false);
-    });
   }
 
   TopAlertKind _kindFor(ServerListNotice notice) => switch (notice) {
@@ -112,7 +91,8 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
       listener: (context, state) {
         final notice = state.notice;
         if (notice == null) return;
-        _showAlert(_noticeText(notice), _kindFor(notice));
+        unawaited(HapticFeedback.mediumImpact());
+        TopAlertScope.of(context).show(_noticeText(notice), _kindFor(notice));
       },
       builder: (context, state) {
         return SafeArea(
@@ -192,16 +172,6 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
                     ],
                   ),
                 ),
-                Positioned(
-                  left: 20,
-                  right: 20,
-                  top: 12,
-                  child: TopAlert(
-                    message: _alertText,
-                    kind: _alertKind,
-                    visible: _alertVisible,
-                  ),
-                ),
               ],
             ),
           ),
@@ -226,8 +196,9 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
     final trimmed = label.trim();
     if (trimmed.isEmpty) return;
     await cubit.rename(profile.id, trimmed);
-    if (!mounted) return;
-    _showAlert('Имя обновлено', TopAlertKind.success);
+    if (!context.mounted) return;
+    unawaited(HapticFeedback.mediumImpact());
+    TopAlertScope.of(context).show('Имя обновлено', TopAlertKind.success);
   }
 
   Future<void> _delete(BuildContext context, ServerProfile profile) async {
