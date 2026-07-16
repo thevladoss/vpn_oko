@@ -10,7 +10,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
   private let demoStore = DemoCooldownStore.shared()
   private let demoTimer = DemoLimitTimer()
   private var commandServer: LibboxCommandServer?
-  private var platform: OkoPlatformInterface?
+  private var platform: OsinPlatformInterface?
   private var appliedSettings: NEPacketTunnelNetworkSettings?
   private var coreActive = false
 
@@ -54,7 +54,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
     _ = LibboxRedirectStderr(AppGroup.cachePath + "/stderr.log", nil)
     LibboxSetMemoryLimit(true)
 
-    let platformInterface = OkoPlatformInterface(host: self)
+    let platformInterface = OsinPlatformInterface(host: self)
     var serverError: NSError?
     guard let server = LibboxNewCommandServer(platformInterface, platformInterface, &serverError) else {
       completionHandler(serverError ?? makeError("command server unavailable"))

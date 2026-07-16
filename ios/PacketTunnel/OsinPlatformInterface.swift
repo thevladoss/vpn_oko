@@ -17,7 +17,7 @@ enum ExtensionLog {
   }
 }
 
-final class OkoPlatformInterface: NSObject {
+final class OsinPlatformInterface: NSObject {
   private weak var host: TunnelHost?
   private let monitorQueue = DispatchQueue(label: "oko.interface.monitor")
   private var pathMonitor: NWPathMonitor?
@@ -28,7 +28,7 @@ final class OkoPlatformInterface: NSObject {
   }
 }
 
-extension OkoPlatformInterface: LibboxPlatformInterfaceProtocol {
+extension OsinPlatformInterface: LibboxPlatformInterfaceProtocol {
   func openTun(_ options: (any LibboxTunOptionsProtocol)?, ret0_: UnsafeMutablePointer<Int32>?) throws {
     guard let options else { throw failure("tun options missing") }
     guard let host else { throw failure("tunnel host released") }
@@ -103,7 +103,7 @@ extension OkoPlatformInterface: LibboxPlatformInterfaceProtocol {
   func localDNSTransport() -> (any LibboxLocalDNSTransportProtocol)? { nil }
 }
 
-extension OkoPlatformInterface: LibboxCommandServerHandlerProtocol {
+extension OsinPlatformInterface: LibboxCommandServerHandlerProtocol {
   func serviceStop() throws {
     host?.requestTeardown()
   }
@@ -125,7 +125,7 @@ extension OkoPlatformInterface: LibboxCommandServerHandlerProtocol {
   }
 }
 
-private extension OkoPlatformInterface {
+private extension OsinPlatformInterface {
   func buildSettings(from options: any LibboxTunOptionsProtocol) -> NEPacketTunnelNetworkSettings {
     let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
     guard options.getAutoRoute() else { return settings }
