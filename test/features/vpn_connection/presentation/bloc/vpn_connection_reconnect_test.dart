@@ -38,6 +38,14 @@ void main() {
     singboxConfigJson: '{"outbounds":[{"type":"vless","tag":"b"}]}',
   );
 
+  const configC = VpnConfig(
+    host: 'c.server',
+    port: 2053,
+    userId: '',
+    serverName: 'C',
+    singboxConfigJson: '{"outbounds":[{"type":"vless","tag":"c"}]}',
+  );
+
   final connectedSince = DateTime(2026, 7, 15, 10);
 
   setUpAll(() {
@@ -144,4 +152,57 @@ void main() {
       expect(bloc.config, configA);
     },
   );
+
+  test(
+      'кулдаун-гейт: демо-истечение в окне reconnect блокирует повторный '
+      'connect', () async {
+    final states = StreamController<VpnState>();
+    final demo = StreamController<DemoExpiry>();
+    final bloc = await buildConnected(states, demo: demo);
+
+    bloc.add(const ConfigSelected(configB));
+    await pumpEventQueue();
+    verify(() => disconnectVpn()).called(1);
+
+    demo.add(
+      DemoExpiry(
+        cooldownUntil: DateTime.now().add(const Duration(minutes: 5)),
+        justExpired: true,
+      ),
+    );
+    await pumpEventQueue();
+
+    states.add(const VpnDisconnected());
+    await pumpEventQueue();
+
+    verifyNever(() => connectVpn(any()));
+
+    await bloc.close();
+    await states.close();
+    await demo.close();
+  });
+
+  test(
+      'latest-wins: серия смен сервера — на Disconnected поднимается '
+      'последний выбранный конфиг', () async {
+    final states = StreamController<VpnState>();
+    final bloc = await buildConnected(states);
+
+    bloc
+      ..add(const ConfigSelected(configB))
+      ..add(const ConfigSelected(configC));
+    await pumpEventQueue();
+
+    verify(() => disconnectVpn()).called(greaterThanOrEqualTo(1));
+    expect(bloc.config, configC);
+
+    states.add(const VpnDisconnected());
+    await pumpEventQueue();
+
+    verify(() => connectVpn(configC)).called(1);
+    verifyNever(() => connectVpn(configB));
+
+    await bloc.close();
+    await states.close();
+  });
 }
