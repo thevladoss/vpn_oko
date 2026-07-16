@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connection_timer.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/iris_painter.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connection_timer.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_painter.dart';
 
 class IrisIndicator extends StatefulWidget {
   const IrisIndicator({

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 class IrisPainter extends CustomPainter {
   const IrisPainter({

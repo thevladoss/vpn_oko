@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
 
 class ServerCard extends StatelessWidget {
   const ServerCard({

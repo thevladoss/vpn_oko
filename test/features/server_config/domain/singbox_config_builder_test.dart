@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/services/singbox_config_builder.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/services/singbox_config_builder.dart';
 
 const _uuid = 'b831381d-6324-4d53-ad4f-8cda48b30811';
 

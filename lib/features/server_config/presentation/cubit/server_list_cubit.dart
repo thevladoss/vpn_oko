@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
-import 'package:vpn_oko/features/server_config/domain/services/proxy_parser.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/clipboard_source.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/services/proxy_parser.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
 
 class ServerListCubit extends Cubit<ServerListState> {
   ServerListCubit({required this.repository, required this.clipboard})

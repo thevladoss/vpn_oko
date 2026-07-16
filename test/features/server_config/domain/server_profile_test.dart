@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
 
 void main() {
   const config = VlessConfig(

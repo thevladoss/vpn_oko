@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
-import 'package:vpn_oko/core/bridge/vpn_bridge.dart';
+import 'package:vpn_osin/core/bridge/vpn_api.g.dart';
+import 'package:vpn_osin/core/bridge/vpn_bridge.dart';
 
 import '../../helpers/mock_vpn_host_api.dart';
 

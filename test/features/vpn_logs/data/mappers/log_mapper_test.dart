@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
-import 'package:vpn_oko/features/vpn_logs/data/mappers/log_mapper.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/core/bridge/vpn_api.g.dart';
+import 'package:vpn_osin/features/vpn_logs/data/mappers/log_mapper.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 LogMessage _log(String level) =>
     LogMessage(text: 'body', timestampMillis: 1234, level: level);

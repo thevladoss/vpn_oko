@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:vpn_oko/core/widgets/top_alert_controller.dart';
+import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 
 class TopAlertScope extends InheritedWidget {
   const TopAlertScope({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_countdown.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 
 class CooldownNotice extends StatelessWidget {
   const CooldownNotice({required this.cooldownUntil, super.key});

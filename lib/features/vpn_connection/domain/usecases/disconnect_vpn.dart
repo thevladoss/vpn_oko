@@ -1,4 +1,4 @@
-import 'package:vpn_oko/features/vpn_connection/domain/repositories/vpn_repository.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/repositories/vpn_repository.dart';
 
 class DisconnectVpn {
   const DisconnectVpn(this._repository);

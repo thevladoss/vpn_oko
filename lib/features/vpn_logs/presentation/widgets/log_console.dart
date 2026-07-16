@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_state.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_line.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_state.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_line.dart';
 
 class LogConsole extends StatefulWidget {
   const LogConsole({super.key});

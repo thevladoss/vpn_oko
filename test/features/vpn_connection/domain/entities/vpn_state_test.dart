@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 void main() {
   group('VpnState equality', () {

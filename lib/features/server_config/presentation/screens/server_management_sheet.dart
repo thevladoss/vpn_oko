@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/widgets/top_alert.dart';
-import 'package:vpn_oko/core/widgets/top_alert_scope.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server_paste_field.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/proxy_error_text.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/server_list_tile.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/widgets/top_alert.dart';
+import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/proxy_error_text.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
 
 String _protocolOf(ProxyConfig config) => switch (config) {
   VlessConfig() => 'vless',

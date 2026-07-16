@@ -1,13 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
-import 'package:vpn_oko/core/error/failures.dart';
-import 'package:vpn_oko/core/error/vpn_exception.dart';
-import 'package:vpn_oko/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/core/bridge/vpn_api.g.dart';
+import 'package:vpn_osin/core/error/failures.dart';
+import 'package:vpn_osin/core/error/vpn_exception.dart';
+import 'package:vpn_osin/features/vpn_connection/data/repositories/vpn_repository_impl.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
 
 import '../../../../helpers/fake_vpn_native_datasource.dart';
 

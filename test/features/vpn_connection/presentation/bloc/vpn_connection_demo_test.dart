@@ -1,14 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
 
 import '../../../../helpers/mock_vpn_usecases.dart';
 

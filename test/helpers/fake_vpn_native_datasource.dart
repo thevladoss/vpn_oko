@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
-import 'package:vpn_oko/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/core/bridge/vpn_api.g.dart';
+import 'package:vpn_osin/features/vpn_connection/data/datasources/vpn_native_datasource.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
 
 class FakeVpnNativeDatasource implements VpnNativeDatasource {
   final StreamController<VpnState> _states =

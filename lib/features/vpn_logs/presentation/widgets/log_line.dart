@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/theme/oko_typography.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/oko_typography.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 class LogLine extends StatelessWidget {
   const LogLine({required this.entry, super.key});

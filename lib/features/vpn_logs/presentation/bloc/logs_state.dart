@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 class LogsState extends Equatable {
   const LogsState({this.entries = const [], this.autoScroll = true});

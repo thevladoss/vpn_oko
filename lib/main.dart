@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_oko/app/app.dart';
-import 'package:vpn_oko/app/di.dart';
+import 'package:vpn_osin/app/app.dart';
+import 'package:vpn_osin/app/di.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

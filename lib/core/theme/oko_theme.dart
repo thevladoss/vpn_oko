@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/theme/oko_typography.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/oko_typography.dart';
 
 class OkoTheme {
   const OkoTheme._();

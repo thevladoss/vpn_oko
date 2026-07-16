@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/widgets/top_alert.dart';
-import 'package:vpn_oko/core/widgets/top_alert_controller.dart';
+import 'package:vpn_osin/core/widgets/top_alert.dart';
+import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 
 void main() {
   testWidgets('show показывает алерт и авто-скрывает через 2s', (tester) async {

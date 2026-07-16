@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/usecases/watch_logs.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/usecases/watch_logs.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 
 class _FakeWatchLogs implements WatchLogs {
   _FakeWatchLogs(this.controller);

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:vpn_oko/features/server_config/data/local/tables.dart';
+import 'package:vpn_osin/features/server_config/data/local/tables.dart';
 
 part 'app_database.g.dart';
 

@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/clipboard_source.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_cubit.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_config_state.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/vless_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/clipboard_source.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/latency_probe.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_config_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_config_state.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
 import '../../../helpers/fake_latency_probe.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 
 Map<String, Object?> buildSingboxConfig(ProxyConfig config) {
   return {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 @immutable
 class OkoTones extends ThemeExtension<OkoTones> {

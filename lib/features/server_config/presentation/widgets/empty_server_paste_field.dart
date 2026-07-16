@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
 
 class EmptyServerPasteField extends StatelessWidget {
   const EmptyServerPasteField({required this.onPaste, super.key});

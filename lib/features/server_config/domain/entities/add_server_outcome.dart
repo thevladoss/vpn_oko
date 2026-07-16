@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
 
 sealed class AddServerOutcome extends Equatable {
   const AddServerOutcome();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 class OkoWordmark extends StatelessWidget {
   const OkoWordmark({required this.status, super.key});

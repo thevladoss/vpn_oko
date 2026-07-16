@@ -1,7 +1,7 @@
-import 'package:vpn_oko/core/bridge/vpn_api.g.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/core/bridge/vpn_api.g.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
 
 VpnState _statusToState(VpnStatusMessage status, int? connectedSinceEpochMs) =>
     switch (status) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 void main() {
   group('OkoTones.accentFor', () {

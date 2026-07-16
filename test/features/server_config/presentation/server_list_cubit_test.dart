@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_cubit.dart';
-import 'package:vpn_oko/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
 

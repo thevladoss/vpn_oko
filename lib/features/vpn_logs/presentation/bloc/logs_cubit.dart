@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/usecases/watch_logs.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_state.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/usecases/watch_logs.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_state.dart';
 
 class LogsCubit extends Cubit<LogsState> {
   LogsCubit({required WatchLogs watchLogs}) : super(const LogsState()) {

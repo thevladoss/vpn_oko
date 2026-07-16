@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/traffic_tile.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/traffic_tile.dart';
 
 class TrafficPanel extends StatelessWidget {
   const TrafficPanel({

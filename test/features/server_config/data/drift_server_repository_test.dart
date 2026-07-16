@@ -1,10 +1,10 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/data/local/app_database.dart';
-import 'package:vpn_oko/features/server_config/data/mappers/server_profile_mapper.dart';
-import 'package:vpn_oko/features/server_config/data/repositories/drift_server_repository.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/data/local/app_database.dart';
+import 'package:vpn_osin/features/server_config/data/mappers/server_profile_mapper.dart';
+import 'package:vpn_osin/features/server_config/data/repositories/drift_server_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 
 const _vlessUrl =
     'vless://b831381d-6324-4d53-ad4f-8cda48b30811@example.com:443'

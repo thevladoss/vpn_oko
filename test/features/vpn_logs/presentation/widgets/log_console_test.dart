@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/usecases/watch_logs.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/bloc/logs_cubit.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_console.dart';
-import 'package:vpn_oko/features/vpn_logs/presentation/widgets/log_line.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/usecases/watch_logs.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_console.dart';
+import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_line.dart';
 
 class _FakeWatchLogs implements WatchLogs {
   _FakeWatchLogs(this.controller);

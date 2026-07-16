@@ -1,4 +1,4 @@
-import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/vless_parse_result.dart';
 
 String describeVlessError(VlessError error) => switch (error) {
   VlessError.empty => 'Буфер пуст',

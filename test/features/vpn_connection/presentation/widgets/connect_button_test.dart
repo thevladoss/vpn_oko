@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connect_button.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connect_button.dart';
 
 void main() {
   Widget host(Widget child) {

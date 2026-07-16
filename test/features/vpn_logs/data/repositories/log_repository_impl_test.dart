@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/vpn_logs/data/repositories/log_repository_impl.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/data/repositories/log_repository_impl.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 import '../../../../helpers/fake_log_native_datasource.dart';
 

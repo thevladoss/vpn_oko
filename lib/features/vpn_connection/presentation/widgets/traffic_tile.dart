@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/formatters/byte_format.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/formatters/byte_format.dart';
 
 enum TrafficDirection { down, up }
 

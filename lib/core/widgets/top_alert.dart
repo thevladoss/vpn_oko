@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
 
 enum TopAlertKind { success, warning, error }
 

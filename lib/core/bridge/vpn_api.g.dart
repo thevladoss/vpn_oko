@@ -572,7 +572,7 @@ class VpnHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<void> startVpn(VpnConfigMessage config) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_oko.VpnHostApi.startVpn$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_osin.VpnHostApi.startVpn$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -590,7 +590,7 @@ class VpnHostApi {
   }
 
   Future<void> stopVpn() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_oko.VpnHostApi.stopVpn$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_osin.VpnHostApi.stopVpn$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -608,7 +608,7 @@ class VpnHostApi {
   }
 
   Future<VpnStatusSnapshotMessage> getStatus() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_oko.VpnHostApi.getStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.vpn_osin.VpnHostApi.getStatus$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -638,7 +638,7 @@ Stream<VpnEventMessage> vpnEvents( {String instanceName = ''}) {
     instanceName = '.$instanceName';
   }
   final EventChannel vpnEventsChannel =
-      EventChannel('dev.flutter.pigeon.vpn_oko.VpnEventsApi.vpnEvents$instanceName', pigeonMethodCodec);
+      EventChannel('dev.flutter.pigeon.vpn_osin.VpnEventsApi.vpnEvents$instanceName', pigeonMethodCodec);
   return vpnEventsChannel.receiveBroadcastStream().map((dynamic event) {
     return event as VpnEventMessage;
   });

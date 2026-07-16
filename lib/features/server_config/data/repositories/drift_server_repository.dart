@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:vpn_oko/features/server_config/data/local/app_database.dart';
-import 'package:vpn_oko/features/server_config/data/mappers/server_profile_mapper.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/add_server_outcome.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_osin/features/server_config/data/local/app_database.dart';
+import 'package:vpn_osin/features/server_config/data/mappers/server_profile_mapper.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
 
 class DriftServerRepository implements ServerRepository {
   const DriftServerRepository(this.db);

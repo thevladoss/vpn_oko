@@ -1,4 +1,4 @@
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
 
 String describeProxyError(ProxyParseError error) => switch (error) {
   ProxyParseError.empty => 'Буфер пуст',

@@ -1,8 +1,8 @@
-import 'package:vpn_oko/features/server_config/data/local/app_database.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/server_profile.dart';
-import 'package:vpn_oko/features/server_config/domain/services/proxy_parser.dart';
+import 'package:vpn_osin/features/server_config/data/local/app_database.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/services/proxy_parser.dart';
 
 String protocolOf(ProxyConfig config) => switch (config) {
   VlessConfig() => 'vless',

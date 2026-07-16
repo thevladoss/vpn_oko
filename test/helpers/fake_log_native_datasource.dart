@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:vpn_oko/features/vpn_logs/data/datasources/log_native_datasource.dart';
-import 'package:vpn_oko/features/vpn_logs/domain/entities/log_entry.dart';
+import 'package:vpn_osin/features/vpn_logs/data/datasources/log_native_datasource.dart';
+import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 class FakeLogNativeDatasource implements LogNativeDatasource {
   final StreamController<LogEntry> _logs =

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 
 const _title = 'Вы исчерпали 5 минут демо подключения';
 

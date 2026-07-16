@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:vpn_oko/core/widgets/top_alert.dart';
+import 'package:vpn_osin/core/widgets/top_alert.dart';
 
 class TopAlertController extends ChangeNotifier {
   String? _message;

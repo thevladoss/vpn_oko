@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/data/local/secret_key_store.dart';
+import 'package:vpn_osin/features/server_config/data/local/secret_key_store.dart';
 
 class _InMemorySecretStore implements SecretStore {
   final Map<String, String> _data = {};

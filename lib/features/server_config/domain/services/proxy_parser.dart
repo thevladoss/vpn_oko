@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/vless_parse_result.dart';
-import 'package:vpn_oko/features/server_config/domain/services/vless_parser.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/vless_parse_result.dart';
+import 'package:vpn_osin/features/server_config/domain/services/vless_parser.dart';
 
 ProxyParseResult parseProxyUrl(String input) {
   final raw = input.trim();

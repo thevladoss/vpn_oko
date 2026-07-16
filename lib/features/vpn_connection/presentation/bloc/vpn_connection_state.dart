@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
 
 class VpnConnectionState extends Equatable {
   const VpnConnectionState({

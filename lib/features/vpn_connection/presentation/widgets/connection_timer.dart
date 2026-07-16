@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/formatters/duration_format.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/formatters/duration_format.dart';
 
 class ConnectionTimer extends StatefulWidget {
   const ConnectionTimer({required this.connectedSince, super.key});

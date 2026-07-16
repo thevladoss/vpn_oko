@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/demo_countdown.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
 
 Widget _host(
   DateTime deadline,

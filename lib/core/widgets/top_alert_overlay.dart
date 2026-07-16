@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpn_oko/core/widgets/top_alert.dart';
-import 'package:vpn_oko/core/widgets/top_alert_controller.dart';
+import 'package:vpn_osin/core/widgets/top_alert.dart';
+import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 
 class TopAlertOverlay extends StatelessWidget {
   const TopAlertOverlay({required this.controller, super.key});

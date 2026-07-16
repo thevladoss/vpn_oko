@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:vpn_oko/core/theme/oko_motion.dart';
-import 'package:vpn_oko/core/theme/oko_tones.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/latency_pill.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/protocol_badge.dart';
+import 'package:vpn_osin/core/theme/oko_motion.dart';
+import 'package:vpn_osin/core/theme/oko_tones.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/protocol_badge.dart';
 
 class ServerListTile extends StatefulWidget {
   const ServerListTile({

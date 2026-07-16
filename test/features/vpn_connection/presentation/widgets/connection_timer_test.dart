@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/widgets/connection_timer.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connection_timer.dart';
 
 void main() {
   testWidgets('timer text carries a single soft drop shadow', (tester) async {

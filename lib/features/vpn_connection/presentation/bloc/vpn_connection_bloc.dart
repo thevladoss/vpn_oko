@@ -1,20 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vpn_oko/core/error/failures.dart';
-import 'package:vpn_oko/core/theme/vpn_status.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/traffic_stats.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_config.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/entities/vpn_state.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/connect_vpn.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/sync_status.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_demo_limit.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_traffic.dart';
-import 'package:vpn_oko/features/vpn_connection/domain/usecases/watch_vpn_state.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
-import 'package:vpn_oko/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
+import 'package:vpn_osin/core/error/failures.dart';
+import 'package:vpn_osin/core/theme/vpn_status.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/connect_vpn.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/sync_status.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_demo_limit.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_traffic.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_vpn_state.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
 
 class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
   VpnConnectionBloc({

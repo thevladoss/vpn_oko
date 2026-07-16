@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/core/theme/oko_theme.dart';
-import 'package:vpn_oko/features/server_config/presentation/widgets/empty_server_paste_field.dart';
+import 'package:vpn_osin/core/theme/oko_theme.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 
 void main() {
   Widget host(Widget child, {required bool dark}) {

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/proxy_config.dart';
-import 'package:vpn_oko/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
+import 'package:vpn_osin/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 
 void main() {
   const proxy = VlessConfig(

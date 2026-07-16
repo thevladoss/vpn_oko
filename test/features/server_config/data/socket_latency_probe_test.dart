@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vpn_oko/features/server_config/data/probes/socket_latency_probe.dart';
-import 'package:vpn_oko/features/server_config/domain/entities/latency_result.dart';
-import 'package:vpn_oko/features/server_config/domain/repositories/latency_probe.dart';
+import 'package:vpn_osin/features/server_config/data/probes/socket_latency_probe.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/latency_probe.dart';
 
 void main() {
   test('measure returns LatencyMeasured for a reachable host', () async {
