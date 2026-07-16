@@ -8,6 +8,7 @@ class ServerProfile extends Equatable {
     required this.config,
     required this.rawUrl,
     required this.createdAt,
+    this.subscriptionId,
   });
 
   final int id;
@@ -15,7 +16,15 @@ class ServerProfile extends Equatable {
   final ProxyConfig config;
   final String rawUrl;
   final DateTime createdAt;
+  final int? subscriptionId;
 
   @override
-  List<Object?> get props => [id, label, config, rawUrl, createdAt];
+  List<Object?> get props => [
+    id,
+    label,
+    config,
+    rawUrl,
+    createdAt,
+    subscriptionId,
+  ];
 }
