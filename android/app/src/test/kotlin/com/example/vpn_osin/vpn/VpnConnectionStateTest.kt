@@ -1,6 +1,6 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
-import com.example.vpn_oko.bridge.VpnStatusMessage
+import com.example.vpn_osin.bridge.VpnStatusMessage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -1,6 +1,6 @@
-package com.example.vpn_oko.bridge
+package com.example.vpn_osin.bridge
 
-import com.example.vpn_oko.vpn.DemoLimit
+import com.example.vpn_osin.vpn.DemoLimit
 
 object VpnEventBus {
     private val listeners =

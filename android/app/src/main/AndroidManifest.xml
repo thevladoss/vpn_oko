@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <application
-        android:label="vpn_oko"
+        android:label="osin"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -37,7 +37,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <service
-            android:name=".vpn.OkoVpnService"
+            android:name=".vpn.OsinVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:foregroundServiceType="systemExempted"
             android:exported="false">

@@ -1,6 +1,6 @@
-package com.example.vpn_oko.bridge
+package com.example.vpn_osin.bridge
 
-import com.example.vpn_oko.vpn.DemoCooldownStore
+import com.example.vpn_osin.vpn.DemoCooldownStore
 
 class VpnHostApiImpl(
     private val gateway: VpnConsentGateway,

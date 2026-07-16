@@ -1,4 +1,4 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
 object DemoLimit {
     const val SESSION_MS = 300_000L

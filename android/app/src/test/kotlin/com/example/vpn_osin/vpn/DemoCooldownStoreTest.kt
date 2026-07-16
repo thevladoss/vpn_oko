@@ -1,4 +1,4 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

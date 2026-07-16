@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package com.example.vpn_oko.bridge
+package com.example.vpn_osin.bridge
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -629,7 +629,7 @@ interface VpnHostApi {
     fun setUp(binaryMessenger: BinaryMessenger, api: VpnHostApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_oko.VpnHostApi.startVpn$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_osin.VpnHostApi.startVpn$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -648,7 +648,7 @@ interface VpnHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_oko.VpnHostApi.stopVpn$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_osin.VpnHostApi.stopVpn$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.stopVpn{ result: Result<Unit> ->
@@ -665,7 +665,7 @@ interface VpnHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_oko.VpnHostApi.getStatus$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.vpn_osin.VpnHostApi.getStatus$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -722,7 +722,7 @@ class PigeonEventSink<T>(private val sink: EventChannel.EventSink) {
 abstract class VpnEventsStreamHandler : MessagesPigeonEventChannelWrapper<VpnEventMessage> {
   companion object {
     fun register(messenger: BinaryMessenger, streamHandler: VpnEventsStreamHandler, instanceName: String = "") {
-      var channelName: String = "dev.flutter.pigeon.vpn_oko.VpnEventsApi.vpnEvents"
+      var channelName: String = "dev.flutter.pigeon.vpn_osin.VpnEventsApi.vpnEvents"
       if (instanceName.isNotEmpty()) {
         channelName += ".$instanceName"
       }

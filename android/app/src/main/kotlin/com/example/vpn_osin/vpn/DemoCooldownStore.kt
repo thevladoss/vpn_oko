@@ -1,4 +1,4 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
 import android.content.Context
 

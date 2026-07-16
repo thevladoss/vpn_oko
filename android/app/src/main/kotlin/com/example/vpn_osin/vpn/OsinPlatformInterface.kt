@@ -1,4 +1,4 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
 import android.net.ConnectivityManager
 import android.net.Network
@@ -11,8 +11,8 @@ import android.os.HandlerThread
 import android.os.Process
 import android.system.Os
 import android.system.OsConstants
-import com.example.vpn_oko.bridge.LogMessage
-import com.example.vpn_oko.bridge.VpnEventBus
+import com.example.vpn_osin.bridge.LogMessage
+import com.example.vpn_osin.bridge.VpnEventBus
 import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
@@ -28,8 +28,8 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import io.nekohasekai.libbox.NetworkInterface as LibboxNetworkInterface
 
-class OkoPlatformInterface(
-    private val service: OkoVpnService,
+class OsinPlatformInterface(
+    private val service: OsinVpnService,
     private val builderFactory: () -> VpnService.Builder,
 ) : PlatformInterface {
 
@@ -41,7 +41,7 @@ class OkoPlatformInterface(
 
     override fun openTun(options: TunOptions): Int {
         val builder = builderFactory()
-            .setSession("Oko VPN")
+            .setSession("osin VPN")
             .setMtu(options.mtu)
 
         var hasInet4 = false

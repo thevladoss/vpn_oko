@@ -1,6 +1,6 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
-import com.example.vpn_oko.bridge.VpnStatusMessage
+import com.example.vpn_osin.bridge.VpnStatusMessage
 
 sealed interface VpnConnectionState {
     data object Disconnected : VpnConnectionState

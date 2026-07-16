@@ -1,4 +1,4 @@
-package com.example.vpn_oko.vpn
+package com.example.vpn_osin.vpn
 
 import android.app.NotificationManager
 import android.content.Intent
@@ -8,12 +8,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import androidx.core.app.ServiceCompat
-import com.example.vpn_oko.bridge.DemoExpiredMessage
-import com.example.vpn_oko.bridge.ErrorMessage
-import com.example.vpn_oko.bridge.LogMessage
-import com.example.vpn_oko.bridge.StatusChangedMessage
-import com.example.vpn_oko.bridge.TrafficChangedMessage
-import com.example.vpn_oko.bridge.VpnEventBus
+import com.example.vpn_osin.bridge.DemoExpiredMessage
+import com.example.vpn_osin.bridge.ErrorMessage
+import com.example.vpn_osin.bridge.LogMessage
+import com.example.vpn_osin.bridge.StatusChangedMessage
+import com.example.vpn_osin.bridge.TrafficChangedMessage
+import com.example.vpn_osin.bridge.VpnEventBus
 import io.nekohasekai.libbox.CommandClient
 import io.nekohasekai.libbox.CommandClientHandler
 import io.nekohasekai.libbox.CommandClientOptions
@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class OkoVpnService : VpnService(), CommandServerHandler {
+class OsinVpnService : VpnService(), CommandServerHandler {
 
     private var state: VpnConnectionState = VpnConnectionState.Disconnected
     private val notificationFactory by lazy { VpnNotificationFactory(this) }
@@ -60,7 +60,7 @@ class OkoVpnService : VpnService(), CommandServerHandler {
     private var trafficClient: CommandClient? = null
 
     @Volatile
-    private var platform: OkoPlatformInterface? = null
+    private var platform: OsinPlatformInterface? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -112,7 +112,7 @@ class OkoVpnService : VpnService(), CommandServerHandler {
         }
 
         try {
-            val platformInterface = OkoPlatformInterface(this) { Builder() }
+            val platformInterface = OsinPlatformInterface(this) { Builder() }
             platform = platformInterface
             val server = Libbox.newCommandServer(this, platformInterface)
             server.start()
@@ -336,13 +336,13 @@ class OkoVpnService : VpnService(), CommandServerHandler {
     }
 
     companion object {
-        const val ACTION_CONNECT = "com.example.vpn_oko.action.CONNECT"
-        const val ACTION_DISCONNECT = "com.example.vpn_oko.action.DISCONNECT"
-        const val EXTRA_HOST = "com.example.vpn_oko.extra.HOST"
-        const val EXTRA_PORT = "com.example.vpn_oko.extra.PORT"
-        const val EXTRA_USER_ID = "com.example.vpn_oko.extra.USER_ID"
-        const val EXTRA_SERVER_NAME = "com.example.vpn_oko.extra.SERVER_NAME"
-        const val EXTRA_CONFIG_JSON = "com.example.vpn_oko.extra.CONFIG_JSON"
+        const val ACTION_CONNECT = "com.example.vpn_osin.action.CONNECT"
+        const val ACTION_DISCONNECT = "com.example.vpn_osin.action.DISCONNECT"
+        const val EXTRA_HOST = "com.example.vpn_osin.extra.HOST"
+        const val EXTRA_PORT = "com.example.vpn_osin.extra.PORT"
+        const val EXTRA_USER_ID = "com.example.vpn_osin.extra.USER_ID"
+        const val EXTRA_SERVER_NAME = "com.example.vpn_osin.extra.SERVER_NAME"
+        const val EXTRA_CONFIG_JSON = "com.example.vpn_osin.extra.CONFIG_JSON"
 
         private const val STATUS_INTERVAL_NANOS = 1_000_000_000L
         private const val LOG_MAX_LINES = 3000L
