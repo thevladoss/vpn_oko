@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_osin/features/server_config/data/local/app_database.dart';
 import 'package:vpn_osin/features/server_config/data/mappers/subscription_mapper.dart';
-import 'package:vpn_osin/features/server_config/domain/entities/subscription.dart';
 
 void main() {
   group('subscription_mapper', () {
