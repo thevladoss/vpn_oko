@@ -15,7 +15,7 @@ ext = project.new_target(:app_extension, 'PacketTunnel', :ios, '13.0')
 
 ext.build_configurations.each do |config|
   settings = config.build_settings
-  settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.example.vpnOko.PacketTunnel'
+  settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.example.vpnOsin.PacketTunnel'
   settings['PRODUCT_NAME'] = 'PacketTunnel'
   settings['INFOPLIST_FILE'] = 'PacketTunnel/Info.plist'
   settings['CODE_SIGN_ENTITLEMENTS'] = 'PacketTunnel/PacketTunnel.entitlements'

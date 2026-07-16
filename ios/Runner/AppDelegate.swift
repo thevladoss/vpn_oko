@@ -15,7 +15,7 @@ import os.log
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     ensureLibboxSetup()
     if #available(iOS 14.0, *) {
-      Logger(subsystem: "com.example.vpnOko", category: "core")
+      Logger(subsystem: "com.example.vpnOsin", category: "core")
         .log("libbox core \(LibboxVersion(), privacy: .public)")
     }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
@@ -37,7 +37,7 @@ import os.log
     if LibboxSetup(options, &setupError) {
       AppDelegate.didSetupLibbox = true
     } else if #available(iOS 14.0, *) {
-      Logger(subsystem: "com.example.vpnOko", category: "core")
+      Logger(subsystem: "com.example.vpnOsin", category: "core")
         .error("libbox setup failed: \(setupError?.localizedDescription ?? "unknown", privacy: .public)")
     }
   }

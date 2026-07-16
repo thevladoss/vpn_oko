@@ -69,10 +69,10 @@ final class VpnHostApiImpl: VpnHostApi {
       let manager = managers?.first ?? NETunnelProviderManager()
       self.manager = manager
       let proto = NETunnelProviderProtocol()
-      proto.providerBundleIdentifier = "com.example.vpnOko.PacketTunnel"
+      proto.providerBundleIdentifier = "com.example.vpnOsin.PacketTunnel"
       proto.serverAddress = config.host
       manager.protocolConfiguration = proto
-      manager.localizedDescription = "Oko VPN"
+      manager.localizedDescription = "osin VPN"
       manager.isEnabled = true
 
       manager.saveToPreferences { error in

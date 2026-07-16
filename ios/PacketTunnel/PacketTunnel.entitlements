@@ -8,7 +8,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.example.vpnOko</string>
+		<string>group.com.example.vpnOsin</string>
 	</array>
 </dict>
 </plist>

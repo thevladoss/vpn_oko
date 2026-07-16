@@ -10,7 +10,7 @@ protocol TunnelHost: AnyObject {
 }
 
 enum ExtensionLog {
-  static let handle = OSLog(subsystem: "com.example.vpnOko.PacketTunnel", category: "core")
+  static let handle = OSLog(subsystem: "com.example.vpnOsin.PacketTunnel", category: "core")
 
   static func write(_ message: String) {
     os_log("%{public}@", log: handle, type: .default, message)
@@ -206,7 +206,7 @@ private extension OsinPlatformInterface {
   }
 
   func failure(_ message: String) -> NSError {
-    NSError(domain: "com.example.vpnOko.PacketTunnel", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
+    NSError(domain: "com.example.vpnOsin.PacketTunnel", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
   }
 
   static func interfaceIndex(_ name: String) -> Int32 {

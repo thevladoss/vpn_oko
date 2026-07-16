@@ -604,7 +604,7 @@ class VpnHostApiSetup {
   /// Sets up an instance of `VpnHostApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: VpnHostApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let startVpnChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_oko.VpnHostApi.startVpn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let startVpnChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_osin.VpnHostApi.startVpn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startVpnChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -621,7 +621,7 @@ class VpnHostApiSetup {
     } else {
       startVpnChannel.setMessageHandler(nil)
     }
-    let stopVpnChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_oko.VpnHostApi.stopVpn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let stopVpnChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_osin.VpnHostApi.stopVpn\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       stopVpnChannel.setMessageHandler { _, reply in
         api.stopVpn { result in
@@ -636,7 +636,7 @@ class VpnHostApiSetup {
     } else {
       stopVpnChannel.setMessageHandler(nil)
     }
-    let getStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_oko.VpnHostApi.getStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.vpn_osin.VpnHostApi.getStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getStatusChannel.setMessageHandler { _, reply in
         do {
@@ -705,7 +705,7 @@ class VpnEventsStreamHandler: PigeonEventChannelWrapper<VpnEventMessage> {
   static func register(with messenger: FlutterBinaryMessenger,
                       instanceName: String = "",
                       streamHandler: VpnEventsStreamHandler) {
-    var channelName = "dev.flutter.pigeon.vpn_oko.VpnEventsApi.vpnEvents"
+    var channelName = "dev.flutter.pigeon.vpn_osin.VpnEventsApi.vpnEvents"
     if !instanceName.isEmpty {
       channelName += ".\(instanceName)"
     }

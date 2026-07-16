@@ -23,7 +23,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
       return
     }
     if #available(iOS 14.0, *) {
-      Logger(subsystem: "com.example.vpnOko.PacketTunnel", category: "core")
+      Logger(subsystem: "com.example.vpnOsin.PacketTunnel", category: "core")
         .log("libbox core \(LibboxVersion(), privacy: .public)")
     }
     let provided = options?["configContent"] as? String
@@ -189,7 +189,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
   }
 
   private func makeError(_ message: String) -> NSError {
-    NSError(domain: "com.example.vpnOko.PacketTunnel", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
+    NSError(domain: "com.example.vpnOsin.PacketTunnel", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
   }
 
   private func nowMillis() -> Int64 {

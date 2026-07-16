@@ -1,7 +1,7 @@
 import Foundation
 
 enum AppGroup {
-  static let id = "group.com.example.vpnOko"
+  static let id = "group.com.example.vpnOsin"
 
   static var containerURL: URL {
     guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id) else {
