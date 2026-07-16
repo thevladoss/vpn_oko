@@ -100,7 +100,7 @@ void main() {
   });
 
   group('DriftSubscriptionRepository applyDiff', () {
-    test('новый добавлен, исчезнувший удалён, уцелевший сохраняет id', () async {
+    test('новый добавлен, исчезнувший удалён, уцелевший с тем же id', () async {
       final sub = await repo.add(_draft(), [_proxy('a'), _proxy('b')]);
       final before = await repo.serversFor(sub.id);
       final bId = before.firstWhere((s) => s.config.host == 'b').id;
@@ -145,7 +145,8 @@ void main() {
                   transport: 'tcp',
                   security: 'none',
                 ),
-                'vless://manual',
+                'vless://$_uuid@manual.example:443'
+                '?type=tcp&security=none#Manual',
               )
               as ServerSaved)
           .profile;
@@ -159,7 +160,7 @@ void main() {
   });
 
   group('DriftSubscriptionRepository updateMeta/remove', () {
-    test('updateMeta обновляет трафик, срок, интервал и lastUpdatedAt', () async {
+    test('updateMeta обновляет трафик, срок и интервал', () async {
       final sub = await repo.add(_draft(), [_proxy('a')]);
       final expiresAt = DateTime(2027);
       final lastUpdatedAt = DateTime(2026, 7, 16, 10);
@@ -196,7 +197,8 @@ void main() {
                   transport: 'tcp',
                   security: 'none',
                 ),
-                'vless://manual',
+                'vless://$_uuid@manual.example:443'
+                '?type=tcp&security=none#Manual',
               )
               as ServerSaved)
           .profile;
