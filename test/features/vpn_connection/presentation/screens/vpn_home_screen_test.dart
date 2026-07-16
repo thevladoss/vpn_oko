@@ -133,6 +133,8 @@ void main() {
     WidgetTester tester, {
     List<ServerProfile> servers = const [],
     ServerProfile? active,
+    ThemeData? theme,
+    bool disableAnimations = false,
   }) async {
     final serversController = StreamController<List<ServerProfile>>();
     final activeController = StreamController<ServerProfile?>();
@@ -153,17 +155,27 @@ void main() {
       await logs.close();
       await serverList.close();
     });
+    final content = MultiBlocProvider(
+      providers: [
+        BlocProvider<VpnConnectionBloc>.value(value: bloc),
+        BlocProvider<LogsCubit>.value(value: logs),
+        BlocProvider<ServerListCubit>.value(value: serverList),
+      ],
+      child: const VpnHomeScreen(),
+    );
     await tester.pumpWidget(
       wrapWithTopAlert(
-        theme: OkoTheme.dark,
-        home: MultiBlocProvider(
-          providers: [
-            BlocProvider<VpnConnectionBloc>.value(value: bloc),
-            BlocProvider<LogsCubit>.value(value: logs),
-            BlocProvider<ServerListCubit>.value(value: serverList),
-          ],
-          child: const VpnHomeScreen(),
-        ),
+        theme: theme ?? OkoTheme.dark,
+        home: disableAnimations
+            ? Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    disableAnimations: true,
+                  ),
+                  child: content,
+                ),
+              )
+            : content,
       ),
     );
     await tester.pump();
@@ -436,4 +448,60 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
+
+  for (final (name, theme) in <(String, ThemeData)>[
+    ('dark', OkoTheme.dark),
+    ('light', OkoTheme.light),
+  ]) {
+    for (final reduceMotion in [false, true]) {
+      testWidgets(
+        'ирис держит Rect при демо-чипе и кулдауне '
+        '($name, reduce=$reduceMotion)',
+        (tester) async {
+          useLargeSurface(tester);
+
+          await pumpScreen(
+            tester,
+            servers: [_tokyo],
+            active: _tokyo,
+            theme: theme,
+            disableAnimations: reduceMotion,
+          );
+
+          final rectDisconnected = tester.getRect(find.byType(IrisIndicator));
+
+          stateController.add(VpnConnected(connectedSince: DateTime.now()));
+          await tester.pump();
+          await tester.pump();
+
+          expect(find.byType(DemoCountdown), findsOneWidget);
+          expect(
+            tester.getRect(find.byType(IrisIndicator)),
+            rectDisconnected,
+          );
+
+          demoController.add(
+            DemoExpiry(
+              cooldownUntil: DateTime.now().add(
+                const Duration(milliseconds: 400),
+              ),
+              justExpired: false,
+            ),
+          );
+          await tester.pump();
+          await tester.pump();
+
+          expect(find.byType(CooldownNotice), findsOneWidget);
+          expect(
+            tester.getRect(find.byType(IrisIndicator)),
+            rectDisconnected,
+          );
+
+          await tester.pump(const Duration(seconds: 1));
+          await tester.pumpWidget(const SizedBox());
+          await tester.pump();
+        },
+      );
+    }
+  }
 }

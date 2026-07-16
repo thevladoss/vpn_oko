@@ -50,6 +50,8 @@ class VpnHomeScreen extends StatefulWidget {
 class _VpnHomeScreenState extends State<VpnHomeScreen>
     with SingleTickerProviderStateMixin {
   static const Duration _total = Duration(milliseconds: 590);
+  static const double _kDemoChipSlot = 58;
+  static const double _kCooldownSlot = 40;
 
   late final AnimationController _entrance;
   bool _started = false;
@@ -165,6 +167,11 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
             final activeProfile = activeServerProfile(
               context.watch<ServerListCubit>().state,
             );
+            final showDemoChip = state.status == VpnStatus.connected &&
+                state.sessionEndsAt != null;
+            final showCooldown = state.cooldownActive &&
+                !state.demoExpired &&
+                state.cooldownUntil != null;
             return Stack(
               children: [
                 _GlowLayer(accent: accent, status: state.status),
@@ -197,14 +204,17 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                             ),
                           ),
                         ),
-                        if (state.status == VpnStatus.connected &&
-                            state.sessionEndsAt != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: _DemoSessionChip(
-                              deadline: state.sessionEndsAt!,
-                            ),
-                          ),
+                        SizedBox(
+                          height: _kDemoChipSlot,
+                          child: showDemoChip
+                              ? Align(
+                                  alignment: Alignment.topCenter,
+                                  child: _DemoSessionChip(
+                                    deadline: state.sessionEndsAt!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
                         if (state.status == VpnStatus.error &&
                             state.errorMessage != null &&
                             state.errorMessage !=
@@ -246,15 +256,17 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           ),
                         ),
                         const SizedBox(height: 24),
-                        if (state.cooldownActive &&
-                            !state.demoExpired &&
-                            state.cooldownUntil != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: CooldownNotice(
-                              cooldownUntil: state.cooldownUntil!,
-                            ),
-                          ),
+                        SizedBox(
+                          height: _kCooldownSlot,
+                          child: showCooldown
+                              ? Align(
+                                  alignment: Alignment.topCenter,
+                                  child: CooldownNotice(
+                                    cooldownUntil: state.cooldownUntil!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
                         _Staggered(
                           animation: _entrance,
                           interval: _interval(OkoMotion.staggerConnectButton),
