@@ -6,7 +6,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
   private static var didSetup = false
   private static let setupLock = NSLock()
 
-  private let workQueue = DispatchQueue(label: "oko.tunnel")
+  private let workQueue = DispatchQueue(label: "osin.tunnel")
   private let demoStore = DemoCooldownStore.shared()
   private let demoTimer = DemoLimitTimer()
   private var commandServer: LibboxCommandServer?

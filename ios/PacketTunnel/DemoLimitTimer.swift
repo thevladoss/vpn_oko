@@ -1,7 +1,7 @@
 import Foundation
 
 final class DemoLimitTimer {
-  private let queue = DispatchQueue(label: "oko.demo.timer")
+  private let queue = DispatchQueue(label: "osin.demo.timer")
   private var source: DispatchSourceTimer?
 
   func schedule(afterMs: Int64, handler: @escaping () -> Void) {

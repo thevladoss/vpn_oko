@@ -41,7 +41,7 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     private val demoStore by lazy { DemoCooldownStore.from(this) }
     private val mainHandler = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor { runnable ->
-        Thread(runnable, "oko-vpn-core").also { it.isDaemon = true }
+        Thread(runnable, "osin-vpn-core").also { it.isDaemon = true }
     }
 
     @Volatile
@@ -133,7 +133,7 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     private fun scheduleExpiry() {
         cancelDemoTimer()
         val timer = Executors.newSingleThreadScheduledExecutor { runnable ->
-            Thread(runnable, "oko-demo-timer").also { it.isDaemon = true }
+            Thread(runnable, "osin-demo-timer").also { it.isDaemon = true }
         }
         timer.schedule({ expireSession() }, DemoLimit.SESSION_MS, TimeUnit.MILLISECONDS)
         demoTimer = timer

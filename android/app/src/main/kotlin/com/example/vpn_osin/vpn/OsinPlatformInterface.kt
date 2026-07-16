@@ -34,7 +34,7 @@ class OsinPlatformInterface(
 ) : PlatformInterface {
 
     private var monitorCallback: ConnectivityManager.NetworkCallback? = null
-    private val monitorThread = HandlerThread("oko-net-monitor").apply { start() }
+    private val monitorThread = HandlerThread("osin-net-monitor").apply { start() }
     private val monitorHandler = Handler(monitorThread.looper)
     private val syntheticIndexes = ConcurrentHashMap<String, Int>()
     private val syntheticIndexCounter = AtomicInteger(1000)

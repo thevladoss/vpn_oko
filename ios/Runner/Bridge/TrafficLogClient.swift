@@ -3,7 +3,7 @@ import Libbox
 
 final class TrafficLogClient: NSObject, LibboxCommandClientHandlerProtocol {
   private let listener: VpnEventListener
-  private let queue = DispatchQueue(label: "oko.traffic.client")
+  private let queue = DispatchQueue(label: "osin.traffic.client")
   private var client: LibboxCommandClient?
   private var statusTick = 0
 

@@ -19,7 +19,7 @@ enum ExtensionLog {
 
 final class OsinPlatformInterface: NSObject {
   private weak var host: TunnelHost?
-  private let monitorQueue = DispatchQueue(label: "oko.interface.monitor")
+  private let monitorQueue = DispatchQueue(label: "osin.interface.monitor")
   private var pathMonitor: NWPathMonitor?
 
   init(host: TunnelHost) {
