@@ -1,4 +1,4 @@
-# Oko VPN: рабочий нативный VPN на Flutter
+# osin VPN: рабочий нативный VPN на Flutter
 
 [![CI](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml/badge.svg)](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml)
 
@@ -159,7 +159,7 @@ test/                         321 автотест: парсер, генерат
 | Мост и домен | Контракт `pigeons/vpn_api.dart`, `VpnBridge` (единственный подписчик event-канала, демультиплексор по sealed-событиям), мапперы DTO → entity, sealed-модели `VpnState` / `ProxyConfig` / `TrafficStats` |
 | Парсер ссылок | `parseProxyUrl`: `vless://` (Reality / XTLS-flow / ws / grpc), `vmess://` (base64-json), `trojan://`, `ss://` (плейн и base64), `hysteria2://`. Каждая схема с TDD и edge-кейсами |
 | Генератор конфига | `buildSingboxConfig` / `toSingboxJson`: чистая функция `ProxyConfig → sing-box JSON` (tun-inbound `gvisor`, DNS через proxy, outbound по протоколу); тест на каждый протокол и транспорт |
-| Android-интеграция ядра | `OkoVpnService` (`Libbox.newCommandServer`, `startOrReloadService`, `CommandClient` для живых rx/tx, единый teardown, FGS `systemExempted`, `onRevoke`), `OkoPlatformInterface` (`openTun` → `establish`, `protect`, монитор интерфейса, `getInterfaces`, connection owner) |
+| Android-интеграция ядра | `OsinVpnService` (`Libbox.newCommandServer`, `startOrReloadService`, `CommandClient` для живых rx/tx, единый teardown, FGS `systemExempted`, `onRevoke`), `OsinPlatformInterface` (`openTun` → `establish`, `protect`, монитор интерфейса, `getInterfaces`, connection owner) |
 | Хранилище серверов | Схема Drift, шифрование через SQLite3MultipleCiphers, ключ в `flutter_secure_storage`, CRUD и выбор активного сервера, реактивный список |
 | Демо-лимит | Нативный таймер сессии `DemoLimit` + `DemoCooldownStore` (кулдаун переживает перезапуск), событие `DemoExpiredMessage`, восстановление через `getStatus()` |
 | UI | `iris_painter.dart` (CustomPainter ирис-индикатора), `VpnConnectionBloc`, `LogsCubit`, `ServerConfigCubit`, `ServerListCubit`, виджеты (кнопка с прогрессом, таймер, панели трафика и логов, карточка сервера, protocol-badge, latency-pill), дизайн-система `core/theme/` |
@@ -171,7 +171,7 @@ test/                         321 автотест: парсер, генерат
 Feature-first clean architecture. Presentation зависит только от domain, data
 реализует доменные интерфейсы, весь обмен с native идёт через один Pigeon-мост.
 Ключевой поток: ссылка `vless://` парсится в `ProxyConfig`, `toSingboxJson`
-собирает конфиг ядра на Dart, строка уходит через `startVpn` в `OkoVpnService`,
+собирает конфиг ядра на Dart, строка уходит через `startVpn` в `OsinVpnService`,
 `libbox` берёт TUN-fd от `establish()` и проксирует трафик. Пунктирные стрелки
 показывают обратный поток событий (`StatusChanged`, `LogMessage`,
 `TrafficChanged`, `DemoExpired`, `Error`).
@@ -186,10 +186,10 @@ flowchart TD
   REPO -->|encrypted CRUD| DB["Drift + SQLite3MultipleCiphers<br/>(key in secure storage)"]
   BR -->|VpnHostApi startVpn(singboxConfigJson)| PG["Pigeon generated<br/>Dart Kotlin Swift"]
   PG -.->|EventChannelApi vpnEvents| BR
-  PG --> ANDROID["Android: VpnHostApiImpl<br/>-> OkoVpnService"]
+  PG --> ANDROID["Android: VpnHostApiImpl<br/>-> OsinVpnService"]
   PG --> IOS["iOS: VpnHostApiImpl<br/>-> NETunnelProviderManager"]
   ANDROID --> CORE["libbox core (sing-box)<br/>newCommandServer -> startOrReloadService"]
-  CORE --> TUN["OkoPlatformInterface.openTun<br/>-> Builder.establish() -> TUN fd -> proxy 0.0.0.0/0"]
+  CORE --> TUN["OsinPlatformInterface.openTun<br/>-> Builder.establish() -> TUN fd -> proxy 0.0.0.0/0"]
   IOS --> NE["PacketTunnelProvider (skeleton)<br/>setTunnelNetworkSettings"]
   CORE -.->|CommandClient status: rx/tx| PG
   ANDROID -.->|StatusChanged / LogMessage / DemoExpired / Error| PG
@@ -206,7 +206,7 @@ sequenceDiagram
   participant R as VpnRepository
   participant G as toSingboxJson (Dart)
   participant P as Pigeon (VpnHostApi)
-  participant S as OkoVpnService
+  participant S as OsinVpnService
   participant C as libbox core
   U->>B: tap Connect (active server)
   B->>R: connect(activeServer)
@@ -230,7 +230,7 @@ sequenceDiagram
 | domain | `lib/features/*/domain/` | sealed/immutable entity, usecases, интерфейсы репозиториев, парсер и генератор конфига |
 | data | `lib/features/*/data/` | Реализации репозиториев, мапперы DTO → entity, Drift-хранилище, датасорсы поверх `VpnBridge` |
 | core/bridge | `lib/core/bridge/` | `vpn_api.g.dart` (Pigeon) + `VpnBridge`, единственный подписчик event-канала |
-| Android native | `android/.../vpn/`, `android/.../bridge/` | `OkoVpnService`, `OkoPlatformInterface`, `DemoLimit`, `DemoCooldownStore`, `VpnEventBus`, `VpnHostApiImpl` |
+| Android native | `android/.../vpn/`, `android/.../bridge/` | `OsinVpnService`, `OsinPlatformInterface`, `DemoLimit`, `DemoCooldownStore`, `VpnEventBus`, `VpnHostApiImpl` |
 | iOS native | `ios/Runner/Bridge/`, `ios/PacketTunnel/` | `VpnHostApiImpl`, `VpnStatusObserver`, `PacketTunnelProvider` (skeleton) |
 
 ## Ограничения
