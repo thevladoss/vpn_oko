@@ -49,6 +49,8 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
 
   VpnConfig? get config => _active;
 
+  VpnConfig? _pendingReconnect;
+
   StreamSubscription<VpnState>? _stateSub;
   StreamSubscription<TrafficStats>? _trafficSub;
   StreamSubscription<DemoExpiry>? _demoSub;
@@ -84,6 +86,11 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     Emitter<VpnConnectionState> emit,
   ) {
     emit(_map(event.state));
+    final pending = _pendingReconnect;
+    if (pending != null && event.state is VpnDisconnected) {
+      _pendingReconnect = null;
+      if (!state.cooldownActive) unawaited(connectVpn(pending));
+    }
   }
 
   void _onTrafficReceived(
@@ -135,7 +142,16 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
     ConfigSelected event,
     Emitter<VpnConnectionState> emit,
   ) {
+    final previous = _active;
     _active = event.config;
+    if (previous == event.config) return;
+    final status = state.status;
+    if (status != VpnStatus.connecting && status != VpnStatus.connected) {
+      return;
+    }
+    if (state.cooldownActive) return;
+    _pendingReconnect = event.config;
+    unawaited(disconnectVpn());
   }
 
   void _onConfigCleared(

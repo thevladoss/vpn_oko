@@ -301,6 +301,7 @@ void main() {
 
   blocTest<VpnConnectionBloc, VpnConnectionState>(
     'ConfigSelected в isBusy не роняет Bloc и сохраняет активный конфиг',
+    setUp: () => when(() => disconnectVpn()).thenAnswer((_) async {}),
     seed: () => const VpnConnectionState(status: VpnStatus.connecting),
     build: buildBloc,
     act: (bloc) => bloc.add(const ConfigSelected(selectedConfig)),
