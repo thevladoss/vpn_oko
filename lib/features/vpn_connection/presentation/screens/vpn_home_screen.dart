@@ -149,8 +149,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
         ),
         BlocListener<VpnConnectionBloc, VpnConnectionState>(
           listenWhen: (previous, current) =>
-              current.status == VpnStatus.error &&
-              current.errorMessage == VpnConnectionBloc.noServerHint,
+              current.noServerNudge != previous.noServerNudge,
           listener: (context, state) {
             unawaited(HapticFeedback.mediumImpact());
             TopAlertScope.of(context).show(
@@ -200,6 +199,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                                 status: state.status,
                                 connectedSince: state.connectedSince,
                                 onTap: _irisToggle(state),
+                                nudge: state.noServerNudge,
                               ),
                             ),
                           ),
@@ -216,9 +216,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               : const SizedBox.shrink(),
                         ),
                         if (state.status == VpnStatus.error &&
-                            state.errorMessage != null &&
-                            state.errorMessage !=
-                                VpnConnectionBloc.noServerHint)
+                            state.errorMessage != null)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Text(

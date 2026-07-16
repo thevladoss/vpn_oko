@@ -55,6 +55,48 @@ void main() {
       expect(find.byType(IrisIndicator), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('смена nudge запускает shake без смены статуса',
+        (tester) async {
+      await tester.pumpWidget(
+        host(const IrisIndicator(status: VpnStatus.disconnected)),
+      );
+      await tester.pump();
+
+      await tester.pumpWidget(
+        host(const IrisIndicator(status: VpnStatus.disconnected, nudge: 1)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(IrisIndicator), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('смена nudge под disableAnimations не роняет и не анимирует',
+        (tester) async {
+      await tester.pumpWidget(
+        host(
+          const IrisIndicator(status: VpnStatus.disconnected),
+          disableAnimations: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(
+        host(
+          const IrisIndicator(status: VpnStatus.disconnected, nudge: 1),
+          disableAnimations: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(IrisIndicator), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox());
+    });
   });
 
   group('ConnectionTimer', () {

@@ -227,7 +227,8 @@ void main() {
   );
 
   testWidgets(
-    'нет сервера: тап Connect не поднимает туннель, bloc → error',
+    'нет сервера: тап Connect не поднимает туннель, статус disconnected + '
+    'nudge',
     (tester) async {
       useLargeSurface(tester);
 
@@ -242,8 +243,9 @@ void main() {
       await tester.pump();
 
       verifyNever(() => connectVpn(any()));
-      expect(bloc.state.status, VpnStatus.error);
-      expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
+      expect(bloc.state.status, VpnStatus.disconnected);
+      expect(bloc.state.errorMessage, isNull);
+      expect(bloc.state.noServerNudge, greaterThan(0));
 
       await tester.pump(const Duration(seconds: 2));
     },
@@ -263,7 +265,7 @@ void main() {
   });
 
   testWidgets(
-    'ирис без сервера не поднимает туннель, bloc → error(noServerHint)',
+    'ирис без сервера не поднимает туннель, статус disconnected + nudge',
     (tester) async {
       useLargeSurface(tester);
 
@@ -273,8 +275,9 @@ void main() {
       await tester.pump();
 
       verifyNever(() => connectVpn(any()));
-      expect(bloc.state.status, VpnStatus.error);
-      expect(bloc.state.errorMessage, VpnConnectionBloc.noServerHint);
+      expect(bloc.state.status, VpnStatus.disconnected);
+      expect(bloc.state.errorMessage, isNull);
+      expect(bloc.state.noServerNudge, greaterThan(0));
 
       await tester.pump(const Duration(seconds: 2));
     },

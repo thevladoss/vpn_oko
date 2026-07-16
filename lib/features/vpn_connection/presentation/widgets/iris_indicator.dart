@@ -13,12 +13,14 @@ class IrisIndicator extends StatefulWidget {
     required this.status,
     this.connectedSince,
     this.onTap,
+    this.nudge = 0,
     super.key,
   });
 
   final VpnStatus status;
   final DateTime? connectedSince;
   final VoidCallback? onTap;
+  final int nudge;
 
   @override
   State<IrisIndicator> createState() => _IrisIndicatorState();
@@ -67,6 +69,10 @@ class _IrisIndicatorState extends State<IrisIndicator>
       _reduceMotion = MediaQuery.disableAnimationsOf(context);
       _appliedStatus = widget.status;
       _applyStatus(oneShot: true);
+    }
+    if (oldWidget.nudge != widget.nudge &&
+        !MediaQuery.disableAnimationsOf(context)) {
+      unawaited(_shake.forward(from: 0));
     }
   }
 
