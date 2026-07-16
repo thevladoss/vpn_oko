@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -76,7 +74,7 @@ void main() {
       final client = MockClient((request) async {
         return http.Response(oversized, 200);
       });
-      final remote = SubscriptionRemote(client, maxBodyBytes: 512 * 1024);
+      final remote = SubscriptionRemote(client);
 
       await expectLater(
         () => remote.fetch('https://example.com/big'),
