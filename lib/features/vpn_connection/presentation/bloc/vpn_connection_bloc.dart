@@ -68,6 +68,7 @@ class VpnConnectionBloc extends Bloc<VpnConnectionEvent, VpnConnectionState> {
           status: VpnStatus.error,
           errorMessage: switch (failure) {
             VpnStartFailure(:final message) => message,
+            SubscriptionFailure(:final message) => message,
           },
           clearConnectedSince: true,
         ),

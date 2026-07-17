@@ -16,3 +16,13 @@ class VpnStartFailure extends Failure {
   @override
   List<Object?> get props => [code, message];
 }
+
+class SubscriptionFailure extends Failure {
+  const SubscriptionFailure(this.message, {this.statusCode});
+
+  final String message;
+  final int? statusCode;
+
+  @override
+  List<Object?> get props => [message, statusCode];
+}
