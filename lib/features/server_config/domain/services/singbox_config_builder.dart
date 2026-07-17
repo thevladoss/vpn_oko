@@ -26,6 +26,46 @@ Map<String, Object?> buildSingboxConfig(ProxyConfig config) {
 String toSingboxJson(ProxyConfig config) =>
     jsonEncode(buildSingboxConfig(config));
 
+Map<String, Object?> buildAutoSwitchConfig(List<ProxyConfig> configs) {
+  final serverTags = <String>[];
+  final serverOutbounds = <Map<String, Object?>>[];
+  for (var i = 0; i < configs.length; i++) {
+    final tag = 'proxy-$i';
+    serverTags.add(tag);
+    serverOutbounds.add(_proxyOutbound(configs[i], tag: tag));
+  }
+  return {
+    'log': {'level': 'warn'},
+    'dns': _dns(),
+    'inbounds': [_tunInbound()],
+    'outbounds': [
+      ...serverOutbounds,
+      {
+        'type': 'urltest',
+        'tag': 'proxy',
+        'outbounds': serverTags,
+        'url': 'https://www.gstatic.com/generate_204',
+        'interval': '3m',
+        'tolerance': 50,
+        'idle_timeout': '30m',
+      },
+      {'type': 'direct', 'tag': 'direct'},
+    ],
+    'route': {
+      'rules': [
+        {'action': 'sniff'},
+        {'protocol': 'dns', 'action': 'hijack-dns'},
+      ],
+      'final': 'proxy',
+      'auto_detect_interface': true,
+      'default_domain_resolver': 'local',
+    },
+  };
+}
+
+String toAutoSwitchJson(List<ProxyConfig> configs) =>
+    jsonEncode(buildAutoSwitchConfig(configs));
+
 Map<String, Object?> _dns() {
   return {
     'servers': [
