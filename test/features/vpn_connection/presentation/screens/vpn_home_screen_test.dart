@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +12,8 @@ import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dar
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 import 'package:vpn_osin/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
@@ -40,6 +43,9 @@ import '../../../../helpers/top_alert_harness.dart';
 class MockWatchLogs extends Mock implements WatchLogs {}
 
 class MockServerRepository extends Mock implements ServerRepository {}
+
+class MockSubscriptionCubit extends MockCubit<SubscriptionState>
+    implements SubscriptionCubit {}
 
 const _tokyoConfig = VlessConfig(
   uuid: 'deadbeef-1111-2222-3333-444455556666',
@@ -150,6 +156,8 @@ void main() {
       repository: repository,
       clipboard: clipboard,
     );
+    final subscriptions = MockSubscriptionCubit();
+    when(() => subscriptions.state).thenReturn(const SubscriptionState());
     addTearDown(() async {
       await bloc.close();
       await logs.close();
@@ -160,6 +168,7 @@ void main() {
         BlocProvider<VpnConnectionBloc>.value(value: bloc),
         BlocProvider<LogsCubit>.value(value: logs),
         BlocProvider<ServerListCubit>.value(value: serverList),
+        BlocProvider<SubscriptionCubit>.value(value: subscriptions),
       ],
       child: const VpnHomeScreen(),
     );

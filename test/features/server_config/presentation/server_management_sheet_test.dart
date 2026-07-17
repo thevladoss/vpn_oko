@@ -1,3 +1,4 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,16 +10,44 @@ import 'package:vpn_osin/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/add_server_outcome.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/subscription.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/screens/server_management_sheet.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/add_subscription_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/subscription_card.dart';
 
 import '../../../helpers/fake_clipboard_source.dart';
 import '../../../helpers/top_alert_harness.dart';
 
 class MockServerRepository extends Mock implements ServerRepository {}
+
+class MockSubscriptionCubit extends MockCubit<SubscriptionState>
+    implements SubscriptionCubit {}
+
+Subscription _subscription({
+  int id = 100,
+  String name = 'Провайдер',
+  int upload = 0,
+  int download = 0,
+  int total = 0,
+  DateTime? expiresAt,
+}) => Subscription(
+  id: id,
+  name: name,
+  url: 'https://example.com/sub',
+  updateIntervalHours: 12,
+  upload: upload,
+  download: download,
+  total: total,
+  expiresAt: expiresAt,
+  lastUpdatedAt: DateTime(2026, 7, 17),
+  createdAt: DateTime(2026, 7, 17),
+);
 
 const _fakeUuid = 'deadbeef-1111-2222-3333-444455556666';
 
@@ -69,15 +98,35 @@ void main() {
   late MockServerRepository repository;
   late FakeClipboardSource clipboard;
   late ServerListCubit cubit;
+  late MockSubscriptionCubit subscriptionCubit;
 
   setUp(() {
     repository = MockServerRepository();
     clipboard = FakeClipboardSource();
+    subscriptionCubit = MockSubscriptionCubit();
+    when(() => subscriptionCubit.state).thenReturn(const SubscriptionState());
+    when(() => subscriptionCubit.add(any())).thenAnswer((_) async {});
+    when(() => subscriptionCubit.refresh(any())).thenAnswer((_) async {});
+    when(() => subscriptionCubit.remove(any())).thenAnswer((_) async {});
   });
 
   tearDown(() async {
     await cubit.close();
   });
+
+  void setSubscriptions(
+    List<Subscription> subscriptions, {
+    Set<int> busyIds = const {},
+    SubscriptionNotice? notice,
+  }) {
+    when(() => subscriptionCubit.state).thenReturn(
+      SubscriptionState(
+        subscriptions: subscriptions,
+        busyIds: busyIds,
+        notice: notice,
+      ),
+    );
+  }
 
   ServerListCubit makeCubit({
     List<ServerProfile> servers = const [],
@@ -92,8 +141,11 @@ void main() {
     await tester.pumpWidget(
       wrapWithTopAlert(
         theme: OsinTheme.dark,
-        home: BlocProvider.value(
-          value: cubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: cubit),
+            BlocProvider<SubscriptionCubit>.value(value: subscriptionCubit),
+          ],
           child: const Scaffold(body: ServerManagementSheet()),
         ),
       ),
@@ -141,7 +193,13 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       verify(() => repository.add(any(), any())).called(1);
-      expect(find.byType(TextField), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(AddSubscriptionField),
+          matching: find.byType(TextField),
+        ),
+        findsOneWidget,
+      );
 
       await tester.pump(const Duration(seconds: 2));
     });
@@ -289,7 +347,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Server 20'),
         200,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: find.byType(Scrollable).last,
       );
       expect(find.text('Server 20'), findsOneWidget);
     });
@@ -315,7 +373,11 @@ void main() {
       await tester.tap(find.text('Переименовать'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(TextField), findsOneWidget);
+      final dialogField = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      expect(dialogField, findsOneWidget);
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
@@ -323,7 +385,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      final fieldWidth = tester.getSize(find.byType(TextField)).width;
+      final fieldWidth = tester.getSize(dialogField).width;
       expect(fieldWidth, greaterThan(200));
     });
 
@@ -348,11 +410,111 @@ void main() {
       await tester.tap(find.text('Переименовать'));
       await tester.pumpAndSettle();
 
-      final field = tester.widget<TextField>(find.byType(TextField));
+      final field = tester.widget<TextField>(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+      );
       final controller = field.controller!;
       expect(controller.text, longName);
       expect(controller.selection.isCollapsed, isTrue);
       expect(controller.selection.baseOffset, longName.length);
+    });
+
+    testWidgets('подписка рендерит карточку с трафиком и группирует серверы', (
+      tester,
+    ) async {
+      setSubscriptions([
+        _subscription(
+          total: 10 * 1024 * 1024 * 1024,
+          download: 2 * 1024 * 1024 * 1024,
+        ),
+      ]);
+      final subServer = ServerProfile(
+        id: 3,
+        label: 'Sub node',
+        config: _osakaConfig,
+        rawUrl: 'vless://$_fakeUuid@osaka.example:8443#SubNode',
+        createdAt: DateTime(2026, 7, 16),
+        subscriptionId: 100,
+      );
+      cubit = makeCubit(servers: [_tokyo, subServer]);
+      await pumpSheet(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SubscriptionCard), findsOneWidget);
+      expect(find.text('Провайдер'), findsOneWidget);
+      expect(find.textContaining('из 10 ГБ'), findsOneWidget);
+      expect(find.text('Sub node'), findsOneWidget);
+      expect(find.text('Tokyo'), findsOneWidget);
+    });
+
+    testWidgets('ввод URL и submit зовёт SubscriptionCubit.add', (
+      tester,
+    ) async {
+      cubit = makeCubit();
+      await pumpSheet(tester);
+
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AddSubscriptionField),
+          matching: find.byType(TextField),
+        ),
+        'https://sub.example/link',
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AddSubscriptionField),
+          matching: find.byIcon(Icons.add_rounded),
+        ),
+      );
+      await tester.pump();
+
+      verify(() => subscriptionCubit.add('https://sub.example/link')).called(1);
+    });
+
+    testWidgets('SubImported показывает алерт с числами импортировано/пропущено',
+        (tester) async {
+      whenListen(
+        subscriptionCubit,
+        Stream<SubscriptionState>.fromIterable([
+          const SubscriptionState(),
+          const SubscriptionState(notice: SubImported(4, 1)),
+        ]),
+        initialState: const SubscriptionState(),
+      );
+      cubit = makeCubit();
+      await pumpSheet(tester);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('Импортировано 4, пропущено 1'), findsOneWidget);
+      final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+      expect(alert.kind, TopAlertKind.success);
+
+      await tester.pump(const Duration(seconds: 2));
+    });
+
+    testWidgets('SubError показывает красный алерт', (tester) async {
+      whenListen(
+        subscriptionCubit,
+        Stream<SubscriptionState>.fromIterable([
+          const SubscriptionState(),
+          const SubscriptionState(notice: SubError('Сервер недоступен')),
+        ]),
+        initialState: const SubscriptionState(),
+      );
+      cubit = makeCubit();
+      await pumpSheet(tester);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('Сервер недоступен'), findsOneWidget);
+      final alert = tester.widget<TopAlert>(find.byType(TopAlert));
+      expect(alert.kind, TopAlertKind.error);
+
+      await tester.pump(const Duration(seconds: 2));
     });
   });
 }

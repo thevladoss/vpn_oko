@@ -9,11 +9,17 @@ import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/domain/entities/subscription.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
+import 'package:vpn_osin/features/server_config/presentation/subscription_grouping.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/add_subscription_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/proxy_error_text.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
+import 'package:vpn_osin/features/server_config/presentation/widgets/subscription_card.dart';
 
 String _protocolOf(ProxyConfig config) => switch (config) {
   VlessConfig() => 'vless',
@@ -68,6 +74,24 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
     NoticeInvalid() => TopAlertKind.error,
   };
 
+  TopAlertKind _subKindFor(SubscriptionNotice notice) => switch (notice) {
+    SubImported() => TopAlertKind.success,
+    SubRefreshed() => TopAlertKind.success,
+    SubRemoved() => TopAlertKind.success,
+    SubUnsupportedFormat() => TopAlertKind.warning,
+    SubError() => TopAlertKind.error,
+  };
+
+  String _subNoticeText(SubscriptionNotice notice) => switch (notice) {
+    SubImported(:final imported, :final skipped) =>
+      'Импортировано $imported, пропущено $skipped',
+    SubRefreshed(:final imported, :final skipped) =>
+      'Обновлено: $imported, пропущено $skipped',
+    SubRemoved() => 'Подписка удалена',
+    SubUnsupportedFormat() => 'Формат Clash пока не поддержан',
+    SubError(:final message) => message,
+  };
+
   Interval _interval(Duration start) {
     final begin = start.inMilliseconds / _total.inMilliseconds;
     final end =
@@ -85,99 +109,174 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
   Widget build(BuildContext context) {
     final tones = context.osinTones;
     final textTheme = Theme.of(context).textTheme;
-    return BlocConsumer<ServerListCubit, ServerListState>(
-      listenWhen: (previous, current) =>
-          current.notice != null && current.notice != previous.notice,
-      listener: (context, state) {
-        final notice = state.notice;
-        if (notice == null) return;
-        unawaited(HapticFeedback.mediumImpact());
-        TopAlertScope.of(context).show(_noticeText(notice), _kindFor(notice));
-      },
-      builder: (context, state) {
-        return SafeArea(
-          child: ConstrainedBox(
-            key: const ValueKey('sheet-bounds'),
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * 0.85,
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ServerListCubit, ServerListState>(
+          listenWhen: (previous, current) =>
+              current.notice != null && current.notice != previous.notice,
+          listener: (context, state) {
+            final notice = state.notice;
+            if (notice == null) return;
+            unawaited(HapticFeedback.mediumImpact());
+            TopAlertScope.of(
+              context,
+            ).show(_noticeText(notice), _kindFor(notice));
+          },
+        ),
+        BlocListener<SubscriptionCubit, SubscriptionState>(
+          listenWhen: (previous, current) =>
+              current.notice != null && current.notice != previous.notice,
+          listener: (context, state) {
+            final notice = state.notice;
+            if (notice == null) return;
+            unawaited(HapticFeedback.mediumImpact());
+            TopAlertScope.of(
+              context,
+            ).show(_subNoticeText(notice), _subKindFor(notice));
+          },
+        ),
+      ],
+      child: BlocBuilder<ServerListCubit, ServerListState>(
+        builder: (context, serverState) {
+          return BlocBuilder<SubscriptionCubit, SubscriptionState>(
+            builder: (context, subState) {
+              final groups = groupServersBySubscription(
+                serverState.servers,
+                subState.subscriptions,
+              );
+              final rows = _buildRows(context, groups, serverState.activeId);
+              final isEmpty = groups.isEmpty;
+              return SafeArea(
+                child: ConstrainedBox(
+                  key: const ValueKey('sheet-bounds'),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+                  ),
+                  child: Stack(
                     children: [
-                      Text(
-                        'Серверы',
-                        style: textTheme.titleLarge?.copyWith(
-                          color: tones.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      FilledButton.tonalIcon(
-                        onPressed: () =>
-                            context.read<ServerListCubit>().addFromClipboard(),
-                        icon: const Icon(Icons.content_paste_rounded),
-                        label: const Text('Вставить из буфера'),
-                      ),
-                      const SizedBox(height: 20),
-                      Flexible(
-                        child: state.servers.isEmpty
-                            ? _Staggered(
-                                animation: _entrance,
-                                interval: _interval(OsinMotion.staggerIris),
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: EmptyServerPasteField(
-                                    onPaste: () => context
-                                        .read<ServerListCubit>()
-                                        .addFromClipboard(),
-                                  ),
-                                ),
-                              )
-                            : ListView.separated(
-                                shrinkWrap: true,
-                                physics:
-                                    const AlwaysScrollableScrollPhysics(),
-                                itemCount: state.servers.length,
-                                separatorBuilder: (_, _) =>
-                                    const SizedBox(height: 12),
-                                itemBuilder: (context, index) {
-                                  final profile = state.servers[index];
-                                  return _Staggered(
-                                    animation: _entrance,
-                                    interval: _tileInterval(index),
-                                    child: ServerListTile(
-                                      dismissKey: ValueKey(
-                                        'server-${profile.id}',
-                                      ),
-                                      name: profile.label,
-                                      host: profile.config.host,
-                                      port: profile.config.port,
-                                      protocol: _protocolOf(profile.config),
-                                      active: profile.id == state.activeId,
-                                      onSelect: () => context
-                                          .read<ServerListCubit>()
-                                          .setActive(profile.id),
-                                      onRename: () => _rename(context, profile),
-                                      onDelete: () => _delete(context, profile),
-                                    ),
-                                  );
-                                },
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Серверы',
+                              style: textTheme.titleLarge?.copyWith(
+                                color: tones.textPrimary,
+                                fontWeight: FontWeight.w700,
                               ),
+                            ),
+                            const SizedBox(height: 16),
+                            AddSubscriptionField(
+                              busy: subState.adding,
+                              onSubmit: (url) =>
+                                  context.read<SubscriptionCubit>().add(url),
+                            ),
+                            const SizedBox(height: 12),
+                            FilledButton.tonalIcon(
+                              onPressed: () => context
+                                  .read<ServerListCubit>()
+                                  .addFromClipboard(),
+                              icon: const Icon(Icons.content_paste_rounded),
+                              label: const Text('Вставить из буфера'),
+                            ),
+                            const SizedBox(height: 20),
+                            Flexible(
+                              child: isEmpty
+                                  ? _Staggered(
+                                      animation: _entrance,
+                                      interval: _interval(
+                                        OsinMotion.staggerIris,
+                                      ),
+                                      child: Align(
+                                        alignment: Alignment.topCenter,
+                                        child: EmptyServerPasteField(
+                                          onPaste: () => context
+                                              .read<ServerListCubit>()
+                                              .addFromClipboard(),
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      itemCount: rows.length,
+                                      separatorBuilder: (_, _) =>
+                                          const SizedBox(height: 12),
+                                      itemBuilder: (context, index) =>
+                                          rows[index],
+                                    ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  List<Widget> _buildRows(
+    BuildContext context,
+    List<ServerGroup> groups,
+    int? activeId,
+  ) {
+    final rows = <Widget>[];
+    var index = 0;
+    for (final group in groups) {
+      final subscription = group.subscription;
+      if (subscription != null) {
+        final busy = context
+            .read<SubscriptionCubit>()
+            .state
+            .busyIds
+            .contains(subscription.id);
+        rows.add(
+          _Staggered(
+            animation: _entrance,
+            interval: _tileInterval(index),
+            child: SubscriptionCard(
+              key: ValueKey('subscription-${subscription.id}'),
+              subscription: subscription,
+              busy: busy,
+              onRefresh: () =>
+                  context.read<SubscriptionCubit>().refresh(subscription.id),
+              onDelete: () => _deleteSubscription(context, subscription),
             ),
           ),
         );
-      },
-    );
+        index += 1;
+      }
+      for (final profile in group.servers) {
+        rows.add(
+          _Staggered(
+            animation: _entrance,
+            interval: _tileInterval(index),
+            child: ServerListTile(
+              dismissKey: ValueKey('server-${profile.id}'),
+              name: profile.label,
+              host: profile.config.host,
+              port: profile.config.port,
+              protocol: _protocolOf(profile.config),
+              active: profile.id == activeId,
+              onSelect: () =>
+                  context.read<ServerListCubit>().setActive(profile.id),
+              onRename: () => _rename(context, profile),
+              onDelete: () => _delete(context, profile),
+            ),
+          ),
+        );
+        index += 1;
+      }
+    }
+    return rows;
   }
 
   String _noticeText(ServerListNotice notice) => switch (notice) {
@@ -224,6 +323,35 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
     );
     if (confirmed ?? false) {
       await cubit.delete(profile.id);
+    }
+  }
+
+  Future<void> _deleteSubscription(
+    BuildContext context,
+    Subscription subscription,
+  ) async {
+    final cubit = context.read<SubscriptionCubit>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Удалить подписку?'),
+        content: Text(
+          '«${subscription.name}» и её серверы будут удалены.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Отмена'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      await cubit.remove(subscription.id);
     }
   }
 }

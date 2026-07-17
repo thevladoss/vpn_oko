@@ -11,6 +11,7 @@ import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/screens/server_management_sheet.dart';
 import 'package:vpn_osin/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
@@ -97,13 +98,17 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
   }
 
   void _openServerSheet(BuildContext context) {
-    final cubit = context.read<ServerListCubit>();
+    final serverListCubit = context.read<ServerListCubit>();
+    final subscriptionCubit = context.read<SubscriptionCubit>();
     unawaited(
       showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
-        builder: (_) => BlocProvider.value(
-          value: cubit,
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: serverListCubit),
+            BlocProvider.value(value: subscriptionCubit),
+          ],
           child: const ServerManagementSheet(),
         ),
       ),
