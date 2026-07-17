@@ -54,22 +54,25 @@ Map<String, Object?> _tunInbound() {
   };
 }
 
-Map<String, Object?> _proxyOutbound(ProxyConfig config) {
+Map<String, Object?> _proxyOutbound(
+  ProxyConfig config, {
+  String tag = 'proxy',
+}) {
   switch (config) {
     case VlessConfig():
-      return _vless(config);
+      return _vless(config, tag);
     case VmessConfig():
-      return _vmess(config);
+      return _vmess(config, tag);
     case TrojanConfig():
-      return _trojan(config);
+      return _trojan(config, tag);
     case ShadowsocksConfig():
-      return _shadowsocks(config);
+      return _shadowsocks(config, tag);
     case Hysteria2Config():
-      return _hysteria2(config);
+      return _hysteria2(config, tag);
   }
 }
 
-Map<String, Object?> _vless(VlessConfig config) {
+Map<String, Object?> _vless(VlessConfig config, String tag) {
   final tls = _tlsBlock(
     security: config.security,
     serverName: config.sni,
@@ -86,7 +89,7 @@ Map<String, Object?> _vless(VlessConfig config) {
   );
   return {
     'type': 'vless',
-    'tag': 'proxy',
+    'tag': tag,
     'server': config.host,
     'server_port': config.port,
     'uuid': config.uuid,
@@ -97,7 +100,7 @@ Map<String, Object?> _vless(VlessConfig config) {
   };
 }
 
-Map<String, Object?> _vmess(VmessConfig config) {
+Map<String, Object?> _vmess(VmessConfig config, String tag) {
   final tls = config.tls
       ? _tlsBlock(security: 'tls', serverName: config.sni, alpn: config.alpn)
       : null;
@@ -108,7 +111,7 @@ Map<String, Object?> _vmess(VmessConfig config) {
   );
   return {
     'type': 'vmess',
-    'tag': 'proxy',
+    'tag': tag,
     'server': config.host,
     'server_port': config.port,
     'uuid': config.uuid,
@@ -119,7 +122,7 @@ Map<String, Object?> _vmess(VmessConfig config) {
   };
 }
 
-Map<String, Object?> _trojan(TrojanConfig config) {
+Map<String, Object?> _trojan(TrojanConfig config, String tag) {
   final tls = _tlsBlock(
     security: 'tls',
     serverName: config.sni,
@@ -133,7 +136,7 @@ Map<String, Object?> _trojan(TrojanConfig config) {
   );
   return {
     'type': 'trojan',
-    'tag': 'proxy',
+    'tag': tag,
     'server': config.host,
     'server_port': config.port,
     'password': config.password,
@@ -142,10 +145,10 @@ Map<String, Object?> _trojan(TrojanConfig config) {
   };
 }
 
-Map<String, Object?> _shadowsocks(ShadowsocksConfig config) {
+Map<String, Object?> _shadowsocks(ShadowsocksConfig config, String tag) {
   return {
     'type': 'shadowsocks',
-    'tag': 'proxy',
+    'tag': tag,
     'server': config.host,
     'server_port': config.port,
     'method': config.method,
@@ -153,7 +156,7 @@ Map<String, Object?> _shadowsocks(ShadowsocksConfig config) {
   };
 }
 
-Map<String, Object?> _hysteria2(Hysteria2Config config) {
+Map<String, Object?> _hysteria2(Hysteria2Config config, String tag) {
   final tls = _tlsBlock(
     security: 'tls',
     serverName: config.sni,
@@ -161,7 +164,7 @@ Map<String, Object?> _hysteria2(Hysteria2Config config) {
   );
   return {
     'type': 'hysteria2',
-    'tag': 'proxy',
+    'tag': tag,
     'server': config.host,
     'server_port': config.port,
     'password': config.password,
