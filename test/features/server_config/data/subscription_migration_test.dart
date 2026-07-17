@@ -33,7 +33,7 @@ CREATE TABLE app_settings (
 }
 
 void main() {
-  group('миграция схемы v1 → v2', () {
+  group('миграция схемы v1 → v3', () {
     late Database raw;
     late AppDatabase db;
 
@@ -89,10 +89,10 @@ void main() {
       expect(tables, hasLength(1));
     });
 
-    test('user_version стал 2', () async {
+    test('user_version стал 3', () async {
       final row = await db.customSelect('PRAGMA user_version').getSingle();
 
-      expect(row.read<int>('user_version'), 2);
+      expect(row.read<int>('user_version'), 3);
     });
   });
 
