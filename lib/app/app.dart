@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_osin/app/di.dart';
@@ -6,6 +8,7 @@ import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 import 'package:vpn_osin/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
@@ -70,6 +73,18 @@ class _OsinAppState extends State<OsinApp> {
                 repository: widget.dependencies.serverRepository,
                 clipboard: widget.dependencies.clipboardSource,
               ),
+            ),
+            BlocProvider(
+              create: (_) {
+                final cubit = SubscriptionCubit(
+                  repository: widget.dependencies.subscriptionRepository,
+                  addSubscription: widget.dependencies.addSubscription,
+                  refreshSubscription: widget.dependencies.refreshSubscription,
+                  removeSubscription: widget.dependencies.removeSubscription,
+                );
+                unawaited(cubit.refreshStaleOnOpen());
+                return cubit;
+              },
             ),
           ],
           child: const VpnHomeScreen(),
