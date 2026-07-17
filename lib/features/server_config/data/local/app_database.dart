@@ -8,7 +8,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -18,6 +18,9 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(subscriptions);
         await m.addColumn(serverProfiles, serverProfiles.subscriptionId);
         await m.addColumn(serverProfiles, serverProfiles.sortOrder);
+      }
+      if (from < 3) {
+        await m.addColumn(appSettings, appSettings.autoSwitchEnabled);
       }
     },
   );

@@ -52,6 +52,9 @@ class AppSettings extends Table {
 
   DateTimeColumn get lastExpiredAt => dateTime().nullable()();
 
+  BoolColumn get autoSwitchEnabled =>
+      boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

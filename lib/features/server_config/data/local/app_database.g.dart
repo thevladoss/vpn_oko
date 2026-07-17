@@ -1199,8 +1199,28 @@ class $AppSettingsTable extends AppSettings
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _autoSwitchEnabledMeta = const VerificationMeta(
+    'autoSwitchEnabled',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, activeServerId, lastExpiredAt];
+  late final GeneratedColumn<bool> autoSwitchEnabled = GeneratedColumn<bool>(
+    'auto_switch_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_switch_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    activeServerId,
+    lastExpiredAt,
+    autoSwitchEnabled,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1234,6 +1254,15 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('auto_switch_enabled')) {
+      context.handle(
+        _autoSwitchEnabledMeta,
+        autoSwitchEnabled.isAcceptableOrUnknown(
+          data['auto_switch_enabled']!,
+          _autoSwitchEnabledMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1255,6 +1284,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_expired_at'],
       ),
+      autoSwitchEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_switch_enabled'],
+      )!,
     );
   }
 
@@ -1268,7 +1301,13 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   final int id;
   final int? activeServerId;
   final DateTime? lastExpiredAt;
-  const AppSetting({required this.id, this.activeServerId, this.lastExpiredAt});
+  final bool autoSwitchEnabled;
+  const AppSetting({
+    required this.id,
+    this.activeServerId,
+    this.lastExpiredAt,
+    required this.autoSwitchEnabled,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1279,6 +1318,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     if (!nullToAbsent || lastExpiredAt != null) {
       map['last_expired_at'] = Variable<DateTime>(lastExpiredAt);
     }
+    map['auto_switch_enabled'] = Variable<bool>(autoSwitchEnabled);
     return map;
   }
 
@@ -1291,6 +1331,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       lastExpiredAt: lastExpiredAt == null && nullToAbsent
           ? const Value.absent()
           : Value(lastExpiredAt),
+      autoSwitchEnabled: Value(autoSwitchEnabled),
     );
   }
 
@@ -1303,6 +1344,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       id: serializer.fromJson<int>(json['id']),
       activeServerId: serializer.fromJson<int?>(json['activeServerId']),
       lastExpiredAt: serializer.fromJson<DateTime?>(json['lastExpiredAt']),
+      autoSwitchEnabled: serializer.fromJson<bool>(json['autoSwitchEnabled']),
     );
   }
   @override
@@ -1312,6 +1354,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       'id': serializer.toJson<int>(id),
       'activeServerId': serializer.toJson<int?>(activeServerId),
       'lastExpiredAt': serializer.toJson<DateTime?>(lastExpiredAt),
+      'autoSwitchEnabled': serializer.toJson<bool>(autoSwitchEnabled),
     };
   }
 
@@ -1319,6 +1362,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     int? id,
     Value<int?> activeServerId = const Value.absent(),
     Value<DateTime?> lastExpiredAt = const Value.absent(),
+    bool? autoSwitchEnabled,
   }) => AppSetting(
     id: id ?? this.id,
     activeServerId: activeServerId.present
@@ -1327,6 +1371,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     lastExpiredAt: lastExpiredAt.present
         ? lastExpiredAt.value
         : this.lastExpiredAt,
+    autoSwitchEnabled: autoSwitchEnabled ?? this.autoSwitchEnabled,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
     return AppSetting(
@@ -1337,6 +1382,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       lastExpiredAt: data.lastExpiredAt.present
           ? data.lastExpiredAt.value
           : this.lastExpiredAt,
+      autoSwitchEnabled: data.autoSwitchEnabled.present
+          ? data.autoSwitchEnabled.value
+          : this.autoSwitchEnabled,
     );
   }
 
@@ -1345,45 +1393,53 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     return (StringBuffer('AppSetting(')
           ..write('id: $id, ')
           ..write('activeServerId: $activeServerId, ')
-          ..write('lastExpiredAt: $lastExpiredAt')
+          ..write('lastExpiredAt: $lastExpiredAt, ')
+          ..write('autoSwitchEnabled: $autoSwitchEnabled')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, activeServerId, lastExpiredAt);
+  int get hashCode =>
+      Object.hash(id, activeServerId, lastExpiredAt, autoSwitchEnabled);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AppSetting &&
           other.id == this.id &&
           other.activeServerId == this.activeServerId &&
-          other.lastExpiredAt == this.lastExpiredAt);
+          other.lastExpiredAt == this.lastExpiredAt &&
+          other.autoSwitchEnabled == this.autoSwitchEnabled);
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<int> id;
   final Value<int?> activeServerId;
   final Value<DateTime?> lastExpiredAt;
+  final Value<bool> autoSwitchEnabled;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.activeServerId = const Value.absent(),
     this.lastExpiredAt = const Value.absent(),
+    this.autoSwitchEnabled = const Value.absent(),
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
     this.activeServerId = const Value.absent(),
     this.lastExpiredAt = const Value.absent(),
+    this.autoSwitchEnabled = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
     Expression<int>? activeServerId,
     Expression<DateTime>? lastExpiredAt,
+    Expression<bool>? autoSwitchEnabled,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (activeServerId != null) 'active_server_id': activeServerId,
       if (lastExpiredAt != null) 'last_expired_at': lastExpiredAt,
+      if (autoSwitchEnabled != null) 'auto_switch_enabled': autoSwitchEnabled,
     });
   }
 
@@ -1391,11 +1447,13 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Value<int>? id,
     Value<int?>? activeServerId,
     Value<DateTime?>? lastExpiredAt,
+    Value<bool>? autoSwitchEnabled,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
       activeServerId: activeServerId ?? this.activeServerId,
       lastExpiredAt: lastExpiredAt ?? this.lastExpiredAt,
+      autoSwitchEnabled: autoSwitchEnabled ?? this.autoSwitchEnabled,
     );
   }
 
@@ -1411,6 +1469,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (lastExpiredAt.present) {
       map['last_expired_at'] = Variable<DateTime>(lastExpiredAt.value);
     }
+    if (autoSwitchEnabled.present) {
+      map['auto_switch_enabled'] = Variable<bool>(autoSwitchEnabled.value);
+    }
     return map;
   }
 
@@ -1419,7 +1480,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     return (StringBuffer('AppSettingsCompanion(')
           ..write('id: $id, ')
           ..write('activeServerId: $activeServerId, ')
-          ..write('lastExpiredAt: $lastExpiredAt')
+          ..write('lastExpiredAt: $lastExpiredAt, ')
+          ..write('autoSwitchEnabled: $autoSwitchEnabled')
           ..write(')'))
         .toString();
   }
@@ -2245,12 +2307,14 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<int> id,
       Value<int?> activeServerId,
       Value<DateTime?> lastExpiredAt,
+      Value<bool> autoSwitchEnabled,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
       Value<int> id,
       Value<int?> activeServerId,
       Value<DateTime?> lastExpiredAt,
+      Value<bool> autoSwitchEnabled,
     });
 
 class $$AppSettingsTableFilterComposer
@@ -2274,6 +2338,11 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<DateTime> get lastExpiredAt => $composableBuilder(
     column: $table.lastExpiredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get autoSwitchEnabled => $composableBuilder(
+    column: $table.autoSwitchEnabled,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2301,6 +2370,11 @@ class $$AppSettingsTableOrderingComposer
     column: $table.lastExpiredAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get autoSwitchEnabled => $composableBuilder(
+    column: $table.autoSwitchEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AppSettingsTableAnnotationComposer
@@ -2322,6 +2396,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get lastExpiredAt => $composableBuilder(
     column: $table.lastExpiredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get autoSwitchEnabled => $composableBuilder(
+    column: $table.autoSwitchEnabled,
     builder: (column) => column,
   );
 }
@@ -2360,20 +2439,24 @@ class $$AppSettingsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int?> activeServerId = const Value.absent(),
                 Value<DateTime?> lastExpiredAt = const Value.absent(),
+                Value<bool> autoSwitchEnabled = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 activeServerId: activeServerId,
                 lastExpiredAt: lastExpiredAt,
+                autoSwitchEnabled: autoSwitchEnabled,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> activeServerId = const Value.absent(),
                 Value<DateTime?> lastExpiredAt = const Value.absent(),
+                Value<bool> autoSwitchEnabled = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 activeServerId: activeServerId,
                 lastExpiredAt: lastExpiredAt,
+                autoSwitchEnabled: autoSwitchEnabled,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
