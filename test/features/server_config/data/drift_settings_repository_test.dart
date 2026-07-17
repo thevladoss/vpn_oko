@@ -36,18 +36,21 @@ void main() {
       expect(await repository.autoSwitchEnabled(), isFalse);
     });
 
-    test('setAutoSwitch(true) переключает флаг в true', () async {
-      await repository.setAutoSwitch(true);
+    test('setAutoSwitch(enabled: true) переключает флаг в true', () async {
+      await repository.setAutoSwitch(enabled: true);
 
       expect(await repository.autoSwitchEnabled(), isTrue);
     });
 
-    test('setAutoSwitch(false) после true возвращает флаг в false', () async {
-      await repository.setAutoSwitch(true);
-      await repository.setAutoSwitch(false);
+    test(
+      'setAutoSwitch(enabled: false) после true возвращает флаг в false',
+      () async {
+        await repository.setAutoSwitch(enabled: true);
+        await repository.setAutoSwitch(enabled: false);
 
-      expect(await repository.autoSwitchEnabled(), isFalse);
-    });
+        expect(await repository.autoSwitchEnabled(), isFalse);
+      },
+    );
 
     test('watchAutoSwitch отдаёт false для пустой строки id=0', () async {
       expect(await repository.watchAutoSwitch().first, isFalse);
@@ -60,7 +63,7 @@ void main() {
       );
 
       await pumpEventQueue();
-      await repository.setAutoSwitch(true);
+      await repository.setAutoSwitch(enabled: true);
       await expectation;
     });
 
@@ -70,7 +73,7 @@ void main() {
           (await servers.add(_vlessConfig, _vlessUrl) as ServerSaved).profile;
       await servers.setActive(saved.id);
 
-      await repository.setAutoSwitch(true);
+      await repository.setAutoSwitch(enabled: true);
 
       expect(await repository.autoSwitchEnabled(), isTrue);
       final active = await servers.getActive();
@@ -82,7 +85,7 @@ void main() {
       final saved =
           (await servers.add(_vlessConfig, _vlessUrl) as ServerSaved).profile;
 
-      await repository.setAutoSwitch(true);
+      await repository.setAutoSwitch(enabled: true);
       await servers.setActive(saved.id);
 
       expect(await repository.autoSwitchEnabled(), isTrue);
