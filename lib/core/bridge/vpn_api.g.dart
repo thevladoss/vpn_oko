@@ -176,8 +176,6 @@ class VpnStatusSnapshotMessage {
     this.connectedSinceEpochMs,
     required this.rxBytes,
     required this.txBytes,
-    this.sessionEndsAtEpochMs,
-    this.cooldownUntilEpochMs,
   });
 
   VpnStatusMessage status;
@@ -188,18 +186,12 @@ class VpnStatusSnapshotMessage {
 
   int txBytes;
 
-  int? sessionEndsAtEpochMs;
-
-  int? cooldownUntilEpochMs;
-
   List<Object?> _toList() {
     return <Object?>[
       status,
       connectedSinceEpochMs,
       rxBytes,
       txBytes,
-      sessionEndsAtEpochMs,
-      cooldownUntilEpochMs,
     ];
   }
 
@@ -213,8 +205,6 @@ class VpnStatusSnapshotMessage {
       connectedSinceEpochMs: result[1] as int?,
       rxBytes: result[2]! as int,
       txBytes: result[3]! as int,
-      sessionEndsAtEpochMs: result[4] as int?,
-      cooldownUntilEpochMs: result[5] as int?,
     );
   }
 
@@ -227,7 +217,7 @@ class VpnStatusSnapshotMessage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(status, other.status) && _deepEquals(connectedSinceEpochMs, other.connectedSinceEpochMs) && _deepEquals(rxBytes, other.rxBytes) && _deepEquals(txBytes, other.txBytes) && _deepEquals(sessionEndsAtEpochMs, other.sessionEndsAtEpochMs) && _deepEquals(cooldownUntilEpochMs, other.cooldownUntilEpochMs);
+    return _deepEquals(status, other.status) && _deepEquals(connectedSinceEpochMs, other.connectedSinceEpochMs) && _deepEquals(rxBytes, other.rxBytes) && _deepEquals(txBytes, other.txBytes);
   }
 
   @override
@@ -236,7 +226,7 @@ class VpnStatusSnapshotMessage {
 
   @override
   String toString() {
-    return 'VpnStatusSnapshotMessage(status: $status, connectedSinceEpochMs: $connectedSinceEpochMs, rxBytes: $rxBytes, txBytes: $txBytes, sessionEndsAtEpochMs: $sessionEndsAtEpochMs, cooldownUntilEpochMs: $cooldownUntilEpochMs)';
+    return 'VpnStatusSnapshotMessage(status: $status, connectedSinceEpochMs: $connectedSinceEpochMs, rxBytes: $rxBytes, txBytes: $txBytes)';
   }
 }
 
@@ -290,61 +280,6 @@ class StatusChangedMessage extends VpnEventMessage {
   @override
   String toString() {
     return 'StatusChangedMessage(status: $status, connectedSinceEpochMs: $connectedSinceEpochMs)';
-  }
-}
-
-class LogMessage extends VpnEventMessage {
-  LogMessage({
-    required this.text,
-    required this.timestampMillis,
-    required this.level,
-  });
-
-  String text;
-
-  int timestampMillis;
-
-  String level;
-
-  List<Object?> _toList() {
-    return <Object?>[
-      text,
-      timestampMillis,
-      level,
-    ];
-  }
-
-  Object encode() {
-    return _toList();  }
-
-  static LogMessage decode(Object result) {
-    result as List<Object?>;
-    return LogMessage(
-      text: result[0]! as String,
-      timestampMillis: result[1]! as int,
-      level: result[2]! as String,
-    );
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) {
-    if (other is! LogMessage || other.runtimeType != runtimeType) {
-      return false;
-    }
-    if (identical(this, other)) {
-      return true;
-    }
-    return _deepEquals(text, other.text) && _deepEquals(timestampMillis, other.timestampMillis) && _deepEquals(level, other.level);
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
-
-  @override
-  String toString() {
-    return 'LogMessage(text: $text, timestampMillis: $timestampMillis, level: $level)';
   }
 }
 
@@ -448,51 +383,6 @@ class ErrorMessage extends VpnEventMessage {
   }
 }
 
-class DemoExpiredMessage extends VpnEventMessage {
-  DemoExpiredMessage({
-    required this.cooldownUntilEpochMs,
-  });
-
-  int cooldownUntilEpochMs;
-
-  List<Object?> _toList() {
-    return <Object?>[
-      cooldownUntilEpochMs,
-    ];
-  }
-
-  Object encode() {
-    return _toList();  }
-
-  static DemoExpiredMessage decode(Object result) {
-    result as List<Object?>;
-    return DemoExpiredMessage(
-      cooldownUntilEpochMs: result[0]! as int,
-    );
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) {
-    if (other is! DemoExpiredMessage || other.runtimeType != runtimeType) {
-      return false;
-    }
-    if (identical(this, other)) {
-      return true;
-    }
-    return _deepEquals(cooldownUntilEpochMs, other.cooldownUntilEpochMs);
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
-
-  @override
-  String toString() {
-    return 'DemoExpiredMessage(cooldownUntilEpochMs: $cooldownUntilEpochMs)';
-  }
-}
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -513,17 +403,11 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is StatusChangedMessage) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    }    else if (value is LogMessage) {
+    }    else if (value is TrafficChangedMessage) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    }    else if (value is TrafficChangedMessage) {
-      buffer.putUint8(134);
-      writeValue(buffer, value.encode());
     }    else if (value is ErrorMessage) {
-      buffer.putUint8(135);
-      writeValue(buffer, value.encode());
-    }    else if (value is DemoExpiredMessage) {
-      buffer.putUint8(136);
+      buffer.putUint8(134);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -543,13 +427,9 @@ class _PigeonCodec extends StandardMessageCodec {
       case 132:
         return StatusChangedMessage.decode(readValue(buffer)!);
       case 133:
-        return LogMessage.decode(readValue(buffer)!);
-      case 134:
         return TrafficChangedMessage.decode(readValue(buffer)!);
-      case 135:
+      case 134:
         return ErrorMessage.decode(readValue(buffer)!);
-      case 136:
-        return DemoExpiredMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }

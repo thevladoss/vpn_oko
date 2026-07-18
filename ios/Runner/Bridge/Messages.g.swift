@@ -253,8 +253,6 @@ struct VpnStatusSnapshotMessage: Hashable, CustomStringConvertible {
   var connectedSinceEpochMs: Int64? = nil
   var rxBytes: Int64
   var txBytes: Int64
-  var sessionEndsAtEpochMs: Int64? = nil
-  var cooldownUntilEpochMs: Int64? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -263,16 +261,12 @@ struct VpnStatusSnapshotMessage: Hashable, CustomStringConvertible {
     let connectedSinceEpochMs: Int64? = nilOrValue(pigeonVar_list[1])
     let rxBytes = pigeonVar_list[2] as! Int64
     let txBytes = pigeonVar_list[3] as! Int64
-    let sessionEndsAtEpochMs: Int64? = nilOrValue(pigeonVar_list[4])
-    let cooldownUntilEpochMs: Int64? = nilOrValue(pigeonVar_list[5])
 
     return VpnStatusSnapshotMessage(
       status: status,
       connectedSinceEpochMs: connectedSinceEpochMs,
       rxBytes: rxBytes,
-      txBytes: txBytes,
-      sessionEndsAtEpochMs: sessionEndsAtEpochMs,
-      cooldownUntilEpochMs: cooldownUntilEpochMs
+      txBytes: txBytes
     )
   }
   func toList() -> [Any?] {
@@ -281,15 +275,13 @@ struct VpnStatusSnapshotMessage: Hashable, CustomStringConvertible {
       connectedSinceEpochMs,
       rxBytes,
       txBytes,
-      sessionEndsAtEpochMs,
-      cooldownUntilEpochMs,
     ]
   }
   static func == (lhs: VpnStatusSnapshotMessage, rhs: VpnStatusSnapshotMessage) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return MessagesPigeonInternal.deepEquals(lhs.status, rhs.status) && MessagesPigeonInternal.deepEquals(lhs.connectedSinceEpochMs, rhs.connectedSinceEpochMs) && MessagesPigeonInternal.deepEquals(lhs.rxBytes, rhs.rxBytes) && MessagesPigeonInternal.deepEquals(lhs.txBytes, rhs.txBytes) && MessagesPigeonInternal.deepEquals(lhs.sessionEndsAtEpochMs, rhs.sessionEndsAtEpochMs) && MessagesPigeonInternal.deepEquals(lhs.cooldownUntilEpochMs, rhs.cooldownUntilEpochMs)
+    return MessagesPigeonInternal.deepEquals(lhs.status, rhs.status) && MessagesPigeonInternal.deepEquals(lhs.connectedSinceEpochMs, rhs.connectedSinceEpochMs) && MessagesPigeonInternal.deepEquals(lhs.rxBytes, rhs.rxBytes) && MessagesPigeonInternal.deepEquals(lhs.txBytes, rhs.txBytes)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -298,12 +290,10 @@ struct VpnStatusSnapshotMessage: Hashable, CustomStringConvertible {
     MessagesPigeonInternal.deepHash(value: connectedSinceEpochMs, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: rxBytes, hasher: &hasher)
     MessagesPigeonInternal.deepHash(value: txBytes, hasher: &hasher)
-    MessagesPigeonInternal.deepHash(value: sessionEndsAtEpochMs, hasher: &hasher)
-    MessagesPigeonInternal.deepHash(value: cooldownUntilEpochMs, hasher: &hasher)
   }
 
   public var description: String {
-    return "VpnStatusSnapshotMessage(status: \(String(describing: status)), connectedSinceEpochMs: \(String(describing: connectedSinceEpochMs)), rxBytes: \(String(describing: rxBytes)), txBytes: \(String(describing: txBytes)), sessionEndsAtEpochMs: \(String(describing: sessionEndsAtEpochMs)), cooldownUntilEpochMs: \(String(describing: cooldownUntilEpochMs)))"
+    return "VpnStatusSnapshotMessage(status: \(String(describing: status)), connectedSinceEpochMs: \(String(describing: connectedSinceEpochMs)), rxBytes: \(String(describing: rxBytes)), txBytes: \(String(describing: txBytes)))"
   }
 }
 
@@ -350,51 +340,6 @@ struct StatusChangedMessage: VpnEventMessage {
 
   public var description: String {
     return "StatusChangedMessage(status: \(String(describing: status)), connectedSinceEpochMs: \(String(describing: connectedSinceEpochMs)))"
-  }
-}
-
-/// Generated class from Pigeon that represents data sent in messages.
-struct LogMessage: VpnEventMessage {
-  var text: String
-  var timestampMillis: Int64
-  var level: String
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> LogMessage? {
-    let text = pigeonVar_list[0] as! String
-    let timestampMillis = pigeonVar_list[1] as! Int64
-    let level = pigeonVar_list[2] as! String
-
-    return LogMessage(
-      text: text,
-      timestampMillis: timestampMillis,
-      level: level
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      text,
-      timestampMillis,
-      level,
-    ]
-  }
-  static func == (lhs: LogMessage, rhs: LogMessage) -> Bool {
-    if Swift.type(of: lhs) != Swift.type(of: rhs) {
-      return false
-    }
-    return MessagesPigeonInternal.deepEquals(lhs.text, rhs.text) && MessagesPigeonInternal.deepEquals(lhs.timestampMillis, rhs.timestampMillis) && MessagesPigeonInternal.deepEquals(lhs.level, rhs.level)
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine("LogMessage")
-    MessagesPigeonInternal.deepHash(value: text, hasher: &hasher)
-    MessagesPigeonInternal.deepHash(value: timestampMillis, hasher: &hasher)
-    MessagesPigeonInternal.deepHash(value: level, hasher: &hasher)
-  }
-
-  public var description: String {
-    return "LogMessage(text: \(String(describing: text)), timestampMillis: \(String(describing: timestampMillis)), level: \(String(describing: level)))"
   }
 }
 
@@ -478,41 +423,6 @@ struct ErrorMessage: VpnEventMessage {
   }
 }
 
-/// Generated class from Pigeon that represents data sent in messages.
-struct DemoExpiredMessage: VpnEventMessage {
-  var cooldownUntilEpochMs: Int64
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> DemoExpiredMessage? {
-    let cooldownUntilEpochMs = pigeonVar_list[0] as! Int64
-
-    return DemoExpiredMessage(
-      cooldownUntilEpochMs: cooldownUntilEpochMs
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      cooldownUntilEpochMs
-    ]
-  }
-  static func == (lhs: DemoExpiredMessage, rhs: DemoExpiredMessage) -> Bool {
-    if Swift.type(of: lhs) != Swift.type(of: rhs) {
-      return false
-    }
-    return MessagesPigeonInternal.deepEquals(lhs.cooldownUntilEpochMs, rhs.cooldownUntilEpochMs)
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine("DemoExpiredMessage")
-    MessagesPigeonInternal.deepHash(value: cooldownUntilEpochMs, hasher: &hasher)
-  }
-
-  public var description: String {
-    return "DemoExpiredMessage(cooldownUntilEpochMs: \(String(describing: cooldownUntilEpochMs)))"
-  }
-}
-
 private class MessagesPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -529,13 +439,9 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 132:
       return StatusChangedMessage.fromList(self.readValue() as! [Any?])
     case 133:
-      return LogMessage.fromList(self.readValue() as! [Any?])
-    case 134:
       return TrafficChangedMessage.fromList(self.readValue() as! [Any?])
-    case 135:
+    case 134:
       return ErrorMessage.fromList(self.readValue() as! [Any?])
-    case 136:
-      return DemoExpiredMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -556,17 +462,11 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? StatusChangedMessage {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? LogMessage {
+    } else if let value = value as? TrafficChangedMessage {
       super.writeByte(133)
       super.writeValue(value.toList())
-    } else if let value = value as? TrafficChangedMessage {
-      super.writeByte(134)
-      super.writeValue(value.toList())
     } else if let value = value as? ErrorMessage {
-      super.writeByte(135)
-      super.writeValue(value.toList())
-    } else if let value = value as? DemoExpiredMessage {
-      super.writeByte(136)
+      super.writeByte(134)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
