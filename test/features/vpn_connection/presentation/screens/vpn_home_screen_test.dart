@@ -14,6 +14,7 @@ import 'package:vpn_osin/features/server_config/domain/repositories/server_repos
 import 'package:vpn_osin/features/server_config/domain/repositories/settings_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/subscription_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/services/singbox_config_builder.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/auto_switch_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
@@ -26,6 +27,7 @@ import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/auto_switch_toggle.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connect_button.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
@@ -167,6 +169,8 @@ void main() {
     ThemeData? theme,
     bool disableAnimations = false,
     bool autoSwitch = false,
+    Stream<bool>? autoSwitchStream,
+    Future<bool> Function()? autoSwitchEnabled,
     List<ServerProfile> subscriptionServers = const [],
   }) async {
     final serversController = StreamController<List<ServerProfile>>();
@@ -179,7 +183,15 @@ void main() {
     when(repository.watchActive).thenAnswer((_) => activeController.stream);
     final settings = MockSettingsRepository();
     final subscriptionRepo = MockSubscriptionRepository();
-    when(settings.autoSwitchEnabled).thenAnswer((_) async => autoSwitch);
+    when(settings.autoSwitchEnabled).thenAnswer(
+      (_) async =>
+          autoSwitchEnabled != null ? await autoSwitchEnabled() : autoSwitch,
+    );
+    when(settings.watchAutoSwitch).thenAnswer(
+      (_) => autoSwitchStream ?? Stream<bool>.value(autoSwitch),
+    );
+    when(() => settings.setAutoSwitch(enabled: any(named: 'enabled')))
+        .thenAnswer((_) async {});
     when(
       () => subscriptionRepo.serversFor(any()),
     ).thenAnswer((_) async => subscriptionServers);
@@ -190,12 +202,14 @@ void main() {
       repository: repository,
       clipboard: clipboard,
     );
+    final autoSwitch$ = AutoSwitchCubit(settings);
     final subscriptions = MockSubscriptionCubit();
     when(() => subscriptions.state).thenReturn(const SubscriptionState());
     addTearDown(() async {
       await bloc.close();
       await logs.close();
       await serverList.close();
+      await autoSwitch$.close();
     });
     final content = MultiBlocProvider(
       providers: [
@@ -203,6 +217,7 @@ void main() {
         BlocProvider<LogsCubit>.value(value: logs),
         BlocProvider<ServerListCubit>.value(value: serverList),
         BlocProvider<SubscriptionCubit>.value(value: subscriptions),
+        BlocProvider<AutoSwitchCubit>.value(value: autoSwitch$),
       ],
       child: VpnHomeScreen(resolveConfig: resolveConfig),
     );
@@ -320,6 +335,80 @@ void main() {
           verify(() => connectVpn(captureAny())).captured.single as VpnConfig;
       expect(sent, proxyConfigToVpnConfig(tokyo.config));
       expect(sent.singboxConfigJson, isNot(contains('urltest')));
+    },
+  );
+
+  testWidgets('тумблер автопереключения доступен для сервера из подписки', (
+    tester,
+  ) async {
+    useLargeSurface(tester);
+    final tokyo = _subServer(1, 'tokyo.example');
+
+    await pumpScreen(
+      tester,
+      servers: [tokyo],
+      active: tokyo,
+      subscriptionServers: [tokyo],
+    );
+
+    expect(find.byType(AutoSwitchToggle), findsOneWidget);
+    final toggle = tester.widget<Switch>(find.byType(Switch));
+    expect(toggle.onChanged, isNotNull);
+  });
+
+  testWidgets('тумблер автопереключения недоступен для ручного сервера', (
+    tester,
+  ) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
+
+    expect(find.byType(AutoSwitchToggle), findsOneWidget);
+    final toggle = tester.widget<Switch>(find.byType(Switch));
+    expect(toggle.onChanged, isNull);
+  });
+
+  testWidgets('без активного сервера тумблер не отображается', (tester) async {
+    useLargeSurface(tester);
+
+    await pumpScreen(tester);
+
+    expect(find.byType(AutoSwitchToggle), findsNothing);
+  });
+
+  testWidgets(
+    'переключение тумблера пересобирает активный конфиг (single→group)',
+    (tester) async {
+      useLargeSurface(tester);
+      final tokyo = _subServer(1, 'tokyo.example');
+      final osaka = _subServer(2, 'osaka.example');
+      final autoController = StreamController<bool>.broadcast();
+      addTearDown(autoController.close);
+      var enabled = false;
+
+      await pumpScreen(
+        tester,
+        servers: [tokyo, osaka],
+        active: tokyo,
+        subscriptionServers: [tokyo, osaka],
+        autoSwitchStream: autoController.stream,
+        autoSwitchEnabled: () async => enabled,
+      );
+
+      enabled = true;
+      autoController.add(true);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pump();
+
+      final sent =
+          verify(() => connectVpn(captureAny())).captured.single as VpnConfig;
+      expect(sent.singboxConfigJson, contains('urltest'));
+      expect(
+        sent.singboxConfigJson,
+        toAutoSwitchJson([tokyo.config, osaka.config]),
+      );
     },
   );
 

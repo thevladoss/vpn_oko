@@ -9,6 +9,8 @@ import 'package:vpn_osin/core/theme/vpn_status.dart';
 import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/auto_switch_cubit.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/auto_switch_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
@@ -17,6 +19,7 @@ import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
+import 'package:vpn_osin/features/vpn_connection/presentation/widgets/auto_switch_toggle.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connect_button.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
@@ -78,7 +81,14 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
       unawaited(_entrance.forward());
     }
     final active = activeServerProfile(context.read<ServerListCubit>().state);
+    _syncAutoSwitchAvailability(active);
     unawaited(_dispatchActiveConfig(active));
+  }
+
+  void _syncAutoSwitchAvailability(ServerProfile? active) {
+    context.read<AutoSwitchCubit>().setAvailable(
+          available: active?.subscriptionId != null,
+        );
   }
 
   Future<void> _dispatchActiveConfig(ServerProfile? active) async {
@@ -147,10 +157,24 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
           listenWhen: (previous, current) {
             final before = activeServerProfile(previous);
             final after = activeServerProfile(current);
-            return before?.id != after?.id || before?.config != after?.config;
+            return before?.id != after?.id ||
+                before?.config != after?.config ||
+                before?.subscriptionId != after?.subscriptionId;
           },
           listener: (context, serverState) {
-            unawaited(_dispatchActiveConfig(activeServerProfile(serverState)));
+            final active = activeServerProfile(serverState);
+            _syncAutoSwitchAvailability(active);
+            unawaited(_dispatchActiveConfig(active));
+          },
+        ),
+        BlocListener<AutoSwitchCubit, AutoSwitchState>(
+          listenWhen: (previous, current) =>
+              previous.enabled != current.enabled,
+          listener: (context, _) {
+            final active = activeServerProfile(
+              context.read<ServerListCubit>().state,
+            );
+            unawaited(_dispatchActiveConfig(active));
           },
         ),
         BlocListener<VpnConnectionBloc, VpnConnectionState>(
@@ -249,6 +273,16 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                                   onTap: () => _openServerSheet(context),
                                 ),
                         ),
+                        if (activeProfile != null) ...[
+                          const SizedBox(height: 12),
+                          _Staggered(
+                            animation: _entrance,
+                            interval: _interval(
+                              OsinMotion.staggerServerCard,
+                            ),
+                            child: const AutoSwitchToggle(),
+                          ),
+                        ],
                         const SizedBox(height: 24),
                         _Staggered(
                           animation: _entrance,

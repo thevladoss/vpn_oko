@@ -7,6 +7,7 @@ import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/core/widgets/top_alert_controller.dart';
 import 'package:vpn_osin/core/widgets/top_alert_overlay.dart';
 import 'package:vpn_osin/core/widgets/top_alert_scope.dart';
+import 'package:vpn_osin/features/server_config/presentation/cubit/auto_switch_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
@@ -85,6 +86,10 @@ class _OsinAppState extends State<OsinApp> {
                 unawaited(cubit.refreshStaleOnOpen());
                 return cubit;
               },
+            ),
+            BlocProvider(
+              create: (_) =>
+                  AutoSwitchCubit(widget.dependencies.settingsRepository),
             ),
           ],
           child: VpnHomeScreen(
