@@ -58,7 +58,6 @@ class _OsinAppState extends State<OsinApp> {
               create: (_) => VpnConnectionBloc(
                 watchVpnState: widget.dependencies.watchVpnState,
                 watchTraffic: widget.dependencies.watchTraffic,
-                watchDemoLimit: widget.dependencies.watchDemoLimit,
                 connectVpn: widget.dependencies.connectVpn,
                 disconnectVpn: widget.dependencies.disconnectVpn,
                 syncStatus: widget.dependencies.syncStatus,

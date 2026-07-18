@@ -3,9 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/latency_result.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 
 Widget host(Widget child) {
   return MediaQuery(
@@ -18,17 +15,7 @@ Widget host(Widget child) {
 }
 
 void main() {
-  final now = DateTime.now();
-  final soon = now.add(const Duration(seconds: 90));
-
   final builders = <String, Widget Function()>{
-    'DemoCountdown': () => DemoCountdown(deadline: soon),
-    'CooldownNotice': () => CooldownNotice(cooldownUntil: soon),
-    'DemoExpiredOverlay': () => SizedBox(
-      width: 360,
-      height: 720,
-      child: Stack(children: [DemoExpiredOverlay(cooldownUntil: soon)]),
-    ),
     'ServerListTile': () => SizedBox(
       width: 360,
       child: ServerListTile(

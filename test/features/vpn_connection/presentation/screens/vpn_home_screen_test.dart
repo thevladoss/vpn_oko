@@ -19,7 +19,6 @@ import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_c
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 import 'package:vpn_osin/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
-import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
@@ -29,9 +28,6 @@ import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connectio
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/auto_switch_toggle.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connect_button.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_indicator.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordmark.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
@@ -90,7 +86,6 @@ final _tokyo = ServerProfile(
 void main() {
   late MockWatchVpnState watchVpnState;
   late MockWatchTraffic watchTraffic;
-  late MockWatchDemoLimit watchDemoLimit;
   late MockConnectVpn connectVpn;
   late MockDisconnectVpn disconnectVpn;
   late MockSyncStatus syncStatus;
@@ -99,7 +94,6 @@ void main() {
 
   late StreamController<VpnState> stateController;
   late StreamController<TrafficStats> trafficController;
-  late StreamController<DemoExpiry> demoController;
 
   setUpAll(() {
     registerFallbackValue(
@@ -116,7 +110,6 @@ void main() {
   setUp(() {
     watchVpnState = MockWatchVpnState();
     watchTraffic = MockWatchTraffic();
-    watchDemoLimit = MockWatchDemoLimit();
     connectVpn = MockConnectVpn();
     disconnectVpn = MockDisconnectVpn();
     syncStatus = MockSyncStatus();
@@ -125,12 +118,10 @@ void main() {
 
     stateController = StreamController<VpnState>.broadcast();
     trafficController = StreamController<TrafficStats>.broadcast();
-    demoController = StreamController<DemoExpiry>.broadcast();
 
     when(() => syncStatus()).thenAnswer((_) async {});
     when(() => watchVpnState()).thenAnswer((_) => stateController.stream);
     when(() => watchTraffic()).thenAnswer((_) => trafficController.stream);
-    when(() => watchDemoLimit()).thenAnswer((_) => demoController.stream);
     when(() => connectVpn(any())).thenAnswer((_) async {});
     when(() => disconnectVpn()).thenAnswer((_) async {});
   });
@@ -138,13 +129,11 @@ void main() {
   tearDown(() async {
     await stateController.close();
     await trafficController.close();
-    await demoController.close();
   });
 
   VpnConnectionBloc buildBloc() => VpnConnectionBloc(
     watchVpnState: watchVpnState,
     watchTraffic: watchTraffic,
-    watchDemoLimit: watchDemoLimit,
     connectVpn: connectVpn,
     disconnectVpn: disconnectVpn,
     syncStatus: syncStatus,
@@ -557,78 +546,13 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('connected: показывает обратный отсчёт сессии', (tester) async {
-    useLargeSurface(tester);
-
-    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
-
-    stateController.add(VpnConnected(connectedSince: DateTime.now()));
-    await tester.pump();
-    await tester.pump();
-
-    expect(find.byType(DemoCountdown), findsOneWidget);
-    expect(find.text('Демо'), findsOneWidget);
-
-    await tester.pumpWidget(const SizedBox());
-    await tester.pump();
-  });
-
-  testWidgets('demoExpired: показывает оверлей истечения демо', (tester) async {
-    useLargeSurface(tester);
-
-    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
-
-    demoController.add(
-      DemoExpiry(
-        cooldownUntil: DateTime.now().add(const Duration(milliseconds: 400)),
-        justExpired: true,
-      ),
-    );
-    await tester.pump();
-    await tester.pump();
-
-    expect(find.byType(DemoExpiredOverlay), findsOneWidget);
-    expect(find.text('Вы исчерпали 5 минут демо подключения'), findsOneWidget);
-
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pumpWidget(const SizedBox());
-    await tester.pump();
-  });
-
-  testWidgets('cooldown без истечения: уведомление и блок Connect', (
-    tester,
-  ) async {
-    useLargeSurface(tester);
-
-    await pumpScreen(tester, servers: [_tokyo], active: _tokyo);
-
-    demoController.add(
-      DemoExpiry(
-        cooldownUntil: DateTime.now().add(const Duration(milliseconds: 400)),
-        justExpired: false,
-      ),
-    );
-    await tester.pump();
-    await tester.pump();
-
-    expect(find.byType(CooldownNotice), findsOneWidget);
-    expect(find.byType(DemoExpiredOverlay), findsNothing);
-
-    final button = tester.widget<ConnectButton>(find.byType(ConnectButton));
-    expect(button.onConnect, isNull);
-
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pumpWidget(const SizedBox());
-    await tester.pump();
-  });
-
   for (final (name, theme) in <(String, ThemeData)>[
     ('dark', OsinTheme.dark),
     ('light', OsinTheme.light),
   ]) {
     for (final reduceMotion in [false, true]) {
       testWidgets(
-        'ирис держит Rect при демо-чипе и кулдауне '
+        'ирис держит Rect при переходе в connected '
         '($name, reduce=$reduceMotion)',
         (tester) async {
           useLargeSurface(tester);
@@ -647,30 +571,11 @@ void main() {
           await tester.pump();
           await tester.pump();
 
-          expect(find.byType(DemoCountdown), findsOneWidget);
           expect(
             tester.getRect(find.byType(IrisIndicator)),
             rectDisconnected,
           );
 
-          demoController.add(
-            DemoExpiry(
-              cooldownUntil: DateTime.now().add(
-                const Duration(milliseconds: 400),
-              ),
-              justExpired: false,
-            ),
-          );
-          await tester.pump();
-          await tester.pump();
-
-          expect(find.byType(CooldownNotice), findsOneWidget);
-          expect(
-            tester.getRect(find.byType(IrisIndicator)),
-            rectDisconnected,
-          );
-
-          await tester.pump(const Duration(seconds: 1));
           await tester.pumpWidget(const SizedBox());
           await tester.pump();
         },

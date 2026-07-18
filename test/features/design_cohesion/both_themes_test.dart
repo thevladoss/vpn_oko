@@ -6,9 +6,6 @@ import 'package:vpn_osin/features/server_config/presentation/widgets/empty_serve
 import 'package:vpn_osin/features/server_config/presentation/widgets/latency_pill.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/protocol_badge.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 
 Widget host(Widget child, ThemeData theme) {
   return MaterialApp(
@@ -19,8 +16,6 @@ Widget host(Widget child, ThemeData theme) {
 
 ThemeData themeOf(String name) =>
     name == 'dark' ? OsinTheme.dark : OsinTheme.light;
-
-const _expiredTitle = 'Вы исчерпали 5 минут демо подключения';
 
 ServerListTile _tile({required bool active}) {
   return ServerListTile(
@@ -37,14 +32,6 @@ ServerListTile _tile({required bool active}) {
   );
 }
 
-Widget _overlay(DateTime cooldownUntil) {
-  return SizedBox(
-    width: 360,
-    height: 720,
-    child: Stack(children: [DemoExpiredOverlay(cooldownUntil: cooldownUntil)]),
-  );
-}
-
 class _Case {
   const _Case(this.name, this.builder, this.finder);
 
@@ -54,10 +41,6 @@ class _Case {
 }
 
 void main() {
-  final now = DateTime.now();
-  final soon = now.add(const Duration(seconds: 90));
-  final past = now.subtract(const Duration(seconds: 1));
-
   final cases = <_Case>[
     _Case(
       'ProtocolBadge',
@@ -95,34 +78,6 @@ void main() {
       'EmptyServerPasteField',
       () => EmptyServerPasteField(onPaste: () {}),
       () => find.text('Добавьте свой первый сервер'),
-    ),
-    _Case(
-      'DemoCountdown выше минуты',
-      () => DemoCountdown(deadline: soon),
-      () => find.byType(DemoCountdown),
-    ),
-    _Case(
-      'DemoCountdown под минуту',
-      () => DemoCountdown(
-        deadline: now.add(const Duration(seconds: 30)),
-        warnStyle: const TextStyle(),
-      ),
-      () => find.byType(DemoCountdown),
-    ),
-    _Case(
-      'DemoExpiredOverlay кулдаун активен',
-      () => _overlay(soon),
-      () => find.text(_expiredTitle),
-    ),
-    _Case(
-      'DemoExpiredOverlay кулдаун истёк',
-      () => _overlay(past),
-      () => find.text(_expiredTitle),
-    ),
-    _Case(
-      'CooldownNotice',
-      () => CooldownNotice(cooldownUntil: soon),
-      () => find.textContaining('Доступно через'),
     ),
   ];
 

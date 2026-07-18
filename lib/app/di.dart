@@ -26,7 +26,6 @@ import 'package:vpn_osin/features/vpn_connection/domain/usecases/connect_vpn.dar
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/sync_status.dart';
-import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_demo_limit.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_traffic.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_vpn_state.dart';
 
@@ -37,7 +36,6 @@ class AppDependencies {
     vpnRepository = VpnRepositoryImpl(vpnDatasource);
     watchVpnState = WatchVpnState(vpnRepository);
     watchTraffic = WatchTraffic(vpnRepository);
-    watchDemoLimit = WatchDemoLimit(vpnRepository);
     connectVpn = ConnectVpn(vpnRepository);
     disconnectVpn = DisconnectVpn(vpnRepository);
     syncStatus = SyncStatus(vpnRepository);
@@ -74,7 +72,6 @@ class AppDependencies {
   late final RemoveSubscription removeSubscription;
   late final WatchVpnState watchVpnState;
   late final WatchTraffic watchTraffic;
-  late final WatchDemoLimit watchDemoLimit;
   late final ConnectVpn connectVpn;
   late final DisconnectVpn disconnectVpn;
   late final SyncStatus syncStatus;

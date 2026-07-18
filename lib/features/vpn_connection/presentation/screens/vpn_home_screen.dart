@@ -21,9 +21,6 @@ import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connectio
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/auto_switch_toggle.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/connect_button.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/cooldown_notice.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_countdown.dart';
-import 'package:vpn_osin/features/vpn_connection/presentation/widgets/demo_expired_overlay.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/iris_indicator.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordmark.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
@@ -55,8 +52,6 @@ class VpnHomeScreen extends StatefulWidget {
 class _VpnHomeScreenState extends State<VpnHomeScreen>
     with SingleTickerProviderStateMixin {
   static const Duration _total = Duration(milliseconds: 590);
-  static const double _kDemoChipSlot = 58;
-  static const double _kCooldownSlot = 40;
 
   late final AnimationController _entrance;
   bool _started = false;
@@ -133,12 +128,9 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
 
   VoidCallback? _irisToggle(VpnConnectionState state) {
     return switch (state.status) {
-      VpnStatus.disconnected || VpnStatus.error =>
-        state.cooldownActive
-            ? null
-            : () => context
-                  .read<VpnConnectionBloc>()
-                  .add(const ConnectRequested()),
+      VpnStatus.disconnected || VpnStatus.error => () => context
+          .read<VpnConnectionBloc>()
+          .add(const ConnectRequested()),
       VpnStatus.connected => () => context
           .read<VpnConnectionBloc>()
           .add(const DisconnectRequested()),
@@ -195,11 +187,6 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
             final activeProfile = activeServerProfile(
               context.watch<ServerListCubit>().state,
             );
-            final showDemoChip = state.status == VpnStatus.connected &&
-                state.sessionEndsAt != null;
-            final showCooldown = state.cooldownActive &&
-                !state.demoExpired &&
-                state.cooldownUntil != null;
             return Stack(
               children: [
                 _GlowLayer(accent: accent, status: state.status),
@@ -232,17 +219,6 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: _kDemoChipSlot,
-                          child: showDemoChip
-                              ? Align(
-                                  alignment: Alignment.topCenter,
-                                  child: _DemoSessionChip(
-                                    deadline: state.sessionEndsAt!,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
                         ),
                         if (state.status == VpnStatus.error &&
                             state.errorMessage != null)
@@ -293,27 +269,14 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           ),
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          height: _kCooldownSlot,
-                          child: showCooldown
-                              ? Align(
-                                  alignment: Alignment.topCenter,
-                                  child: CooldownNotice(
-                                    cooldownUntil: state.cooldownUntil!,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        ),
                         _Staggered(
                           animation: _entrance,
                           interval: _interval(OsinMotion.staggerConnectButton),
                           child: ConnectButton(
                             status: state.status,
-                            onConnect: state.cooldownActive
-                                ? null
-                                : () => context
-                                      .read<VpnConnectionBloc>()
-                                      .add(const ConnectRequested()),
+                            onConnect: () => context
+                                .read<VpnConnectionBloc>()
+                                .add(const ConnectRequested()),
                             onDisconnect: () => context
                                 .read<VpnConnectionBloc>()
                                 .add(const DisconnectRequested()),
@@ -324,8 +287,6 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                     ),
                   ),
                 ),
-                if (state.demoExpired && state.cooldownUntil != null)
-                  DemoExpiredOverlay(cooldownUntil: state.cooldownUntil!),
               ],
             );
           },
@@ -402,49 +363,6 @@ class _NoServerCard extends StatelessWidget {
             child: content,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DemoSessionChip extends StatelessWidget {
-  const _DemoSessionChip({required this.deadline});
-
-  final DateTime deadline;
-
-  @override
-  Widget build(BuildContext context) {
-    final tones = context.osinTones;
-    final textTheme = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: tones.surfaceElevated.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: tones.glow),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.hourglass_bottom_rounded,
-            size: 16,
-            color: tones.textSecondary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Демо',
-            style: textTheme.labelSmall?.copyWith(color: tones.textSecondary),
-          ),
-          const SizedBox(width: 10),
-          DemoCountdown(
-            deadline: deadline,
-            style: textTheme.titleMedium?.copyWith(color: tones.textSecondary),
-            warnStyle: textTheme.titleMedium?.copyWith(
-              color: tones.accentTransitional,
-            ),
-          ),
-        ],
       ),
     );
   }
