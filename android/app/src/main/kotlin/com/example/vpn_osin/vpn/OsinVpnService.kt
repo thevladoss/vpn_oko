@@ -55,7 +55,7 @@ class OsinVpnService : VpnService(), CommandServerHandler {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_DISCONNECT) {
-            teardown("stopped by user")
+            teardown()
             return START_NOT_STICKY
         }
         if (intent == null) {
@@ -152,7 +152,7 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     }
 
     override fun serviceStop() {
-        teardown("core requested stop")
+        teardown()
     }
 
     override fun serviceReload() {
@@ -191,7 +191,7 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     }
 
     @Synchronized
-    private fun teardown(reason: String) {
+    private fun teardown() {
         if (state !is VpnConnectionState.Connecting && state !is VpnConnectionState.Connected) return
         transition(VpnConnectionState.Disconnecting)
         releaseCore()
@@ -217,11 +217,11 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     }
 
     override fun onRevoke() {
-        teardown("revoked by system")
+        teardown()
     }
 
     override fun onDestroy() {
-        teardown("service destroyed")
+        teardown()
         worker.shutdown()
         super.onDestroy()
     }

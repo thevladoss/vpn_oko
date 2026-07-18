@@ -10,7 +10,6 @@ class OsinMotion {
   static const Duration staggerServerCard = Duration(milliseconds: 60);
   static const Duration staggerTrafficPanel = Duration(milliseconds: 120);
   static const Duration staggerConnectButton = Duration(milliseconds: 180);
-  static const Duration staggerLogConsole = Duration(milliseconds: 240);
 
   static const Duration statusCrossfade = Duration(milliseconds: 300);
   static const Curve statusCrossfadeCurve = Curves.easeInOut;
