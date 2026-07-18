@@ -28,52 +28,27 @@ void main() {
   group('demultiplex', () {
     test('routes each event type to its own stream only', () async {
       final statuses = <StatusChangedMessage>[];
-      final logs = <LogMessage>[];
       final traffics = <TrafficChangedMessage>[];
       final errors = <ErrorMessage>[];
 
       bridge.statusEvents.listen(statuses.add);
-      bridge.logEvents.listen(logs.add);
       bridge.trafficEvents.listen(traffics.add);
       bridge.errorEvents.listen(errors.add);
 
       final status =
           StatusChangedMessage(status: VpnStatusMessage.connecting);
-      final log = LogMessage(text: 'hi', timestampMillis: 1, level: 'info');
       final traffic = TrafficChangedMessage(rxBytes: 10, txBytes: 20);
       final error = ErrorMessage(code: 'E1', message: 'boom');
 
       source
         ..add(status)
-        ..add(log)
         ..add(traffic)
         ..add(error);
       await pumpEventQueue();
 
       expect(statuses, [status]);
-      expect(logs, [log]);
       expect(traffics, [traffic]);
       expect(errors, [error]);
-    });
-
-    test('routes DemoExpiredMessage to demoEvents only', () async {
-      final demos = <DemoExpiredMessage>[];
-      final statuses = <StatusChangedMessage>[];
-      final errors = <ErrorMessage>[];
-
-      bridge.demoEvents.listen(demos.add);
-      bridge.statusEvents.listen(statuses.add);
-      bridge.errorEvents.listen(errors.add);
-
-      final demo = DemoExpiredMessage(cooldownUntilEpochMs: 1720000000000);
-
-      source.add(demo);
-      await pumpEventQueue();
-
-      expect(demos, [demo]);
-      expect(demos.single.cooldownUntilEpochMs, 1720000000000);
-      expect(statuses, isEmpty);
-      expect(errors, isEmpty);
     });
 
     test('preserves order within a single stream', () async {

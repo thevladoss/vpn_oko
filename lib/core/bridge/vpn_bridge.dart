@@ -14,20 +14,14 @@ class VpnBridge {
   late final StreamSubscription<VpnEventMessage> _sub;
   final StreamController<StatusChangedMessage> _status =
       StreamController<StatusChangedMessage>.broadcast();
-  final StreamController<LogMessage> _logs =
-      StreamController<LogMessage>.broadcast();
   final StreamController<TrafficChangedMessage> _traffic =
       StreamController<TrafficChangedMessage>.broadcast();
   final StreamController<ErrorMessage> _errors =
       StreamController<ErrorMessage>.broadcast();
-  final StreamController<DemoExpiredMessage> _demo =
-      StreamController<DemoExpiredMessage>.broadcast();
 
   Stream<StatusChangedMessage> get statusEvents => _status.stream;
-  Stream<LogMessage> get logEvents => _logs.stream;
   Stream<TrafficChangedMessage> get trafficEvents => _traffic.stream;
   Stream<ErrorMessage> get errorEvents => _errors.stream;
-  Stream<DemoExpiredMessage> get demoEvents => _demo.stream;
 
   Future<void> startVpn(VpnConfigMessage config) => _hostApi.startVpn(config);
 
@@ -39,23 +33,17 @@ class VpnBridge {
     switch (event) {
       case StatusChangedMessage():
         _status.add(event);
-      case LogMessage():
-        _logs.add(event);
       case TrafficChangedMessage():
         _traffic.add(event);
       case ErrorMessage():
         _errors.add(event);
-      case DemoExpiredMessage():
-        _demo.add(event);
     }
   }
 
   Future<void> dispose() async {
     await _sub.cancel();
     await _status.close();
-    await _logs.close();
     await _traffic.close();
     await _errors.close();
-    await _demo.close();
   }
 }
