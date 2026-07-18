@@ -1,7 +1,5 @@
 package com.example.vpn_osin.bridge
 
-import com.example.vpn_osin.vpn.DemoLimit
-
 object VpnEventBus {
     private val listeners =
         java.util.concurrent.CopyOnWriteArraySet<(VpnEventMessage) -> Unit>()
@@ -35,16 +33,9 @@ object VpnEventBus {
         when (event) {
             is StatusChangedMessage -> {
                 lastStatus = event
-                val sessionEndsAt =
-                    if (event.status == VpnStatusMessage.CONNECTED && event.connectedSinceEpochMs != null) {
-                        event.connectedSinceEpochMs + DemoLimit.SESSION_MS
-                    } else {
-                        null
-                    }
                 snapshot = snapshot.copy(
                     status = event.status,
                     connectedSinceEpochMs = event.connectedSinceEpochMs,
-                    sessionEndsAtEpochMs = sessionEndsAt,
                 )
             }
             is TrafficChangedMessage -> {

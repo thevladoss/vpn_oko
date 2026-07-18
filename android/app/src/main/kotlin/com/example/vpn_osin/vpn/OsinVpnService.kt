@@ -4,11 +4,8 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.net.VpnService
-import android.os.Handler
-import android.os.Looper
 import android.os.ParcelFileDescriptor
 import androidx.core.app.ServiceCompat
-import com.example.vpn_osin.bridge.DemoExpiredMessage
 import com.example.vpn_osin.bridge.ErrorMessage
 import com.example.vpn_osin.bridge.StatusChangedMessage
 import com.example.vpn_osin.bridge.TrafficChangedMessage
@@ -29,25 +26,15 @@ import io.nekohasekai.libbox.StringIterator
 import io.nekohasekai.libbox.SystemProxyStatus
 import java.io.File
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OsinVpnService : VpnService(), CommandServerHandler {
 
     private var state: VpnConnectionState = VpnConnectionState.Disconnected
     private val notificationFactory by lazy { VpnNotificationFactory(this) }
-    private val demoStore by lazy { DemoCooldownStore.from(this) }
-    private val mainHandler = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor { runnable ->
         Thread(runnable, "osin-vpn-core").also { it.isDaemon = true }
     }
-
-    @Volatile
-    private var demoTimer: ScheduledExecutorService? = null
-
-    @Volatile
-    private var expiredByDemo = false
 
     @Volatile
     private var tunnel: ParcelFileDescriptor? = null
@@ -76,7 +63,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
             return START_NOT_STICKY
         }
 
-        expiredByDemo = false
         notificationFactory.ensureChannel()
         ServiceCompat.startForeground(
             this,
@@ -123,32 +109,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
         val connectedSince = System.currentTimeMillis()
         transition(VpnConnectionState.Connected(connectedSince))
         updateNotification("Connected", connectedSince)
-        scheduleExpiry()
-    }
-
-    private fun scheduleExpiry() {
-        cancelDemoTimer()
-        val timer = Executors.newSingleThreadScheduledExecutor { runnable ->
-            Thread(runnable, "osin-demo-timer").also { it.isDaemon = true }
-        }
-        timer.schedule({ expireSession() }, DemoLimit.SESSION_MS, TimeUnit.MILLISECONDS)
-        demoTimer = timer
-    }
-
-    private fun expireSession() {
-        val now = System.currentTimeMillis()
-        demoStore.recordExpiry(now)
-        val cooldownUntil = demoStore.cooldownUntil(now) ?: (now + DemoLimit.COOLDOWN_MS)
-        mainHandler.post {
-            expiredByDemo = true
-            VpnEventBus.emit(DemoExpiredMessage(cooldownUntil))
-            teardown("session ended by demo limit")
-        }
-    }
-
-    private fun cancelDemoTimer() {
-        demoTimer?.shutdownNow()
-        demoTimer = null
     }
 
     private fun startTrafficClient() {
@@ -233,24 +193,11 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     @Synchronized
     private fun teardown(reason: String) {
         if (state !is VpnConnectionState.Connecting && state !is VpnConnectionState.Connected) return
-        cancelDemoTimer()
         transition(VpnConnectionState.Disconnecting)
         releaseCore()
-        if (expiredByDemo) {
-            updateExpiredNotification()
-            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
-        } else {
-            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        }
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         transition(VpnConnectionState.Disconnected)
         stopSelf()
-    }
-
-    private fun updateExpiredNotification() {
-        getSystemService(NotificationManager::class.java).notify(
-            VpnNotificationFactory.NOTIFICATION_ID,
-            notificationFactory.expired("Демо: 5 минут вышло. Кулдаун 2 мин"),
-        )
     }
 
     private fun releaseCore() {
@@ -275,7 +222,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
 
     override fun onDestroy() {
         teardown("service destroyed")
-        cancelDemoTimer()
         worker.shutdown()
         super.onDestroy()
     }

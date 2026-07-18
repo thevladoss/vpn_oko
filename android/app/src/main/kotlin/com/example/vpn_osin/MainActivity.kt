@@ -7,7 +7,6 @@ import android.net.VpnService
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.example.vpn_osin.bridge.DemoExpiredMessage
 import com.example.vpn_osin.bridge.ErrorMessage
 import com.example.vpn_osin.bridge.StatusChangedMessage
 import com.example.vpn_osin.bridge.VpnConfigMessage
@@ -18,7 +17,6 @@ import com.example.vpn_osin.bridge.VpnEventsStreamHandler
 import com.example.vpn_osin.bridge.VpnHostApi
 import com.example.vpn_osin.bridge.VpnHostApiImpl
 import com.example.vpn_osin.bridge.VpnStatusMessage
-import com.example.vpn_osin.vpn.DemoCooldownStore
 import com.example.vpn_osin.vpn.OsinVpnService
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -26,7 +24,6 @@ import io.flutter.embedding.engine.FlutterEngine
 class MainActivity : FlutterFragmentActivity(), VpnConsentGateway {
 
     private var pendingConfig: VpnConfigMessage? = null
-    private lateinit var demoStore: DemoCooldownStore
 
     private val vpnConsent =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -45,19 +42,12 @@ class MainActivity : FlutterFragmentActivity(), VpnConsentGateway {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        demoStore = DemoCooldownStore.from(this)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
-        VpnHostApi.setUp(messenger, VpnHostApiImpl(this, demoStore))
+        VpnHostApi.setUp(messenger, VpnHostApiImpl(this))
         VpnEventsStreamHandler.register(messenger, VpnEventListener())
     }
 
     override fun connect(config: VpnConfigMessage) {
-        val now = System.currentTimeMillis()
-        val until = demoStore.cooldownUntil(now)
-        if (until != null) {
-            VpnEventBus.emit(DemoExpiredMessage(until))
-            return
-        }
         ensureNotificationPermission()
         val consent = VpnService.prepare(this)
         if (consent == null) {

@@ -1,10 +1,7 @@
 package com.example.vpn_osin.bridge
 
-import com.example.vpn_osin.vpn.DemoCooldownStore
-
 class VpnHostApiImpl(
     private val gateway: VpnConsentGateway,
-    private val store: DemoCooldownStore,
 ) : VpnHostApi {
     override fun startVpn(config: VpnConfigMessage, callback: (Result<Unit>) -> Unit) {
         gateway.connect(config)
@@ -16,6 +13,5 @@ class VpnHostApiImpl(
         callback(Result.success(Unit))
     }
 
-    override fun getStatus(): VpnStatusSnapshotMessage =
-        VpnEventBus.snapshot.copy(cooldownUntilEpochMs = store.cooldownUntil(System.currentTimeMillis()))
+    override fun getStatus(): VpnStatusSnapshotMessage = VpnEventBus.snapshot
 }

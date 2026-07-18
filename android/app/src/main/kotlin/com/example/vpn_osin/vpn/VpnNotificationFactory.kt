@@ -31,16 +31,6 @@ class VpnNotificationFactory(private val context: Context) {
             }
             .build()
 
-    fun expired(text: String): Notification =
-        Notification.Builder(context, CHANNEL_ID)
-            .setContentTitle("osin VPN")
-            .setContentText(text)
-            .setSmallIcon(android.R.drawable.ic_lock_lock)
-            .setOngoing(false)
-            .setAutoCancel(true)
-            .setContentIntent(openAppIntent())
-            .build()
-
     private fun openAppIntent(): PendingIntent {
         val launch = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
