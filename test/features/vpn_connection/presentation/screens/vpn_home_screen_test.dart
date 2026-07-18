@@ -11,6 +11,9 @@ import 'package:vpn_osin/core/widgets/top_alert.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/proxy_config.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/server_profile.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/settings_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/subscription_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/services/singbox_config_builder.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
@@ -19,6 +22,7 @@ import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart
 import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
@@ -44,8 +48,29 @@ class MockWatchLogs extends Mock implements WatchLogs {}
 
 class MockServerRepository extends Mock implements ServerRepository {}
 
+class MockSettingsRepository extends Mock implements SettingsRepository {}
+
+class MockSubscriptionRepository extends Mock
+    implements SubscriptionRepository {}
+
 class MockSubscriptionCubit extends MockCubit<SubscriptionState>
     implements SubscriptionCubit {}
+
+ServerProfile _subServer(int id, String host) => ServerProfile(
+  id: id,
+  label: host,
+  config: VlessConfig(
+    uuid: 'deadbeef-1111-2222-3333-444455556666',
+    host: host,
+    port: 443,
+    transport: 'tcp',
+    security: 'none',
+    name: host,
+  ),
+  rawUrl: 'vless://x@$host:443',
+  createdAt: DateTime(2026, 7, 17),
+  subscriptionId: 5,
+);
 
 const _tokyoConfig = VlessConfig(
   uuid: 'deadbeef-1111-2222-3333-444455556666',
@@ -141,6 +166,8 @@ void main() {
     ServerProfile? active,
     ThemeData? theme,
     bool disableAnimations = false,
+    bool autoSwitch = false,
+    List<ServerProfile> subscriptionServers = const [],
   }) async {
     final serversController = StreamController<List<ServerProfile>>();
     final activeController = StreamController<ServerProfile?>();
@@ -150,6 +177,13 @@ void main() {
     });
     when(repository.watchAll).thenAnswer((_) => serversController.stream);
     when(repository.watchActive).thenAnswer((_) => activeController.stream);
+    final settings = MockSettingsRepository();
+    final subscriptionRepo = MockSubscriptionRepository();
+    when(settings.autoSwitchEnabled).thenAnswer((_) async => autoSwitch);
+    when(
+      () => subscriptionRepo.serversFor(any()),
+    ).thenAnswer((_) async => subscriptionServers);
+    final resolveConfig = ResolveActiveVpnConfig(settings, subscriptionRepo);
     final bloc = buildBloc()..add(const VpnStarted());
     final logs = LogsCubit(watchLogs: watchLogs);
     final serverList = ServerListCubit(
@@ -170,7 +204,7 @@ void main() {
         BlocProvider<ServerListCubit>.value(value: serverList),
         BlocProvider<SubscriptionCubit>.value(value: subscriptions),
       ],
-      child: const VpnHomeScreen(),
+      child: VpnHomeScreen(resolveConfig: resolveConfig),
     );
     await tester.pumpWidget(
       wrapWithTopAlert(
@@ -232,6 +266,60 @@ void main() {
       verify(
         () => connectVpn(proxyConfigToVpnConfig(_tokyoConfig)),
       ).called(1);
+    },
+  );
+
+  testWidgets(
+    'ON + активный из подписки: Connect шлёт групповой конфиг (urltest)',
+    (tester) async {
+      useLargeSurface(tester);
+      final tokyo = _subServer(1, 'tokyo.example');
+      final osaka = _subServer(2, 'osaka.example');
+
+      await pumpScreen(
+        tester,
+        servers: [tokyo, osaka],
+        active: tokyo,
+        autoSwitch: true,
+        subscriptionServers: [tokyo, osaka],
+      );
+
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pump();
+
+      final sent =
+          verify(() => connectVpn(captureAny())).captured.single as VpnConfig;
+      expect(sent.singboxConfigJson, contains('urltest'));
+      expect(sent.singboxConfigJson, contains('proxy-0'));
+      expect(sent.singboxConfigJson, contains('proxy-1'));
+      expect(
+        sent.singboxConfigJson,
+        toAutoSwitchJson([tokyo.config, osaka.config]),
+      );
+    },
+  );
+
+  testWidgets(
+    'OFF + активный из подписки: Connect шлёт одиночный конфиг',
+    (tester) async {
+      useLargeSurface(tester);
+      final tokyo = _subServer(1, 'tokyo.example');
+      final osaka = _subServer(2, 'osaka.example');
+
+      await pumpScreen(
+        tester,
+        servers: [tokyo, osaka],
+        active: tokyo,
+        subscriptionServers: [tokyo, osaka],
+      );
+
+      await tester.tap(find.byType(ConnectButton));
+      await tester.pump();
+
+      final sent =
+          verify(() => connectVpn(captureAny())).captured.single as VpnConfig;
+      expect(sent, proxyConfigToVpnConfig(tokyo.config));
+      expect(sent.singboxConfigJson, isNot(contains('urltest')));
     },
   );
 
