@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
-import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
 
 void main() {
   group('VpnState equality', () {
@@ -41,28 +40,6 @@ void main() {
 
     test('different subtypes are not equal', () {
       expect(const VpnConnecting(), isNot(equals(const VpnDisconnecting())));
-    });
-  });
-
-  group('LogEntry equality', () {
-    test('entries with equal fields are equal', () {
-      final time = DateTime.utc(2026);
-      expect(
-        LogEntry(text: 'up', level: LogLevel.info, time: time),
-        equals(LogEntry(text: 'up', level: LogLevel.info, time: time)),
-      );
-    });
-
-    test('entries differ when level differs', () {
-      final time = DateTime.utc(2026);
-      expect(
-        LogEntry(text: 'up', level: LogLevel.info, time: time),
-        isNot(equals(LogEntry(text: 'up', level: LogLevel.error, time: time))),
-      );
-    });
-
-    test('LogLevel resolves by name', () {
-      expect(LogLevel.values.byName('warning'), equals(LogLevel.warning));
     });
   });
 }

@@ -37,16 +37,10 @@ import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordm
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/status_badge.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/traffic_panel.dart';
-import 'package:vpn_osin/features/vpn_logs/domain/entities/log_entry.dart';
-import 'package:vpn_osin/features/vpn_logs/domain/usecases/watch_logs.dart';
-import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
-import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_console.dart';
 
 import '../../../../helpers/fake_clipboard_source.dart';
 import '../../../../helpers/mock_vpn_usecases.dart';
 import '../../../../helpers/top_alert_harness.dart';
-
-class MockWatchLogs extends Mock implements WatchLogs {}
 
 class MockServerRepository extends Mock implements ServerRepository {}
 
@@ -100,13 +94,11 @@ void main() {
   late MockConnectVpn connectVpn;
   late MockDisconnectVpn disconnectVpn;
   late MockSyncStatus syncStatus;
-  late MockWatchLogs watchLogs;
   late MockServerRepository repository;
   late FakeClipboardSource clipboard;
 
   late StreamController<VpnState> stateController;
   late StreamController<TrafficStats> trafficController;
-  late StreamController<LogEntry> logController;
   late StreamController<DemoExpiry> demoController;
 
   setUpAll(() {
@@ -128,20 +120,17 @@ void main() {
     connectVpn = MockConnectVpn();
     disconnectVpn = MockDisconnectVpn();
     syncStatus = MockSyncStatus();
-    watchLogs = MockWatchLogs();
     repository = MockServerRepository();
     clipboard = FakeClipboardSource();
 
     stateController = StreamController<VpnState>.broadcast();
     trafficController = StreamController<TrafficStats>.broadcast();
-    logController = StreamController<LogEntry>.broadcast();
     demoController = StreamController<DemoExpiry>.broadcast();
 
     when(() => syncStatus()).thenAnswer((_) async {});
     when(() => watchVpnState()).thenAnswer((_) => stateController.stream);
     when(() => watchTraffic()).thenAnswer((_) => trafficController.stream);
     when(() => watchDemoLimit()).thenAnswer((_) => demoController.stream);
-    when(() => watchLogs()).thenAnswer((_) => logController.stream);
     when(() => connectVpn(any())).thenAnswer((_) async {});
     when(() => disconnectVpn()).thenAnswer((_) async {});
   });
@@ -149,7 +138,6 @@ void main() {
   tearDown(() async {
     await stateController.close();
     await trafficController.close();
-    await logController.close();
     await demoController.close();
   });
 
@@ -197,7 +185,6 @@ void main() {
     ).thenAnswer((_) async => subscriptionServers);
     final resolveConfig = ResolveActiveVpnConfig(settings, subscriptionRepo);
     final bloc = buildBloc()..add(const VpnStarted());
-    final logs = LogsCubit(watchLogs: watchLogs);
     final serverList = ServerListCubit(
       repository: repository,
       clipboard: clipboard,
@@ -207,14 +194,12 @@ void main() {
     when(() => subscriptions.state).thenReturn(const SubscriptionState());
     addTearDown(() async {
       await bloc.close();
-      await logs.close();
       await serverList.close();
       await autoSwitch$.close();
     });
     final content = MultiBlocProvider(
       providers: [
         BlocProvider<VpnConnectionBloc>.value(value: bloc),
-        BlocProvider<LogsCubit>.value(value: logs),
         BlocProvider<ServerListCubit>.value(value: serverList),
         BlocProvider<SubscriptionCubit>.value(value: subscriptions),
         BlocProvider<AutoSwitchCubit>.value(value: autoSwitch$),
@@ -261,7 +246,6 @@ void main() {
     expect(find.byType(ServerCard), findsOneWidget);
     expect(find.byType(TrafficPanel), findsOneWidget);
     expect(find.byType(ConnectButton), findsOneWidget);
-    expect(find.byType(LogConsole), findsOneWidget);
     expect(find.text('Tokyo'), findsOneWidget);
   });
 

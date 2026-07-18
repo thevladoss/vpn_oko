@@ -29,7 +29,6 @@ import 'package:vpn_osin/features/vpn_connection/presentation/widgets/osin_wordm
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/server_card.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/status_badge.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/widgets/traffic_panel.dart';
-import 'package:vpn_osin/features/vpn_logs/presentation/widgets/log_console.dart';
 
 ServerProfile? activeServerProfile(ServerListState state) {
   final id = state.activeId;
@@ -321,15 +320,9 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const SizedBox(height: LogConsole.collapsedHeight),
                       ],
                     ),
                   ),
-                ),
-                _Staggered(
-                  animation: _entrance,
-                  interval: _interval(OsinMotion.staggerLogConsole),
-                  child: const LogConsole(),
                 ),
                 if (state.demoExpired && state.cooldownUntil != null)
                   DemoExpiredOverlay(cooldownUntil: state.cooldownUntil!),

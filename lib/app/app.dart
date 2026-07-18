@@ -13,7 +13,6 @@ import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/screens/vpn_home_screen.dart';
-import 'package:vpn_osin/features/vpn_logs/presentation/bloc/logs_cubit.dart';
 
 class OsinApp extends StatefulWidget {
   const OsinApp({
@@ -64,10 +63,6 @@ class _OsinAppState extends State<OsinApp> {
                 disconnectVpn: widget.dependencies.disconnectVpn,
                 syncStatus: widget.dependencies.syncStatus,
               )..add(const VpnStarted()),
-            ),
-            BlocProvider(
-              create: (_) =>
-                  LogsCubit(watchLogs: widget.dependencies.watchLogs),
             ),
             BlocProvider(
               create: (_) => ServerListCubit(
