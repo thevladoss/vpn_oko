@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.vpn_osin.bridge.DemoExpiredMessage
 import com.example.vpn_osin.bridge.ErrorMessage
-import com.example.vpn_osin.bridge.LogMessage
 import com.example.vpn_osin.bridge.StatusChangedMessage
 import com.example.vpn_osin.bridge.VpnConfigMessage
 import com.example.vpn_osin.bridge.VpnConsentGateway
@@ -36,22 +35,13 @@ class MainActivity : FlutterFragmentActivity(), VpnConsentGateway {
             if (result.resultCode == RESULT_OK && config != null) {
                 startVpnService(config)
             } else {
-                VpnEventBus.emit(
-                    LogMessage("VPN permission denied", System.currentTimeMillis(), "error"),
-                )
                 VpnEventBus.emit(ErrorMessage("consent_denied", "VPN permission denied by user"))
                 VpnEventBus.emit(StatusChangedMessage(VpnStatusMessage.ERROR))
             }
         }
 
     private val notifPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (!granted) {
-                VpnEventBus.emit(
-                    LogMessage("notifications denied", System.currentTimeMillis(), "warning"),
-                )
-            }
-        }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -65,7 +55,6 @@ class MainActivity : FlutterFragmentActivity(), VpnConsentGateway {
         val now = System.currentTimeMillis()
         val until = demoStore.cooldownUntil(now)
         if (until != null) {
-            VpnEventBus.emit(LogMessage("connect blocked: cooldown", now, "warning"))
             VpnEventBus.emit(DemoExpiredMessage(until))
             return
         }

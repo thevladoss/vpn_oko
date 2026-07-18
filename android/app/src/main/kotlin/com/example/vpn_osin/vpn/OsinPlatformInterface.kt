@@ -11,8 +11,6 @@ import android.os.HandlerThread
 import android.os.Process
 import android.system.Os
 import android.system.OsConstants
-import com.example.vpn_osin.bridge.LogMessage
-import com.example.vpn_osin.bridge.VpnEventBus
 import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
@@ -223,11 +221,7 @@ class OsinPlatformInterface(
 
     override fun readWIFIState(): WIFIState = WIFIState("", "")
 
-    override fun sendNotification(notification: Notification) {
-        val title = notification.title.orEmpty()
-        val body = notification.body.orEmpty()
-        VpnEventBus.emit(LogMessage("$title $body".trim(), System.currentTimeMillis(), "info"))
-    }
+    override fun sendNotification(notification: Notification) {}
 
     override fun systemCertificates(): StringIterator = StringList(emptyList())
 

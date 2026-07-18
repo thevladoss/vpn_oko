@@ -10,7 +10,6 @@ import android.os.ParcelFileDescriptor
 import androidx.core.app.ServiceCompat
 import com.example.vpn_osin.bridge.DemoExpiredMessage
 import com.example.vpn_osin.bridge.ErrorMessage
-import com.example.vpn_osin.bridge.LogMessage
 import com.example.vpn_osin.bridge.StatusChangedMessage
 import com.example.vpn_osin.bridge.TrafficChangedMessage
 import com.example.vpn_osin.bridge.VpnEventBus
@@ -87,9 +86,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
         )
 
         if (!transition(VpnConnectionState.Connecting)) {
-            VpnEventBus.emit(
-                LogMessage("connect ignored: already active", System.currentTimeMillis(), "warning"),
-            )
             return START_NOT_STICKY
         }
 
@@ -145,7 +141,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
         val cooldownUntil = demoStore.cooldownUntil(now) ?: (now + DemoLimit.COOLDOWN_MS)
         mainHandler.post {
             expiredByDemo = true
-            VpnEventBus.emit(LogMessage("demo limit reached", now, "info"))
             VpnEventBus.emit(DemoExpiredMessage(cooldownUntil))
             teardown("session ended by demo limit")
         }
@@ -165,10 +160,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
             val client = CommandClient(TrafficHandler(), options)
             client.connect()
             trafficClient = client
-        }.onFailure {
-            VpnEventBus.emit(
-                LogMessage("traffic stats unavailable: ${it.message}", System.currentTimeMillis(), "warning"),
-            )
         }
     }
 
@@ -188,9 +179,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
             )
         }.onFailure {
             libboxSetup.set(false)
-            VpnEventBus.emit(
-                LogMessage("libbox setup failed: ${it.message}", System.currentTimeMillis(), "error"),
-            )
         }
     }
 
@@ -219,14 +207,9 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     override fun setSystemProxyEnabled(isEnabled: Boolean) {
     }
 
-    override fun writeDebugMessage(message: String?) {
-        if (!message.isNullOrBlank()) {
-            VpnEventBus.emit(LogMessage(message, System.currentTimeMillis(), "info"))
-        }
-    }
+    override fun writeDebugMessage(message: String?) {}
 
     private fun failStart(code: String, reason: String) {
-        VpnEventBus.emit(LogMessage(reason, System.currentTimeMillis(), "error"))
         VpnEventBus.emit(ErrorMessage(code, reason))
         releaseCore()
         transition(VpnConnectionState.Error(code))
@@ -237,14 +220,10 @@ class OsinVpnService : VpnService(), CommandServerHandler {
     @Synchronized
     private fun transition(next: VpnConnectionState): Boolean {
         if (!canTransition(state, next)) {
-            VpnEventBus.emit(
-                LogMessage("illegal transition $state -> $next", System.currentTimeMillis(), "error"),
-            )
             return false
         }
         state = next
         val status = next.toStatusMessage()
-        VpnEventBus.emit(LogMessage("state -> $status", System.currentTimeMillis(), "info"))
         VpnEventBus.emit(
             StatusChangedMessage(status, (next as? VpnConnectionState.Connected)?.sinceEpochMs),
         )
@@ -257,7 +236,6 @@ class OsinVpnService : VpnService(), CommandServerHandler {
         cancelDemoTimer()
         transition(VpnConnectionState.Disconnecting)
         releaseCore()
-        VpnEventBus.emit(LogMessage(reason, System.currentTimeMillis(), "info"))
         if (expiredByDemo) {
             updateExpiredNotification()
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
