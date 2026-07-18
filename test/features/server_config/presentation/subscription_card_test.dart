@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vpn_osin/core/theme/osin_theme.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/subscription.dart';
-import 'package:vpn_osin/features/server_config/presentation/widgets/add_subscription_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/subscription_card.dart';
 
 Subscription _sub({
@@ -124,39 +123,4 @@ void main() {
     });
   });
 
-  group('AddSubscriptionField', () {
-    testWidgets('submit непустого URL зовёт onSubmit и чистит поле', (
-      tester,
-    ) async {
-      final submitted = <String>[];
-      await _pump(
-        tester,
-        AddSubscriptionField(onSubmit: submitted.add),
-      );
-
-      await tester.enterText(find.byType(TextField), 'https://sub.example');
-      await tester.tap(find.byIcon(Icons.add_rounded));
-      await tester.pump();
-
-      expect(submitted, ['https://sub.example']);
-      expect(
-        tester.widget<TextField>(find.byType(TextField)).controller!.text,
-        isEmpty,
-      );
-    });
-
-    testWidgets('пустой ввод игнорируется', (tester) async {
-      final submitted = <String>[];
-      await _pump(
-        tester,
-        AddSubscriptionField(onSubmit: submitted.add),
-      );
-
-      await tester.enterText(find.byType(TextField), '   ');
-      await tester.tap(find.byIcon(Icons.add_rounded));
-      await tester.pump();
-
-      expect(submitted, isEmpty);
-    });
-  });
 }

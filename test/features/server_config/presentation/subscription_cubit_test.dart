@@ -13,6 +13,8 @@ import 'package:vpn_osin/features/server_config/domain/usecases/remove_subscript
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 
+import '../../../helpers/fake_clipboard_source.dart';
+
 class MockSubscriptionRepository extends Mock
     implements SubscriptionRepository {}
 
@@ -52,6 +54,7 @@ void main() {
   late MockAddSubscription addSubscription;
   late MockRefreshSubscription refreshSubscription;
   late MockRemoveSubscription removeSubscription;
+  late FakeClipboardSource clipboard;
   late StreamController<List<Subscription>> controller;
 
   setUp(() {
@@ -59,6 +62,7 @@ void main() {
     addSubscription = MockAddSubscription();
     refreshSubscription = MockRefreshSubscription();
     removeSubscription = MockRemoveSubscription();
+    clipboard = FakeClipboardSource();
     controller = StreamController<List<Subscription>>.broadcast();
     when(repository.watchAll).thenAnswer((_) => controller.stream);
   });
@@ -72,6 +76,7 @@ void main() {
         addSubscription: addSubscription,
         refreshSubscription: refreshSubscription,
         removeSubscription: removeSubscription,
+        clipboard: clipboard,
         now: () => _now,
       );
 
@@ -84,6 +89,37 @@ void main() {
         SubscriptionState(subscriptions: [_sub(id: 1), _sub(id: 2)]),
       ],
     );
+  });
+
+  group('addFromClipboard', () {
+    test('читает буфер и зовёт add', () async {
+      clipboard.textToReturn = 'https://sub.example/link';
+      when(() => addSubscription('https://sub.example/link')).thenAnswer(
+        (_) async => AddSubscriptionResult(
+          subscription: _sub(id: 1),
+          imported: 1,
+          skipped: 0,
+          format: SubscriptionFormat.uriList,
+        ),
+      );
+      final cubit = build();
+
+      await cubit.addFromClipboard();
+
+      verify(() => addSubscription('https://sub.example/link')).called(1);
+      await cubit.close();
+    });
+
+    test('пустой буфер → SubError, add не зовётся', () async {
+      clipboard.textToReturn = '   ';
+      final cubit = build();
+
+      await cubit.addFromClipboard();
+
+      expect(cubit.state.notice, const SubError('Буфер обмена пуст'));
+      verifyNever(() => addSubscription(any()));
+      await cubit.close();
+    });
   });
 
   group('add', () {

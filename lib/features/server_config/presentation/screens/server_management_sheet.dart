@@ -15,7 +15,6 @@ import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_s
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/subscription_grouping.dart';
-import 'package:vpn_osin/features/server_config/presentation/widgets/add_subscription_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/proxy_error_text.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
@@ -168,18 +167,50 @@ class _ServerManagementSheetState extends State<ServerManagementSheet>
                               ),
                             ),
                             const SizedBox(height: 16),
-                            AddSubscriptionField(
-                              busy: subState.adding,
-                              onSubmit: (url) =>
-                                  context.read<SubscriptionCubit>().add(url),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: FilledButton.tonalIcon(
+                                    onPressed: () => context
+                                        .read<ServerListCubit>()
+                                        .addFromClipboard(),
+                                    icon: const Icon(
+                                      Icons.content_paste_rounded,
+                                    ),
+                                    label: const Text('Сервер'),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: FilledButton.tonalIcon(
+                                    onPressed: subState.adding
+                                        ? null
+                                        : () => context
+                                              .read<SubscriptionCubit>()
+                                              .addFromClipboard(),
+                                    icon: subState.adding
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.content_paste_rounded,
+                                          ),
+                                    label: const Text('Подписка'),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 12),
-                            FilledButton.tonalIcon(
-                              onPressed: () => context
-                                  .read<ServerListCubit>()
-                                  .addFromClipboard(),
-                              icon: const Icon(Icons.content_paste_rounded),
-                              label: const Text('Вставить из буфера'),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Вставить из буфера обмена',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: tones.textSecondary,
+                              ),
                             ),
                             const SizedBox(height: 20),
                             Flexible(

@@ -16,7 +16,6 @@ import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_c
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/screens/server_management_sheet.dart';
-import 'package:vpn_osin/features/server_config/presentation/widgets/add_subscription_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/empty_server_paste_field.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/server_list_tile.dart';
 import 'package:vpn_osin/features/server_config/presentation/widgets/subscription_card.dart';
@@ -193,13 +192,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       verify(() => repository.add(any(), any())).called(1);
-      expect(
-        find.descendant(
-          of: find.byType(AddSubscriptionField),
-          matching: find.byType(TextField),
-        ),
-        findsOneWidget,
-      );
+      expect(find.text('Подписка'), findsOneWidget);
 
       await tester.pump(const Duration(seconds: 2));
     });
@@ -222,7 +215,7 @@ void main() {
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      await tester.tap(find.text('Вставить из буфера'));
+      await tester.tap(find.text('Сервер'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
@@ -249,7 +242,7 @@ void main() {
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      await tester.tap(find.text('Вставить из буфера'));
+      await tester.tap(find.text('Сервер'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
@@ -291,7 +284,7 @@ void main() {
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      await tester.tap(find.text('Вставить из буфера'));
+      await tester.tap(find.text('Сервер'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
@@ -450,28 +443,17 @@ void main() {
       expect(find.text('Tokyo'), findsOneWidget);
     });
 
-    testWidgets('ввод URL и submit зовёт SubscriptionCubit.add', (
+    testWidgets('тап «Подписка» зовёт SubscriptionCubit.addFromClipboard', (
       tester,
     ) async {
+      when(() => subscriptionCubit.addFromClipboard()).thenAnswer((_) async {});
       cubit = makeCubit();
       await pumpSheet(tester);
 
-      await tester.enterText(
-        find.descendant(
-          of: find.byType(AddSubscriptionField),
-          matching: find.byType(TextField),
-        ),
-        'https://sub.example/link',
-      );
-      await tester.tap(
-        find.descendant(
-          of: find.byType(AddSubscriptionField),
-          matching: find.byIcon(Icons.add_rounded),
-        ),
-      );
+      await tester.tap(find.text('Подписка'));
       await tester.pump();
 
-      verify(() => subscriptionCubit.add('https://sub.example/link')).called(1);
+      verify(() => subscriptionCubit.addFromClipboard()).called(1);
     });
 
     testWidgets('SubImported показывает алерт с числами импортировано/пропущено',

@@ -493,7 +493,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Серверы'), findsOneWidget);
-    expect(find.text('Вставить из буфера'), findsOneWidget);
+    expect(find.text('Сервер'), findsOneWidget);
+    expect(find.text('Подписка'), findsOneWidget);
   });
 
   testWidgets('ирис в disconnected запускает подключение как Connect', (

@@ -76,6 +76,7 @@ class _OsinAppState extends State<OsinApp> {
                   addSubscription: widget.dependencies.addSubscription,
                   refreshSubscription: widget.dependencies.refreshSubscription,
                   removeSubscription: widget.dependencies.removeSubscription,
+                  clipboard: widget.dependencies.clipboardSource,
                 );
                 unawaited(cubit.refreshStaleOnOpen());
                 return cubit;

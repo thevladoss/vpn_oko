@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vpn_osin/core/error/failures.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/subscription.dart';
 import 'package:vpn_osin/features/server_config/domain/entities/subscription_import.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/subscription_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/usecases/add_subscription.dart';
 import 'package:vpn_osin/features/server_config/domain/usecases/refresh_subscription.dart';
@@ -16,6 +17,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     required this.addSubscription,
     required this.refreshSubscription,
     required this.removeSubscription,
+    required this.clipboard,
     DateTime Function()? now,
   })  : _now = now ?? DateTime.now,
         super(const SubscriptionState()) {
@@ -26,10 +28,26 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   final AddSubscription addSubscription;
   final RefreshSubscription refreshSubscription;
   final RemoveSubscription removeSubscription;
+  final ClipboardSource clipboard;
   final DateTime Function() _now;
 
   late final StreamSubscription<List<Subscription>> _subscription;
   final Completer<void> _firstLoad = Completer<void>();
+
+  Future<void> addFromClipboard() async {
+    final String? raw;
+    try {
+      raw = await clipboard.readText();
+    } on Object {
+      _emitNotice(const SubError('Буфер обмена пуст'));
+      return;
+    }
+    if (raw == null || raw.trim().isEmpty) {
+      _emitNotice(const SubError('Буфер обмена пуст'));
+      return;
+    }
+    await add(raw.trim());
+  }
 
   Future<void> add(String url) async {
     emit(state.copyWith(adding: true, clearNotice: true));
