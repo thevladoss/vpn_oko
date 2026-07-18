@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:vpn_osin/features/vpn_connection/domain/entities/demo_limit.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/traffic_stats.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/entities/vpn_state.dart';
@@ -44,19 +43,6 @@ class ConfigSelected extends VpnConnectionEvent {
 
 class ConfigCleared extends VpnConnectionEvent {
   const ConfigCleared();
-}
-
-class VpnDemoLimitReceived extends VpnConnectionEvent {
-  const VpnDemoLimitReceived(this.demo);
-
-  final DemoExpiry demo;
-
-  @override
-  List<Object?> get props => [demo];
-}
-
-class VpnCooldownElapsed extends VpnConnectionEvent {
-  const VpnCooldownElapsed();
 }
 
 class ConnectRequested extends VpnConnectionEvent {

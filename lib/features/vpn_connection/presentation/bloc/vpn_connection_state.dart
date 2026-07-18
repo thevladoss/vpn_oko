@@ -8,9 +8,6 @@ class VpnConnectionState extends Equatable {
     this.rxBytes = 0,
     this.txBytes = 0,
     this.errorMessage,
-    this.sessionEndsAt,
-    this.cooldownUntil,
-    this.demoExpired = false,
     this.noServerNudge = 0,
   });
 
@@ -19,15 +16,10 @@ class VpnConnectionState extends Equatable {
   final int rxBytes;
   final int txBytes;
   final String? errorMessage;
-  final DateTime? sessionEndsAt;
-  final DateTime? cooldownUntil;
-  final bool demoExpired;
   final int noServerNudge;
 
   bool get isBusy =>
       status == VpnStatus.connecting || status == VpnStatus.disconnecting;
-
-  bool get cooldownActive => cooldownUntil != null;
 
   VpnConnectionState copyWith({
     VpnStatus? status,
@@ -37,11 +29,6 @@ class VpnConnectionState extends Equatable {
     int? txBytes,
     String? errorMessage,
     bool clearError = false,
-    DateTime? sessionEndsAt,
-    bool clearSessionEndsAt = false,
-    DateTime? cooldownUntil,
-    bool clearCooldown = false,
-    bool? demoExpired,
     int? noServerNudge,
   }) {
     return VpnConnectionState(
@@ -51,11 +38,6 @@ class VpnConnectionState extends Equatable {
       rxBytes: rxBytes ?? this.rxBytes,
       txBytes: txBytes ?? this.txBytes,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      sessionEndsAt:
-          clearSessionEndsAt ? null : (sessionEndsAt ?? this.sessionEndsAt),
-      cooldownUntil:
-          clearCooldown ? null : (cooldownUntil ?? this.cooldownUntil),
-      demoExpired: demoExpired ?? this.demoExpired,
       noServerNudge: noServerNudge ?? this.noServerNudge,
     );
   }
@@ -67,9 +49,6 @@ class VpnConnectionState extends Equatable {
         rxBytes,
         txBytes,
         errorMessage,
-        sessionEndsAt,
-        cooldownUntil,
-        demoExpired,
         noServerNudge,
       ];
 }
