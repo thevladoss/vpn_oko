@@ -2,14 +2,11 @@ import NetworkExtension
 
 final class VpnStatusObserver {
   private let listener: VpnEventListener
-  private let store: DemoCooldownStore
   private var token: NSObjectProtocol?
-  private var lastReported: NEVPNStatus?
   var onStatus: ((NEVPNStatus) -> Void)?
 
-  init(listener: VpnEventListener = .shared, store: DemoCooldownStore = .shared()) {
+  init(listener: VpnEventListener = .shared) {
     self.listener = listener
-    self.store = store
   }
 
   func attach(_ connection: NEVPNConnection, emitInitial: Bool = false) {
@@ -39,29 +36,11 @@ final class VpnStatusObserver {
     case .disconnecting:
       listener.emit(StatusChangedMessage(status: .disconnecting))
     case .disconnected:
-      reportDisconnected()
+      listener.emit(StatusChangedMessage(status: .disconnected))
     case .invalid:
       listener.emit(StatusChangedMessage(status: .error))
     @unknown default:
       listener.emit(StatusChangedMessage(status: .disconnected))
-    }
-    lastReported = connection.status
-  }
-
-  private func reportDisconnected() {
-    let now = Int64(Date().timeIntervalSince1970 * 1000)
-    if wasActive(lastReported), let until = store.cooldownUntil(now) {
-      listener.emit(DemoExpiredMessage(cooldownUntilEpochMs: until))
-    }
-    listener.emit(StatusChangedMessage(status: .disconnected))
-  }
-
-  private func wasActive(_ status: NEVPNStatus?) -> Bool {
-    switch status {
-    case .some(.connected), .some(.connecting), .some(.reasserting), .some(.disconnecting):
-      return true
-    default:
-      return false
     }
   }
 

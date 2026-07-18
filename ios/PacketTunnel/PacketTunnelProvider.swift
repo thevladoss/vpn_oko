@@ -7,8 +7,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
   private static let setupLock = NSLock()
 
   private let workQueue = DispatchQueue(label: "osin.tunnel")
-  private let demoStore = DemoCooldownStore.shared()
-  private let demoTimer = DemoLimitTimer()
   private var commandServer: LibboxCommandServer?
   private var platform: OsinPlatformInterface?
   private var appliedSettings: NEPacketTunnelNetworkSettings?
@@ -18,10 +16,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
     options: [String: NSObject]?,
     completionHandler: @escaping (Error?) -> Void
   ) {
-    if demoStore.cooldownUntil(nowMillis()) != nil {
-      completionHandler(makeError("cooldown_active: демо-лимит на кулдауне"))
-      return
-    }
     if #available(iOS 14.0, *) {
       Logger(subsystem: "com.example.vpnOsin.PacketTunnel", category: "core")
         .log("libbox core \(LibboxVersion(), privacy: .public)")
@@ -73,10 +67,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
     commandServer = server
     platform = platformInterface
     coreActive = true
-    demoStore.recordSessionEnd(nowMillis() + DemoLimit.sessionMs)
-    demoTimer.schedule(afterMs: DemoLimit.sessionMs) { [weak self] in
-      self?.expireSession()
-    }
     completionHandler(nil)
   }
 
@@ -124,9 +114,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
         completionHandler()
         return
       }
-      if self.coreActive, let endsAt = self.demoStore.sessionEndsAt(), self.nowMillis() >= endsAt {
-        self.demoStore.recordExpiry(self.nowMillis())
-      }
       self.teardown { completionHandler() }
     }
   }
@@ -142,16 +129,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
     workQueue.async { [weak self] in
       guard let self else { return }
       self.commandServer?.wake()
-      if self.coreActive, let endsAt = self.demoStore.sessionEndsAt(), self.nowMillis() >= endsAt {
-        self.expireSession()
-      }
-    }
-  }
-
-  private func expireSession() {
-    demoStore.recordExpiry(nowMillis())
-    teardown { [weak self] in
-      self?.cancelTunnelWithError(nil)
     }
   }
 
@@ -161,7 +138,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
         completion()
         return
       }
-      self.demoTimer.cancel()
       if self.coreActive {
         self.coreActive = false
         let server = self.commandServer
@@ -190,9 +166,5 @@ final class PacketTunnelProvider: NEPacketTunnelProvider, TunnelHost {
 
   private func makeError(_ message: String) -> NSError {
     NSError(domain: "com.example.vpnOsin.PacketTunnel", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
-  }
-
-  private func nowMillis() -> Int64 {
-    Int64(Date().timeIntervalSince1970 * 1000)
   }
 }
