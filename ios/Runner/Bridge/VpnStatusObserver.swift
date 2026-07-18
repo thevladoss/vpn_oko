@@ -51,7 +51,6 @@ final class VpnStatusObserver {
   private func reportDisconnected() {
     let now = Int64(Date().timeIntervalSince1970 * 1000)
     if wasActive(lastReported), let until = store.cooldownUntil(now) {
-      listener.emit(LogMessage(text: "demo limit reached", timestampMillis: now, level: "info"))
       listener.emit(DemoExpiredMessage(cooldownUntilEpochMs: until))
     }
     listener.emit(StatusChangedMessage(status: .disconnected))

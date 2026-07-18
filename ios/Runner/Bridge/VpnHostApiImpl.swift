@@ -37,23 +37,14 @@ final class VpnHostApiImpl: VpnHostApi {
   func startVpn(config: VpnConfigMessage, completion: @escaping (Result<Void, Error>) -> Void) {
     let now = nowMillis()
     if let until = store.cooldownUntil(now) {
-      listener.emit(LogMessage(text: "connect blocked: cooldown", timestampMillis: now, level: "warning"))
       listener.emit(DemoExpiredMessage(cooldownUntilEpochMs: until))
       completion(.success(()))
       return
     }
 
-    listener.emit(LogMessage(text: "starting vpn", timestampMillis: nowMillis(), level: "info"))
     listener.emit(StatusChangedMessage(status: .connecting))
 
     #if targetEnvironment(simulator)
-    listener.emit(
-      LogMessage(
-        text: "Network Extension недоступен в симуляторе",
-        timestampMillis: nowMillis(),
-        level: "warning"
-      )
-    )
     NETunnelProviderManager.loadAllFromPreferences { _, _ in
       self.fail(code: "ne_unavailable", message: "Network Extension недоступен в симуляторе")
     }
@@ -107,7 +98,6 @@ final class VpnHostApiImpl: VpnHostApi {
   }
 
   func stopVpn(completion: @escaping (Result<Void, Error>) -> Void) {
-    listener.emit(LogMessage(text: "stopping vpn", timestampMillis: nowMillis(), level: "info"))
     listener.emit(StatusChangedMessage(status: .disconnecting))
 
     #if targetEnvironment(simulator)
