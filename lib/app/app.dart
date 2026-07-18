@@ -87,7 +87,9 @@ class _OsinAppState extends State<OsinApp> {
               },
             ),
           ],
-          child: const VpnHomeScreen(),
+          child: VpnHomeScreen(
+            resolveConfig: widget.dependencies.resolveActiveVpnConfig,
+          ),
         ),
       ),
     );

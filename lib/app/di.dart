@@ -9,10 +9,12 @@ import 'package:vpn_osin/features/server_config/data/local/encrypted_database.da
 import 'package:vpn_osin/features/server_config/data/local/secret_key_store.dart';
 import 'package:vpn_osin/features/server_config/data/probes/socket_latency_probe.dart';
 import 'package:vpn_osin/features/server_config/data/repositories/drift_server_repository.dart';
+import 'package:vpn_osin/features/server_config/data/repositories/drift_settings_repository.dart';
 import 'package:vpn_osin/features/server_config/data/repositories/drift_subscription_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/clipboard_source.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/latency_probe.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/server_repository.dart';
+import 'package:vpn_osin/features/server_config/domain/repositories/settings_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/repositories/subscription_repository.dart';
 import 'package:vpn_osin/features/server_config/domain/usecases/add_subscription.dart';
 import 'package:vpn_osin/features/server_config/domain/usecases/refresh_subscription.dart';
@@ -22,6 +24,7 @@ import 'package:vpn_osin/features/vpn_connection/data/repositories/vpn_repositor
 import 'package:vpn_osin/features/vpn_connection/domain/repositories/vpn_repository.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/connect_vpn.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/disconnect_vpn.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/sync_status.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_demo_limit.dart';
 import 'package:vpn_osin/features/vpn_connection/domain/usecases/watch_traffic.dart';
@@ -52,6 +55,11 @@ class AppDependencies {
     serverRepository = DriftServerRepository(_database);
     final subscriptionRemote = SubscriptionRemote(_httpClient);
     subscriptionRepository = DriftSubscriptionRepository(_database);
+    settingsRepository = DriftSettingsRepository(_database);
+    resolveActiveVpnConfig = ResolveActiveVpnConfig(
+      settingsRepository,
+      subscriptionRepository,
+    );
     addSubscription =
         AddSubscription(subscriptionRemote, subscriptionRepository);
     refreshSubscription =
@@ -66,6 +74,8 @@ class AppDependencies {
   late final VpnRepository vpnRepository;
   late final ServerRepository serverRepository;
   late final SubscriptionRepository subscriptionRepository;
+  late final SettingsRepository settingsRepository;
+  late final ResolveActiveVpnConfig resolveActiveVpnConfig;
   late final AddSubscription addSubscription;
   late final RefreshSubscription refreshSubscription;
   late final RemoveSubscription removeSubscription;

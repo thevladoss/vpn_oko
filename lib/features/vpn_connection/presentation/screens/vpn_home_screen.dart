@@ -13,7 +13,7 @@ import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_c
 import 'package:vpn_osin/features/server_config/presentation/cubit/server_list_state.dart';
 import 'package:vpn_osin/features/server_config/presentation/cubit/subscription_cubit.dart';
 import 'package:vpn_osin/features/server_config/presentation/screens/server_management_sheet.dart';
-import 'package:vpn_osin/features/vpn_connection/data/mappers/proxy_config_mapper.dart';
+import 'package:vpn_osin/features/vpn_connection/domain/usecases/resolve_active_vpn_config.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_bloc.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_event.dart';
 import 'package:vpn_osin/features/vpn_connection/presentation/bloc/vpn_connection_state.dart';
@@ -42,7 +42,9 @@ ServerProfile? activeServerProfile(ServerListState state) {
 }
 
 class VpnHomeScreen extends StatefulWidget {
-  const VpnHomeScreen({super.key});
+  const VpnHomeScreen({required this.resolveConfig, super.key});
+
+  final ResolveActiveVpnConfig resolveConfig;
 
   @override
   State<VpnHomeScreen> createState() => _VpnHomeScreenState();
@@ -76,11 +78,16 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
       unawaited(_entrance.forward());
     }
     final active = activeServerProfile(context.read<ServerListCubit>().state);
-    if (active != null) {
-      context
-          .read<VpnConnectionBloc>()
-          .add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
+    unawaited(_dispatchActiveConfig(active));
+  }
+
+  Future<void> _dispatchActiveConfig(ServerProfile? active) async {
+    final bloc = context.read<VpnConnectionBloc>();
+    final config = await widget.resolveConfig(active);
+    if (!mounted || bloc.isClosed) {
+      return;
     }
+    bloc.add(config == null ? const ConfigCleared() : ConfigSelected(config));
   }
 
   @override
@@ -143,13 +150,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen>
             return before?.id != after?.id || before?.config != after?.config;
           },
           listener: (context, serverState) {
-            final active = activeServerProfile(serverState);
-            final bloc = context.read<VpnConnectionBloc>();
-            if (active == null) {
-              bloc.add(const ConfigCleared());
-            } else {
-              bloc.add(ConfigSelected(proxyConfigToVpnConfig(active.config)));
-            }
+            unawaited(_dispatchActiveConfig(activeServerProfile(serverState)));
           },
         ),
         BlocListener<VpnConnectionBloc, VpnConnectionState>(
