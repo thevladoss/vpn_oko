@@ -1,6 +1,6 @@
 # osin — нативный VPN на Flutter (Android + iOS)
 
-[![CI](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml/badge.svg)](https://github.com/thevladoss/vpn_oko/actions/workflows/ci.yml)
+[![CI](https://github.com/thevladoss/osin/actions/workflows/ci.yml/badge.svg)](https://github.com/thevladoss/osin/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 osin гонит весь трафик (`0.0.0.0/0` и `::/0`) через ваш прокси-сервер на обеих
